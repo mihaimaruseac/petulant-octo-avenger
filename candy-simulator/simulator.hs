@@ -31,15 +31,12 @@ data Action
   deriving (Eq, Show)
 
 plans :: [[Action]]
-plans = [[Take 1, Wait 1], [Take 2, Wait 2]]
-{-
 plans = concat
   [ [[Take x, Wait x] | x <- [1 .. 30]]
   , [[Take x, Wait x, Take y, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
   , [[Take x, Wait y, Take y, Wait x] | x <- [1 .. 30], y <- [1 .. 30]]
   , [[Take x, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
   ]
--}
 
 data Player a = P
   { g :: a

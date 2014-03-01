@@ -33,9 +33,9 @@ data Action
 plans :: [[Action]]
 plans = concat
   [ [[Take x, Wait x] | x <- [1 .. 30]]
-  , [[Take x, Wait x, Take y, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
-  , [[Take x, Wait y, Take y, Wait x] | x <- [1 .. 30], y <- [1 .. 30]]
-  , [[Take x, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
+  , [[Take x, Wait x, Take y, Wait y] | x <- [1 .. 30], y <- [1 .. 30], x /= y]
+  , [[Take x, Wait y, Take y, Wait x] | x <- [1 .. 30], y <- [1 .. 30], x /= y]
+  , [[Take x, Wait y] | x <- [1 .. 30], y <- [1 .. 30], x /= y]
   ]
 
 data Player a = P

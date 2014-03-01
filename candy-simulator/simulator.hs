@@ -22,6 +22,8 @@ gMinAP = 200
 gMaxAP = 250
 -- diabetes factor
 gFactor = 8
+-- number of solutions to get
+gNumSol = 5
 
 data Action
   = Wait Int
@@ -42,8 +44,8 @@ data Player a = P
 instance Show (Player a) where
   show P{..} = concat [ show plan, " ", show tripControl, " ", show tonsTaken, " ", show apsGained]
 
-makeAgent :: RandomGen g => g -> [Action] -> Int -> Player g
-makeAgent g p tc = P g p 0 tc gInitialTime 0 0 0
+makeAgent :: RandomGen g => Int -> [Action] -> g -> Player g
+makeAgent tc p g = P g p 0 tc gInitialTime 0 0 0
 
 stepAgent :: RandomGen g => State (Player g) ()
 stepAgent = do
@@ -74,3 +76,41 @@ generateAPs tc sg cd g = (appt * cd - gFactor * s, g')
   where
     (appt, g') = randomR (gMinAP, gMaxAP) g
     s = sum [sg .. sg + cd - 1]
+
+plans :: [[Action]]
+plans = [[Take 1, Wait 1], [Take 2, Wait 2]]
+{-
+plans = concat
+  [ [[Take x, Wait x] | x <- [1 .. 30]]
+  , [[Take x, Wait x, Take y, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
+  , [[Take x, Wait y, Take y, Wait x] | x <- [1 .. 30], y <- [1 .. 30]]
+  , [[Take x, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
+  ]
+-}
+
+evalPlans :: RandomGen g => g -> Int -> [Player g]
+evalPlans g tc = map (execState stepAgent) $ zipWith (makeAgent tc) plans gs
+  where
+    gs = map (splitn (level g) pbits) [0 .. fiPlan plans - 1]
+    pbits = ceiling (log (fiPlan plans) / log 2)
+    fiPlan p = fromIntegral . length $ p
+
+topKAPTPlans, topKAPHPlans :: RandomGen g => [Player g] -> [Player g]
+topKAPHPlans = topKPlans apsPerHour gNumSol
+topKAPTPlans = topKPlans apsPerTon gNumSol
+
+topKPlans :: RandomGen g => (Player g -> Player g -> Ordering) -> Int -> [Player g] -> [Player g]
+topKPlans cmp k plans = take k . sortBy cmp $ plans
+
+apsPerTon, apsPerHour :: RandomGen g => (Player g -> Player g -> Ordering)
+apsPerTon p1 p2 = getAPPerTon p1 `compare` getAPPerTon p2
+apsPerHour p1 p2 = getAPPerHour p1 `compare` getAPPerHour p2
+
+getAPPerTon, getAPPerHour :: (RandomGen g) => Player g -> Double
+getAPPerTon P{..} = fromIntegral apsGained / fromIntegral tonsTaken
+getAPPerHour P{..} = fromIntegral apsGained / fromIntegral gInitialTime
+
+getSolutionForTC :: RandomGen g => g -> Int -> ([Player g], [Player g])
+getSolutionForTC g tc = (topKAPTPlans evaled, topKAPHPlans evaled)
+  where
+    evaled = evalPlans g tc

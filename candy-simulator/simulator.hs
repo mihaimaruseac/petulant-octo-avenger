@@ -23,7 +23,7 @@ gMaxAP = 250
 -- diabetes factor
 gFactor = 8
 -- number of solutions to get
-gNumSol = 5
+gNumSol = 50
 
 data Action
   = Wait Int

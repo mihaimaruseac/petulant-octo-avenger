@@ -120,11 +120,12 @@ generateSolution tc = do
   t <- mkSeedUnix
   putStrLn $ "Generating solutions for TC=" ++ show tc
   let (bestAPT, bestAPH) = getSolutionForTC (seedTFGen t) tc
-  putStrLn $ "Done"
-  putStrLn $ "Best solution in terms of AP/t:"
+  putStrLn "Best solution in terms of AP/t:"
   print bestAPT
-  putStrLn $ "Best solution in terms of AP/h:"
+  putStrLn ""
+  putStrLn "Best solution in terms of AP/h:"
   print bestAPH
+  putStrLn "==================\n"
 
 main :: IO ()
 main = mapM_ generateSolution [0..5]

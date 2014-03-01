@@ -55,7 +55,7 @@ data Player a = P
 instance Show (Player a) where
   show P{..} = concat [ show plan, " ", show tripControl, " ", show tonsTaken, " ", show apsGained]
 
-makeAgent :: RandomGen g => Int -> [Action] -> g -> Player g
+makeAgent :: Int -> [Action] -> g -> Player g
 makeAgent tc p g = P g p 0 tc gInitialTime 0 0 0
 
 stepAgent :: RandomGen g => State (Player g) ()
@@ -95,18 +95,18 @@ evalPlans g tc = map (execState stepAgent) $ zipWith (makeAgent tc) plans gs
     pbits = ceiling (log (fiPlan plans) / log 2)
     fiPlan p = fromIntegral . length $ p
 
-topKAPTPlans, topKAPHPlans :: RandomGen g => [Player g] -> [Player g]
+topKAPTPlans, topKAPHPlans :: [Player g] -> [Player g]
 topKAPHPlans = topKPlans apsPerHour gNumSol
 topKAPTPlans = topKPlans apsPerTon gNumSol
 
-topKPlans :: RandomGen g => (Player g -> Player g -> Ordering) -> Int -> [Player g] -> [Player g]
+topKPlans :: (Player g -> Player g -> Ordering) -> Int -> [Player g] -> [Player g]
 topKPlans cmp k plans = take k . sortBy cmp $ plans
 
-apsPerTon, apsPerHour :: RandomGen g => (Player g -> Player g -> Ordering)
+apsPerTon, apsPerHour :: (Player g -> Player g -> Ordering)
 apsPerTon p1 p2 = getAPPerTon p1 `compare` getAPPerTon p2
 apsPerHour p1 p2 = getAPPerHour p1 `compare` getAPPerHour p2
 
-getAPPerTon, getAPPerHour :: (RandomGen g) => Player g -> Double
+getAPPerTon, getAPPerHour :: Player g -> Double
 getAPPerTon P{..} = fromIntegral apsGained / fromIntegral tonsTaken
 getAPPerHour P{..} = fromIntegral apsGained / fromIntegral gInitialTime
 

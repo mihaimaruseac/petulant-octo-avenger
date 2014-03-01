@@ -16,7 +16,7 @@ import System.Random.TF.Instances
 import Debug.Trace
 
 -- number of hours of simulation
-gInitialTime = 1000000
+gInitialTime = 100000
 -- min, max AP random gain
 gMinAP = 200
 gMaxAP = 250

@@ -87,7 +87,7 @@ generateAPs :: RandomGen g => Int -> Int -> Int -> g -> (Int, g)
 generateAPs tc sg cd g = (max 0 $ appt * cd - gFactor * s, g')
   where
     (appt, g') = randomR (gMinAP, gMaxAP) g
-    s = sum [sg .. sg + cd - 1]
+    s = sum . map (max 0) . map (\x -> x - tc) $ [sg .. sg + cd - 1]
 
 evalPlans :: RandomGen g => g -> Int -> [Player g]
 evalPlans g tc = map (execState stepAgent) $ zipWith (makeAgent tc) plans gs

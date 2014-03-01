@@ -6,3 +6,4 @@ cabal-dev
 *.chs.h
 .virtualenv
 logs
+cabal.sandbox.config

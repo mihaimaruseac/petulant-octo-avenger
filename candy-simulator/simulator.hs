@@ -107,8 +107,8 @@ topKPlans :: (Player g -> Player g -> Ordering) -> Int -> [Player g] -> [Player 
 topKPlans cmp k plans = take k . sortBy cmp $ plans
 
 apsPerTon, apsPerHour :: (Player g -> Player g -> Ordering)
-apsPerTon p1 p2 = getAPPerTon p1 `compare` getAPPerTon p2
-apsPerHour p1 p2 = getAPPerHour p1 `compare` getAPPerHour p2
+apsPerTon p1 p2 = getAPPerTon p2 `compare` getAPPerTon p1
+apsPerHour p1 p2 = getAPPerHour p2 `compare` getAPPerHour p1
 
 getAPPerTon, getAPPerHour :: Player g -> Double
 getAPPerTon P{..} = fromIntegral apsGained / fromIntegral tonsTaken

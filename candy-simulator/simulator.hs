@@ -114,3 +114,17 @@ getSolutionForTC :: RandomGen g => g -> Int -> ([Player g], [Player g])
 getSolutionForTC g tc = (topKAPTPlans evaled, topKAPHPlans evaled)
   where
     evaled = evalPlans g tc
+
+generateSolution :: Int -> IO ()
+generateSolution tc = do
+  t <- mkSeedUnix
+  putStrLn $ "Generating solutions for TC=" ++ show tc
+  let (bestAPT, bestAPH) = getSolutionForTC (seedTFGen t) tc
+  putStrLn $ "Done"
+  putStrLn $ "Best solution in terms of AP/t:"
+  print bestAPT
+  putStrLn $ "Best solution in terms of AP/h:"
+  print bestAPH
+
+main :: IO ()
+main = mapM_ generateSolution [0..5]

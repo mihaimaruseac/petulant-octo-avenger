@@ -35,7 +35,8 @@ executable candy-simulator
   -- other-modules:       
 
   -- LANGUAGE extensions used by modules in this package.
-  -- other-extensions:    
+  other-extensions:
+    RecordWildCards
 
   -- Other library packages from which modules are imported.
   build-depends:

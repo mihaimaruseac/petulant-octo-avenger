@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 {-
  - Simulate the amount of action points (APs) one gets after consuming several
  - tons (the unit of measure) of candy (popular name for one commodity) in the

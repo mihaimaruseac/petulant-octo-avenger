@@ -31,6 +31,7 @@ data Action
 data Player a = P
   { g :: a
   , plan :: [Action]
+  , planIndex :: Int
   , tripControl :: Int
   , timeLeft :: Int
   , sugarFactor :: Int
@@ -42,18 +43,31 @@ instance Show (Player a) where
   show P{..} = concat [ show plan, " ", show tripControl, " ", show tonsTaken, " ", show apsGained]
 
 makeAgent :: RandomGen g => g -> [Action] -> Int -> Player g
-makeAgent g p tc = P g p tc gInitialTime 0 0 0
+makeAgent g p tc = P g p 0 tc gInitialTime 0 0 0
 
 stepAgent :: RandomGen g => State (Player g) ()
 stepAgent = do
   p <- get
-  if timeLeft p < 0 then return () else doStepAgent
+  if timeLeft p < 0 then return () else (runPlanStep >> stepAgent)
 
-doStepAgent :: RandomGen g => State (Player g) ()
-doStepAgent = do
+runPlanStep :: RandomGen g => State (Player g) ()
+runPlanStep = do
   p@P{..} <- get
-  put $ trace (show timeLeft) $ p {timeLeft = timeLeft - 10000}
-  stepAgent
+  case plan !! planIndex of
+    Wait t -> put $ p
+      { timeLeft = timeLeft - t
+      , planIndex = (planIndex + 1) `mod` (length plan)
+      , sugarFactor = max 0 (sugarFactor - t)
+      }
+    Take t -> do
+      let (ap, g') = generateAPs tripControl sugarFactor t g
+      put $ p
+        { planIndex = (planIndex + 1) `mod` (length plan)
+        , sugarFactor = sugarFactor + t
+        , tonsTaken = tonsTaken + t
+        , apsGained = apsGained + ap
+        , g = g'
+        }
 
 generateAPs :: RandomGen g => Int -> Int -> Int -> g -> (Int, g)
 generateAPs tc sg cd g = (appt * cd - gFactor * s, g')

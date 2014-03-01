@@ -30,6 +30,17 @@ data Action
   | Take Int
   deriving (Eq, Show)
 
+plans :: [[Action]]
+plans = [[Take 1, Wait 1], [Take 2, Wait 2]]
+{-
+plans = concat
+  [ [[Take x, Wait x] | x <- [1 .. 30]]
+  , [[Take x, Wait x, Take y, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
+  , [[Take x, Wait y, Take y, Wait x] | x <- [1 .. 30], y <- [1 .. 30]]
+  , [[Take x, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
+  ]
+-}
+
 data Player a = P
   { g :: a
   , plan :: [Action]
@@ -76,17 +87,6 @@ generateAPs tc sg cd g = (appt * cd - gFactor * s, g')
   where
     (appt, g') = randomR (gMinAP, gMaxAP) g
     s = sum [sg .. sg + cd - 1]
-
-plans :: [[Action]]
-plans = [[Take 1, Wait 1], [Take 2, Wait 2]]
-{-
-plans = concat
-  [ [[Take x, Wait x] | x <- [1 .. 30]]
-  , [[Take x, Wait x, Take y, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
-  , [[Take x, Wait y, Take y, Wait x] | x <- [1 .. 30], y <- [1 .. 30]]
-  , [[Take x, Wait y] | x <- [1 .. 30], y <- [1 .. 30]]
-  ]
--}
 
 evalPlans :: RandomGen g => g -> Int -> [Player g]
 evalPlans g tc = map (execState stepAgent) $ zipWith (makeAgent tc) plans gs

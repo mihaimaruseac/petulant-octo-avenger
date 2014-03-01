@@ -79,7 +79,7 @@ runPlanStep = do
         { planIndex = (planIndex + 1) `mod` (length plan)
         , sugarFactor = sugarFactor + t
         , tonsTaken = tonsTaken + t
-        , apsGained = apsGained + ap
+        , apsGained = apsGained + ap - 10
         , g = g'
         }
 

@@ -40,6 +40,7 @@ executable candy-simulator
   -- Other library packages from which modules are imported.
   build-depends:
     base >=4.6 && <4.7,
+    mtl >= 2.1 && <2.2,
     tf-random >=0.1 && <0.2
 
   -- Directories containing source files.

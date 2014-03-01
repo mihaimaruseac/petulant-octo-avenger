@@ -87,7 +87,7 @@ runPlanStep = do
         }
 
 generateAPs :: RandomGen g => Int -> Int -> Int -> g -> (Int, g)
-generateAPs tc sg cd g = (appt * cd - gFactor * s, g')
+generateAPs tc sg cd g = (max 0 $ appt * cd - gFactor * s, g')
   where
     (appt, g') = randomR (gMinAP, gMaxAP) g
     s = sum [sg .. sg + cd - 1]

@@ -7,17 +7,56 @@
  - his blood and the value of trip-control/meditation skill (TC).
  -}
 
+import Control.Monad.State
+import Data.List
 import System.Random.TF
 import System.Random.TF.Gen
 import System.Random.TF.Instances
 
-type TripControl = Int
-type SugarInSystem = Int
-type Candy = Int
-type AP = Int
+import Debug.Trace
 
-generateAPs :: RandomGen g => TripControl -> SugarInSystem -> Candy -> g -> (AP, g)
-generateAPs tc sg cd g = (appt * cd - 8 * s, g')
+-- number of hours of simulation
+gInitialTime = 10000
+-- min, max AP random gain
+gMinAP = 200
+gMaxAP = 250
+-- diabetes factor
+gFactor = 8
+
+data Action
+  = Wait Int
+  | Take Int
+  deriving (Eq, Show)
+
+data Player a = P
+  { g :: a
+  , plan :: [Action]
+  , tripControl :: Int
+  , timeLeft :: Int
+  , sugarFactor :: Int
+  , tonsTaken :: Int
+  , apsGained :: Int
+  }
+
+instance Show (Player a) where
+  show P{..} = concat [ show plan, " ", show tripControl, " ", show tonsTaken, " ", show apsGained]
+
+makeAgent :: RandomGen g => g -> [Action] -> Int -> Player g
+makeAgent g p tc = P g p tc gInitialTime 0 0 0
+
+stepAgent :: RandomGen g => State (Player g) ()
+stepAgent = do
+  p <- get
+  if timeLeft p < 0 then return () else doStepAgent
+
+doStepAgent :: RandomGen g => State (Player g) ()
+doStepAgent = do
+  p@P{..} <- get
+  put $ trace (show timeLeft) $ p {timeLeft = timeLeft - 10000}
+  stepAgent
+
+generateAPs :: RandomGen g => Int -> Int -> Int -> g -> (Int, g)
+generateAPs tc sg cd g = (appt * cd - gFactor * s, g')
   where
-    (appt, g') = randomR (200, 250) g
+    (appt, g') = randomR (gMinAP, gMaxAP) g
     s = sum [sg .. sg + cd - 1]

@@ -50,7 +50,14 @@ data Player a = P
   }
 
 instance Show (Player a) where
-  show P{..} = concat [ show plan, " ", show tripControl, " ", show tonsTaken, " ", show apsGained]
+  show P{..} = intercalate " "
+    [ show plan
+    , "TC: " ++ show tripControl
+    , "tons: " ++ show tonsTaken
+    , "APs: " ++ show apsGained
+    , "AP/t: " ++ (show $ fromIntegral apsGained / fromIntegral tonsTaken)
+    , "AP/h: " ++ (show $ fromIntegral apsGained / fromIntegral gInitialTime)
+    ] ++ "\n"
 
 makeAgent :: Int -> [Action] -> g -> Player g
 makeAgent tc p g = P g p 0 tc gInitialTime 0 0 0

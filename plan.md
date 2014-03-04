@@ -1,5 +1,8 @@
 # Plans for this project
 
+1. Stats
+2. Others
+
 * candies
 * personal stats
 * factions stats

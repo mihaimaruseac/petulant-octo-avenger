@@ -1,9 +1,7 @@
 # Plans for this project
 
 1. Stats
-2. Others
 
-* candies
 * personal stats
 * factions stats
 * monsters kills stats
@@ -15,3 +13,7 @@
 * alliance members stats
 * ships stats
 * buildings stats
+
+2. Others
+
+* candies

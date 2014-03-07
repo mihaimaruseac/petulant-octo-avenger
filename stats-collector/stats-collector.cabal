@@ -1,4 +1,4 @@
-name:                candy-simulator
+name:                stats-collector
 
 -- The package version.  See the Haskell package versioning policy (PVP) 
 -- for standards guiding when and how versions should be incremented.
@@ -27,7 +27,7 @@ extra-source-files:
 
 cabal-version:       >=1.10
 
-executable candy-simulator
+executable stats-collector
   -- .hs or .lhs file containing the Main module.
   main-is:           stats.hs
 

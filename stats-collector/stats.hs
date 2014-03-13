@@ -3,4 +3,6 @@
  -}
 import Network.HTTP.Conduit
 
-main = simpleHttp "http://artemis.pardus.at/statistics.php?display=onlinelist" >>= print
+main = do
+  x <- simpleHttp "http://artemis.pardus.at/statistics.php?display=onlinelist"
+  print x

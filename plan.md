@@ -1,6 +1,6 @@
 # Plans for this project
 
-1. Stats
+## 1. Stats
 
 * personal stats
 * factions stats
@@ -14,6 +14,6 @@
 * ships stats
 * buildings stats
 
-2. Others
+## 2. Others
 
 * candies

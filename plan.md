@@ -17,3 +17,7 @@
 ## 2. Others
 
 * candies
+
+# Hypotheses
+
+* tcpdump/libpcap + zlib and intercept traffic

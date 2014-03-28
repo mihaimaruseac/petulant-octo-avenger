@@ -40,7 +40,9 @@ executable stats-collector
 
   -- Other library packages from which modules are imported.
   build-depends:
-    base >=4.6 && <4.7
+    base >=4.6 && <4.7,
+    pcap >=0.4 && <0.5,
+    zlib >= 0.5 && <0.6
 
   -- Directories containing source files.
   -- hs-source-dirs:      

@@ -2,22 +2,22 @@
 
 ## 1. Stats
 
-- [ ] personal stats
-- [ ] factions stats
-- [ ] monsters kills stats
-- [ ] pilots kills stats
-- [ ] alliances stats
-- [ ] top20 stats
-- [ ] respected factions stats
-- [ ] despised factions stats
-- [ ] alliance members stats
-- [ ] ships stats
-- [ ] buildings stats
+* personal stats
+* factions stats
+* monsters kills stats
+* pilots kills stats
+* alliances stats
+* top20 stats
+* respected factions stats
+* despised factions stats
+* alliance members stats
+* ships stats
+* buildings stats
 
 ## 2. Others
 
-- [ ] candies
+* candies
 
 # Hypotheses
 
-- [ ] tcpdump/libpcap + zlib and intercept traffic
+* tcpdump/libpcap + zlib and intercept traffic

@@ -2,7 +2,7 @@
 
 ## 1. Stats
 
-* personal stats
+* :ballot_box_with_check: personal stats
 * factions stats
 * monsters kills stats
 * pilots kills stats

@@ -2,9 +2,9 @@
 
 ## 1. Stats
 
-- :ballot_box_without_check: personal stats
-- :ballot_box_with_check: factions stats
-- :ballot_box_with_check: monsters kills stats
+- :white_check_mark: personal stats
+- :negative_squared_cross_mark: factions stats
+- :white_medium_square: monsters kills stats
 - :ballot_box_with_check: pilots kills stats
 - :ballot_box_with_check: alliances stats
 - :ballot_box_with_check: top20 stats

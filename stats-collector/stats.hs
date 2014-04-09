@@ -4,6 +4,8 @@
 import Network.Pcap
 
 main = do
+  devs <- findAllDevs
+  print devs
   putStrLn "Opening capture device"
   h <- openLive "any" 0 False 0
   pRead <- loopBS h (- 1) cb

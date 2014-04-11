@@ -3,11 +3,13 @@
  -}
 import Network.Pcap
 
+gSnapshotSize = 1000000000
+
 main = do
   devs <- findAllDevs
   print devs
   putStrLn "Opening capture device"
-  h <- openLive "any" 1000000000 False 0
+  h <- openLive "any" gSnapshotSize False 0
   pRead <- loopBS h (- 1) cb
   putStrLn $ "Read " ++ show pRead ++ " packets"
 

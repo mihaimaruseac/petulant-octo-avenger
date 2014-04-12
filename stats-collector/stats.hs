@@ -14,7 +14,9 @@ main = do
   putStrLn $ "Read " ++ show pRead ++ " packets"
 
 cb :: CallbackBS
-cb h bs = do
-  print h
-  print bs
-  return ()
+cb h bs
+  | hdrWireLength h > hdrCaptureLength h = putStrLn $ "Incomplete packet captured" ++ show h
+  | otherwise = do
+    print h
+    print bs
+    return ()

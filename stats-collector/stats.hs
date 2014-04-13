@@ -18,5 +18,5 @@ cb h bs
   | hdrWireLength h > hdrCaptureLength h = putStrLn $ "Incomplete packet captured" ++ show h
   | otherwise = do
     print h
-    print bs
+    --print bs
     return ()

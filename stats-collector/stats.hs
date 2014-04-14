@@ -10,6 +10,7 @@ main = do
   print devs
   putStrLn "Opening capture device"
   h <- openLive "any" gSnapshotSize False 0
+  setFilter h "tcp port 8000" True 0
   pRead <- loopBS h (- 1) cb
   putStrLn $ "Read " ++ show pRead ++ " packets"
 

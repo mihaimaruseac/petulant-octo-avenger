@@ -6,8 +6,6 @@ import Network.Pcap
 gSnapshotSize = 1000000000
 
 main = do
-  devs <- findAllDevs
-  print devs
   putStrLn "Opening capture device"
   h <- openLive "any" gSnapshotSize False 0
   setFilter h "host artemis.pardus.at" True 0

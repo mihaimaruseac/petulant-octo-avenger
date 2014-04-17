@@ -30,6 +30,7 @@ cabal-version:       >=1.10
 executable stats-collector
   -- .hs or .lhs file containing the Main module.
   main-is:           stats.hs
+  ghc-options:      -Wall -O2
 
   -- Modules included in this executable, other than Main.
   -- other-modules:       

@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
 
 {-
  - Extract statistics about the Artemis universe of Pardus.
@@ -27,12 +28,12 @@ buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
 mainCallback :: CallbackBS
-mainCallback header payload
-  | hdrWireLength header > hdrCaptureLength header = incomplete header
-  | otherwise = process header payload
+mainCallback h@PktHdr{..}
+  | hdrWireLength > hdrCaptureLength = incomplete h
+  | otherwise = process h
 
-incomplete :: PktHdr -> IO ()
-incomplete header = putStrLn $ "Incomplete packet captured" ++ show header
+incomplete :: CallbackBS
+incomplete header _ = putStrLn $ "Incomplete packet captured" ++ show header
 
 process :: CallbackBS
 process header payload = do

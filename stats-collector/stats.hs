@@ -19,6 +19,7 @@ main = do
 
 statsOn :: String -> IO ()
 statsOn universe = do
+  putStrLn $ concat ["Capturing on ", universe]
   handle <- openLive "any" gSnapshotSize False 0
   setFilter handle (buildFilter universe) True 0
   pRead <- loopBS handle (- 1) mainCallback

@@ -1,9 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-{-
- - Extract statistics about the Artemis universe of Pardus.
- -}
 import Network.Pcap
 import System.Environment
 

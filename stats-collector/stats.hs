@@ -7,16 +7,20 @@ import System.Environment
 gSnapshotSize :: Int
 gSnapshotSize = 1000000000
 
+gDefaultUniverse :: String
+gDefaultUniverse = "artemis"
+
 main :: IO ()
 main = do
   args <- getArgs
   case args of
-    [] -> statsOn "artemis"
+    [] -> statsOn gDefaultUniverse
     u:_ -> statsOn u
 
 statsOn :: String -> IO ()
 statsOn universe = do
   putStrLn $ concat ["Capturing on ", universe]
+  putStrLn "Press ^C twice to end"
   handle <- openLive "any" gSnapshotSize False 0
   setFilter handle (buildFilter universe) True 0
   pRead <- loopBS handle (- 1) mainCallback

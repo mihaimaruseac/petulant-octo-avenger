@@ -41,7 +41,9 @@ executable stats-collector
 
   -- Other library packages from which modules are imported.
   build-depends:
+    attoparsec >= 0.10 && <0.11,
     base >= 4.6 && <4.7,
+    cereal >= 0.4 && <0.5,
     bytestring >= 0.10 && <0.11,
     pcap >= 0.4 && <0.5,
     zlib >= 0.5 && <0.6

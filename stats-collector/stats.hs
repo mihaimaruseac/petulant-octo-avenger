@@ -1,11 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
+import Data.Bits
+import Data.Serialize
+import Data.Word
 import Network.Pcap
-import Numeric
 import System.Environment
 
 import qualified Data.ByteString as B
+
+import Debug.Trace
 
 gSnapshotSize :: Int
 gSnapshotSize = 1000000000
@@ -39,7 +43,7 @@ buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
 linkHdrLen :: Link -> LinkLength
-linkHdrLen DLT_LINUX_SLL = 12
+linkHdrLen DLT_LINUX_SLL = 16
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
 mainCallback :: LinkLength -> CallbackBS
@@ -51,24 +55,24 @@ incomplete :: CallbackBS
 incomplete header _ = putStrLn $ "Incomplete packet captured" ++ show header
 
 process :: ProcessPacket
-process payload
-  | ipLayer == nextLayer = processIP cnt
-  | otherwise = error $ concat ["Unknown second layer protocol ", show . B.unpack $ nextLayer]
-  where
-    (nextLayer, cnt) = B.splitAt 4 payload
-    ipLayer = B.pack [0, 0, 8, 0]
+process payload = print $ runGetPartial parseIP payload
 
-processIP :: ProcessPacket
-processIP payload = putStrLn . concatMap (flip showHex "") . B.unpack $ payload
-{-
-  | ipVersion == 4 = processTCP $ B.drop ihl  payload
-  | otherwise = error $ concat ["Unknown IP version ", show ipVersion]
-  where
-    ipVersion = B.head payload
-    ihl = fromInteger $ 4 * (toInteger . B.head . B.tail $ payload)
--- -}
+-- http://tools.ietf.org/html/rfc791
+data IP = IP
+  { version :: Version
+  , hlen :: Int
+  } deriving Show
 
-processTCP :: ProcessPacket
-processTCP payload
-  | False = undefined
-  | otherwise = putStrLn . concatMap (flip showHex "") . B.unpack $ payload
+data Version = IPv4 | IPv6 deriving Show
+
+mkVersion :: Word8 -> Version
+mkVersion 4 = IPv4
+mkVersion 6 = IPv6
+mkVersion x = error $ concat ["Unknown IP version ", show x]
+
+parseIP :: Get IP
+parseIP = do
+  vhl <- getWord8
+  let v = mkVersion $ (vhl .&. 0xf0) `shiftR` 4
+  let l = fromInteger . (4 *) . toInteger $ vhl .&. 0x0f
+  return $ IP v l

@@ -1,25 +1,15 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-import Data.Bits
-import Data.Serialize
-import Data.Word
 import Network.Pcap
 import System.Environment
 
 import qualified Data.ByteString as B
 
+import Globals
+import IP
+import Types
+
 import Debug.Trace
-
-gSnapshotSize :: Int
-gSnapshotSize = 1000000000
-
-gDefaultUniverse :: String
-gDefaultUniverse = "artemis"
-
-type LinkLength = Int
-type Payload = B.ByteString
-type ProcessPacket = Payload -> IO ()
 
 main :: IO ()
 main = do
@@ -37,7 +27,7 @@ statsOn universe = do
   putStrLn $ concat ["Capturing on ", universe]
   putStrLn "Press ^C twice to end"
   pRead <- loopBS handle (- 1) $ mainCallback hdrLen
-  putStrLn $ "Read " ++ show pRead ++ " packets"
+  putStrLn $ concat ["Read ", show pRead, " packets"]
 
 buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
@@ -52,27 +42,7 @@ mainCallback hdrLen h@PktHdr{..} payload
   | otherwise = process $ B.drop hdrLen payload
 
 incomplete :: CallbackBS
-incomplete header _ = putStrLn $ "Incomplete packet captured" ++ show header
+incomplete header _ = putStrLn $ concat ["Incomplete packet captured ", show header]
 
 process :: ProcessPacket
-process payload = print $ runGetPartial parseIP payload
-
--- http://tools.ietf.org/html/rfc791
-data IP = IP
-  { version :: Version
-  , hlen :: Int
-  } deriving Show
-
-data Version = IPv4 | IPv6 deriving Show
-
-mkVersion :: Word8 -> Version
-mkVersion 4 = IPv4
-mkVersion 6 = IPv6
-mkVersion x = error $ concat ["Unknown IP version ", show x]
-
-parseIP :: Get IP
-parseIP = do
-  vhl <- getWord8
-  let v = mkVersion $ (vhl .&. 0xf0) `shiftR` 4
-  let l = fromInteger . (4 *) . toInteger $ vhl .&. 0x0f
-  return $ IP v l
+process = skipIP

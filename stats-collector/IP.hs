@@ -1,7 +1,7 @@
 {-
  - Parse IP header conforming to http://tools.ietf.org/html/rfc791
  -}
-module IP (IP(..), parseIP) where
+module IP (IP(..), IPNextProtocol(..), parseIP) where
 
 import Control.Monad
 import Data.Bits
@@ -17,15 +17,15 @@ data IP = IPv4
   , ip4MFFlag :: MF
   , ip4FragOffset :: Word16
   , ip4TTL :: Word8
-  , ip4Proto :: Protocol
+  , ip4Proto :: IPNextProtocol
   , ip4ChkSum :: Word16
   , ip4SrcAddr :: Word32 -- TODO
   , ip4DstAddr :: Word32 -- TODO
   } deriving Show
 
-data DF = MayFragment | DontFragment deriving Show
-data MF = LastFragment | MoreFragments deriving Show
-data Protocol = TCP deriving Show
+data DF = MayFragment | DontFragment deriving (Eq, Show)
+data MF = LastFragment | MoreFragments deriving (Eq, Show)
+data IPNextProtocol = TCP deriving (Eq, Show)
 
 parseIP :: Get IP
 parseIP = do
@@ -58,6 +58,6 @@ parseIPv4 len = do
 parseIPv6 :: Int -> Get IP
 parseIPv6 = error $ "Parsing IPv6 is not implemented yet."
 
-buildProtocol :: Word8 -> Protocol
+buildProtocol :: Word8 -> IPNextProtocol
 buildProtocol 6 = TCP
 buildProtocol x = error $ concat ["IP next protocol ", show x, " unknown."]

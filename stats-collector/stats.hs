@@ -1,5 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
+import Data.Serialize
 import Network.Pcap
 import System.Environment
 
@@ -43,4 +44,9 @@ incomplete :: CallbackBS
 incomplete header _ = putStrLn $ concat ["Incomplete packet captured ", show header]
 
 process :: ProcessPacket
-process = skipIP
+process payload = case runGetPartial parseIP payload of
+  Done _ p -> processTCP p
+  _ -> error "Unhandled parseIP case"
+
+processTCP :: ProcessPacket
+processTCP = print

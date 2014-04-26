@@ -9,8 +9,6 @@ import Globals
 import IP
 import Types
 
-import Debug.Trace
-
 main :: IO ()
 main = do
   args <- getArgs

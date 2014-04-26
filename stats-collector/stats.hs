@@ -32,7 +32,7 @@ buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
 linkHdrLen :: Link -> LinkLength
-linkHdrLen DLT_LINUX_SLL = 16
+linkHdrLen DLT_LINUX_SLL = 16 -- TODO we should check that IP is next layer
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
 mainCallback :: LinkLength -> CallbackBS

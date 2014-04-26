@@ -52,8 +52,11 @@ incomplete header _ = putStrLn $ "Incomplete packet captured" ++ show header
 
 process :: ProcessPacket
 process payload
-  | B.pack [0, 0, 8, 0] == B.take 4 payload = processIP $ B.drop 4 payload
-  | otherwise = error $ concat ["Unknown second layer protocol ", show . B.unpack . B.take 4 $ payload]
+  | ipLayer == nextLayer = processIP cnt
+  | otherwise = error $ concat ["Unknown second layer protocol ", show . B.unpack $ nextLayer]
+  where
+    (nextLayer, cnt) = B.splitAt 4 payload
+    ipLayer = B.pack [0, 0, 8, 0]
 
 processIP :: ProcessPacket
 processIP payload

@@ -59,6 +59,16 @@ process payload
     ipLayer = B.pack [0, 0, 8, 0]
 
 processIP :: ProcessPacket
-processIP payload
+processIP payload = putStrLn . concatMap (flip showHex "") . B.unpack $ payload
+{-
+  | ipVersion == 4 = processTCP $ B.drop ihl  payload
+  | otherwise = error $ concat ["Unknown IP version ", show ipVersion]
+  where
+    ipVersion = B.head payload
+    ihl = fromInteger $ 4 * (toInteger . B.head . B.tail $ payload)
+-- -}
+
+processTCP :: ProcessPacket
+processTCP payload
   | False = undefined
   | otherwise = putStrLn . concatMap (flip showHex "") . B.unpack $ payload

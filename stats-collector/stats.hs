@@ -13,7 +13,9 @@ gSnapshotSize = 1000000000
 gDefaultUniverse :: String
 gDefaultUniverse = "artemis"
 
-type LinkLength = Integer
+type LinkLength = Int
+type Payload = B.ByteString
+type ProcessPacket = Payload -> IO ()
 
 main :: IO ()
 main = do
@@ -41,15 +43,19 @@ linkHdrLen DLT_LINUX_SLL = 12
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
 mainCallback :: LinkLength -> CallbackBS
-mainCallback hdrLen h@PktHdr{..}
-  | hdrWireLength > hdrCaptureLength = incomplete h
-  | otherwise = process hdrLen h
+mainCallback hdrLen h@PktHdr{..} payload
+  | hdrWireLength > hdrCaptureLength = incomplete h payload
+  | otherwise = process $ B.drop hdrLen payload
 
 incomplete :: CallbackBS
 incomplete header _ = putStrLn $ "Incomplete packet captured" ++ show header
 
-process :: LinkLength -> CallbackBS
-process hdrLen header payload = do
-    print header
-    --print payload
-    putStrLn . concatMap (flip showHex "") . B.unpack $ payload
+process :: ProcessPacket
+process payload
+  | B.pack [0, 0, 8, 0] == B.take 4 payload = processIP $ B.drop 4 payload
+  | otherwise = error $ concat ["Unknown second layer protocol ", show . B.unpack . B.take 4 $ payload]
+
+processIP :: ProcessPacket
+processIP payload
+  | False = undefined
+  | otherwise = putStrLn . concatMap (flip showHex "") . B.unpack $ payload

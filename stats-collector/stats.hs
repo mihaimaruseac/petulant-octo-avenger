@@ -45,8 +45,13 @@ incomplete header _ = putStrLn $ concat ["Incomplete packet captured ", show hea
 
 process :: ProcessPacket
 process payload = case runGetPartial parseIP payload of
-  Done IPv4{..} p -> if ip4Proto == TCP then processTCP p else error "Undefined layer 3 proto"
+  Done ip p -> go ip p
   _ -> error "Unhandled parseIP case"
+  where
+    go IPv4{..} p
+      | ip4MFFlag == MoreFragments = error "Unable to handle fragmentation at IP level"
+      | ip4Proto == TCP = processTCP p
+      | otherwise = error "Undefined layer 3 proto"
 
 processTCP :: ProcessPacket
 processTCP = print

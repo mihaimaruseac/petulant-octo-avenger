@@ -1,7 +1,7 @@
 {-
  - Parse IP header conforming to http://tools.ietf.org/html/rfc791
  -}
-module IP (IP(..), IPNextProtocol(..), parseIP) where
+module IP (IP(..), DF(..), MF(..), IPNextProtocol(..), parseIP) where
 
 import Control.Monad
 import Data.Bits

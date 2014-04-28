@@ -25,7 +25,7 @@ data IP = IPv4
 
 data DF = MayFragment | DontFragment deriving (Eq, Show)
 data MF = LastFragment | MoreFragments deriving (Eq, Show)
-data IPNextProtocol = TCP deriving (Eq, Show)
+data IPNextProtocol = IPNextTCP deriving (Eq, Show)
 
 parseIP :: Get IP
 parseIP = do
@@ -59,5 +59,5 @@ parseIPv6 :: Int -> Get IP
 parseIPv6 = error $ "Parsing IPv6 is not implemented yet."
 
 buildProtocol :: Word8 -> IPNextProtocol
-buildProtocol 6 = TCP
+buildProtocol 6 = IPNextTCP
 buildProtocol x = error $ concat ["IP next protocol ", show x, " unknown."]

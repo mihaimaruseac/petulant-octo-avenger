@@ -50,7 +50,7 @@ process payload = case runGetPartial parseIP payload of
   where
     go IPv4{..} p
       | ip4MFFlag == MoreFragments = error "Unable to handle fragmentation at IP level"
-      | ip4Proto == TCP = processTCP p
+      | ip4Proto == IPNextTCP = processTCP p
       | otherwise = error "Undefined layer 3 proto"
 
 processTCP :: ProcessPacket

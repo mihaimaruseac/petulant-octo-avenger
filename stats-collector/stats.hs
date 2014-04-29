@@ -8,6 +8,7 @@ import qualified Data.ByteString as B
 
 import Globals
 import IP
+import TCP
 import Types
 
 main :: IO ()
@@ -54,4 +55,6 @@ process payload = case runGetPartial parseIP payload of
       | otherwise = error "Undefined layer 3 proto"
 
 processTCP :: ProcessPacket
-processTCP = print
+processTCP payload = case runGetPartial parseTCP payload of
+  Done tcp _ -> print tcp
+  _ -> error "Unhandled parseTCP case"

@@ -11,10 +11,14 @@ import Data.Word
 data TCP = TCP
   { tcpSPort :: Word16
   , tcpDPort :: Word16
+  , tcpSeqNr :: Word32
+  , tcpAckNr :: Word32
   } deriving Show
 
 parseTCP :: Get TCP
 parseTCP = do
   sp <- getWord16be
   dp <- getWord16be
-  return $ TCP sp dp
+  sq <- getWord32be
+  ack <- getWord32be
+  return $ TCP sp dp sq ack

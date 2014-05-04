@@ -15,6 +15,9 @@ data TCP = TCP
   , tcpAckNr :: Word32
   , tcpDtOff :: Int
   , tcpFlags :: [TCPFlags]
+  , tcpWindw :: Word16
+  , tcpChkSm :: Word16
+  , tcpUrgPt :: Word16
   } deriving Show
 
 data TCPFlags
@@ -36,7 +39,11 @@ parseTCP = do
   when (fo .&. 0x0fc0 /= 0) $ error "Invalid TCP packet: invalid reserved bits"
   let offset = fromIntegral $ 4 * ((fo .&. 0xf000) `shiftR` 12)
   let flags = getFlags (fo .&. 0x03f)
-  return $ TCP sp dp sq ack offset flags
+  w <- getWord16be
+  ck <- getWord16be
+  urg <- getWord16be
+  skip (offset - 20) -- TODO: parse options
+  return $ TCP sp dp sq ack offset flags w ck urg
 
 getFlags :: Word16 -> [TCPFlags]
 getFlags f = map fst . filter ((/= 0) . snd) . zip [TCPURG .. TCPFIN] . map ($ f) $ fields

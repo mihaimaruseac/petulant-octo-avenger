@@ -39,13 +39,13 @@ linkHdrLen l = error $ concat ["Unknown link header ", show l]
 mainCallback :: LinkLength -> CallbackBS
 mainCallback hdrLen h@PktHdr{..} payload
   | hdrWireLength > hdrCaptureLength = incomplete h payload
-  | otherwise = process $ B.drop hdrLen payload
+  | otherwise = processIP $ B.drop hdrLen payload
 
 incomplete :: CallbackBS
 incomplete header _ = putStrLn $ concat ["Incomplete packet captured ", show header]
 
-process :: ProcessPacket
-process payload = case runGetPartial parseIP payload of
+processIP :: ProcessPacket
+processIP payload = case runGetPartial parseIP payload of
   Done ip p -> go ip p
   _ -> error "Unhandled parseIP case"
   where
@@ -56,5 +56,10 @@ process payload = case runGetPartial parseIP payload of
 
 processTCP :: ProcessPacket
 processTCP payload = case runGetPartial parseTCP payload of
-  Done tcp _ -> print tcp
+  Done tcp p -> process tcp p
   _ -> error "Unhandled parseTCP case"
+
+process :: TCP -> ProcessPacket
+process TCP{..} p = do
+  print (tcpSPort, tcpDPort, tcpFlags)
+  print p

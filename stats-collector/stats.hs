@@ -61,5 +61,5 @@ processTCP payload = case runGetPartial parseTCP payload of
 
 process :: TCP -> ProcessPacket
 process TCP{..} p = do
-  print (tcpSPort, tcpDPort, tcpFlags)
+  print (tcpSPort, tcpDPort, tcpFlags, tcpSeqNr, tcpAckNr)
   print p

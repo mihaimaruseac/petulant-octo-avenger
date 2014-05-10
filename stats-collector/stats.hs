@@ -11,6 +11,13 @@ import IP
 import TCP
 import Types
 
+import Control.Monad
+import Control.Monad.IO.Class
+import Data.Char
+import Control.Applicative
+import Control.Exception
+import Data.Enumerator hiding (map, filter)
+
 main :: IO ()
 main = do
   args <- getArgs
@@ -25,9 +32,8 @@ statsOn universe = do
   link <- datalink handle
   let hdrLen = linkHdrLen link
   putStrLn $ concat ["Capturing on ", universe]
-  putStrLn "Press ^C twice to end"
-  pRead <- loopBS handle (- 1) $ mainCallback hdrLen
-  putStrLn $ concat ["Read ", show pRead, " packets"]
+  putStrLn "Press ^C to end"
+  run_ $ iterateeChain handle
 
 buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
@@ -36,6 +42,27 @@ linkHdrLen :: Link -> LinkLength
 linkHdrLen DLT_LINUX_SLL = 16 -- TODO we should check that IP is next layer
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
+--iterateeChain :: PcapHandle -> Iteratee (PktHdr, B.ByteString) m ()
+iterateeChain h =
+  -- enumerate all packets
+  packetEnumerator h $$
+  -- print everything of value (debugging)
+  printChunks False
+
+packetEnumerator :: MonadIO m => PcapHandle -> Enumerator (PktHdr, B.ByteString) m b
+packetEnumerator h = list
+  where
+    list (Continue k) = do
+      pkt@(hdr, _) <- liftIO $ nextBS h
+      k (Chunks $ if hdrCaptureLength hdr == 0 then [] else [pkt]) >>== list
+    list step = returnI step
+
+{-
+  pRead <- loopBS handle (- 1) $ mainCallback hdrLen
+  putStrLn $ concat ["Read ", show pRead, " packets"]
+  -}
+
+{-
 mainCallback :: LinkLength -> CallbackBS
 mainCallback hdrLen h@PktHdr{..} payload
   | hdrWireLength > hdrCaptureLength = incomplete h payload
@@ -63,3 +90,4 @@ process :: TCP -> ProcessPacket
 process TCP{..} p = do
   print (tcpSPort, tcpDPort, tcpFlags, tcpSeqNr, tcpAckNr)
   print p
+-}

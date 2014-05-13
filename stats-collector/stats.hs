@@ -49,6 +49,8 @@ iterateeChain h hdrLen =
   packetEnumerator h $$
   -- drop cooked frame
   dropCookedFrame hdrLen =$
+  -- process IP layer
+  DEL.map processIP =$
   -- print everything of value (debugging)
   printChunks False
 
@@ -67,12 +69,6 @@ dropCookedFrame hdrLen = DEL.map f
       | hdrWireLength > hdrCaptureLength = error "Incomplete capture"
       | otherwise = B.drop hdrLen payload
 
-{-
-mainCallback :: LinkLength -> CallbackBS
-mainCallback hdrLen h@PktHdr{..} payload
-  | hdrWireLength > hdrCaptureLength = incomplete h payload
-  | otherwise = processIP $ B.drop hdrLen payload
-
 processIP :: ProcessPacket
 processIP payload = case runGetPartial parseIP payload of
   Done ip p -> go ip p
@@ -80,9 +76,10 @@ processIP payload = case runGetPartial parseIP payload of
   where
     go IPv4{..} p
       | ip4MFFlag == MoreFragments = error "Unable to handle fragmentation at IP level"
-      | ip4Proto == IPNextTCP = processTCP p
+      | ip4Proto == IPNextTCP = p --processTCP p
       | otherwise = error "Undefined layer 3 proto"
 
+{-
 processTCP :: ProcessPacket
 processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> process tcp p

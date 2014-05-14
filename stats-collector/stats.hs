@@ -51,6 +51,8 @@ iterateeChain h hdrLen =
   dropCookedFrame hdrLen =$
   -- process IP layer
   DEL.map processIP =$
+  -- process TCP layer
+  DEL.map processTCP =$
   -- print everything of value (debugging)
   printChunks False
 
@@ -79,12 +81,12 @@ processIP payload = case runGetPartial parseIP payload of
       | ip4Proto == IPNextTCP = p --processTCP p
       | otherwise = error "Undefined layer 3 proto"
 
-{-
-processTCP :: ProcessPacket
+processTCP :: Payload -> (TCP, Payload)
 processTCP payload = case runGetPartial parseTCP payload of
-  Done tcp p -> process tcp p
+  Done tcp p -> (tcp, p)
   _ -> error "Unhandled parseTCP case"
 
+{-
 process :: TCP -> ProcessPacket
 process TCP{..} p = do
   print (tcpSPort, tcpDPort, tcpFlags, tcpSeqNr, tcpAckNr)

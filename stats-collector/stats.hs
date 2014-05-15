@@ -1,23 +1,19 @@
 {-# LANGUAGE RecordWildCards #-}
 
+import Control.Monad.IO.Class
 import Data.Serialize
 import Network.Pcap
 import System.Environment
 
+import Data.Enumerator hiding (map, filter)
+
 import qualified Data.ByteString as B
+import qualified Data.Enumerator.List as DEL
 
 import Globals
 import IP
 import TCP
 import Types
-
-import Control.Monad
-import Control.Monad.IO.Class
-import Data.Char
-import Control.Applicative
-import Control.Exception
-import Data.Enumerator hiding (map, filter)
-import qualified Data.Enumerator.List as DEL
 
 main :: IO ()
 main = do
@@ -43,7 +39,7 @@ linkHdrLen :: Link -> LinkLength
 linkHdrLen DLT_LINUX_SLL = 16 -- TODO we should check that IP is next layer
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
---iterateeChain :: PcapHandle -> Iteratee CookedPacket m ()
+iterateeChain :: MonadIO m => PcapHandle -> LinkLength -> Iteratee CookedPacket m ()
 iterateeChain h hdrLen =
   -- enumerate all packets
   packetEnumerator h $$
@@ -67,18 +63,18 @@ packetEnumerator h = list
 dropCookedFrame :: Monad m => LinkLength -> Enumeratee CookedPacket Payload m b
 dropCookedFrame hdrLen = DEL.map f
   where
-    f (h@PktHdr{..}, payload)
+    f (PktHdr{..}, payload)
       | hdrWireLength > hdrCaptureLength = error "Incomplete capture"
       | otherwise = B.drop hdrLen payload
 
-processIP :: ProcessPacket
+processIP :: Payload -> Payload
 processIP payload = case runGetPartial parseIP payload of
   Done ip p -> go ip p
   _ -> error "Unhandled parseIP case"
   where
     go IPv4{..} p
       | ip4MFFlag == MoreFragments = error "Unable to handle fragmentation at IP level"
-      | ip4Proto == IPNextTCP = p --processTCP p
+      | ip4Proto == IPNextTCP = p
       | otherwise = error "Undefined layer 3 proto"
 
 processTCP :: Payload -> (TCP, Payload)
@@ -87,7 +83,7 @@ processTCP payload = case runGetPartial parseTCP payload of
   _ -> error "Unhandled parseTCP case"
 
 {-
-process :: TCP -> ProcessPacket
+process :: TCP -> Payload -> Payload
 process TCP{..} p = do
   print (tcpSPort, tcpDPort, tcpFlags, tcpSeqNr, tcpAckNr)
   print p

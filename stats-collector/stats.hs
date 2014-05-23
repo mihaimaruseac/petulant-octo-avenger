@@ -41,15 +41,10 @@ linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
 iterateeChain :: MonadIO m => PcapHandle -> LinkLength -> Iteratee CookedPacket m ()
 iterateeChain h hdrLen =
-  -- enumerate all packets
   packetEnumerator h $$
-  -- drop cooked frame
-  dropCookedFrame hdrLen =$
-  -- process IP layer
+  DEL.map (dropCookedFrame hdrLen) =$
   DEL.map processIP =$
-  -- process TCP layer
   DEL.map processTCP =$
-  -- print everything of value (debugging)
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -60,12 +55,10 @@ packetEnumerator h = list
       k (Chunks $ if hdrCaptureLength hdr == 0 then [] else [pkt]) >>== list
     list step = returnI step
 
-dropCookedFrame :: Monad m => LinkLength -> Enumeratee CookedPacket Payload m b
-dropCookedFrame hdrLen = DEL.map f
-  where
-    f (PktHdr{..}, payload)
-      | hdrWireLength > hdrCaptureLength = error "Incomplete capture"
-      | otherwise = B.drop hdrLen payload
+dropCookedFrame :: LinkLength -> CookedPacket -> Payload
+dropCookedFrame hdrLen(PktHdr{..}, payload)
+  | hdrWireLength > hdrCaptureLength = error "Incomplete capture"
+  | otherwise = B.drop hdrLen payload
 
 processIP :: Payload -> Payload
 processIP payload = case runGetPartial parseIP payload of

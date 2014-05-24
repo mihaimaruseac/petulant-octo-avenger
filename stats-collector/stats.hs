@@ -39,10 +39,10 @@ linkHdrLen :: Link -> LinkLength
 linkHdrLen DLT_LINUX_SLL = 16 -- TODO we should check that IP is next layer
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
-iterateeChain :: MonadIO m => PcapHandle -> LinkLength -> Iteratee CookedPacket m ()
+iterateeChain :: PcapHandle -> LinkLength -> Iteratee CookedPacket IO ()
 iterateeChain h hdrLen =
   packetEnumerator h $$
-  DEL.map (dropCookedFrame hdrLen) =$
+  DEL.mapM (dropCookedFrame hdrLen) =$ DEL.filter (not . B.null) =$
   DEL.map processIP =$
   DEL.map processTCP =$
   printChunks False
@@ -55,10 +55,12 @@ packetEnumerator h = list
       k (Chunks $ if hdrCaptureLength hdr == 0 then [] else [pkt]) >>== list
     list step = returnI step
 
-dropCookedFrame :: LinkLength -> CookedPacket -> Payload
+dropCookedFrame :: LinkLength -> CookedPacket -> IO Payload
 dropCookedFrame hdrLen(PktHdr{..}, payload)
-  | hdrWireLength > hdrCaptureLength = error "Incomplete capture"
-  | otherwise = B.drop hdrLen payload
+  | hdrWireLength <= hdrCaptureLength = return $ B.drop hdrLen payload
+  | otherwise = do
+      putStrLn $ concat ["Incomplete capture: ", show (hdrWireLength, hdrCaptureLength)]
+      return B.empty
 
 processIP :: Payload -> Payload
 processIP payload = case runGetPartial parseIP payload of

@@ -42,8 +42,8 @@ linkHdrLen l = error $ concat ["Unknown link header ", show l]
 iterateeChain :: PcapHandle -> LinkLength -> Iteratee CookedPacket IO ()
 iterateeChain h hdrLen =
   packetEnumerator h $$
-  DEL.mapM (dropCookedFrame hdrLen) =$ DEL.filter (not . B.null) =$
-  DEL.map processIP =$
+  removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$
+  removePayloadFail (DEL.mapM processIP) =$
   DEL.map processTCP =$
   printChunks False
 
@@ -58,24 +58,31 @@ packetEnumerator h = list
 dropCookedFrame :: LinkLength -> CookedPacket -> IO Payload
 dropCookedFrame hdrLen(PktHdr{..}, payload)
   | hdrWireLength <= hdrCaptureLength = return $ B.drop hdrLen payload
-  | otherwise = do
-      putStrLn $ concat ["Incomplete capture: ", show (hdrWireLength, hdrCaptureLength)]
-      return B.empty
+  | otherwise = failPayload $
+      concat ["Incomplete capture: ", show (hdrWireLength, hdrCaptureLength)]
 
-processIP :: Payload -> Payload
+processIP :: Payload -> IO Payload
 processIP payload = case runGetPartial parseIP payload of
   Done ip p -> go ip p
-  _ -> error "Unhandled parseIP case"
+  _ -> failPayload "Unhandled parseIP case"
   where
     go IPv4{..} p
-      | ip4MFFlag == MoreFragments = error "Unable to handle fragmentation at IP level"
-      | ip4Proto == IPNextTCP = p
-      | otherwise = error "Undefined layer 3 proto"
+      | ip4MFFlag == MoreFragments = failPayload
+          "Unable to handle fragmentation at IP level"
+      | ip4Proto == IPNextTCP = return p
+      | otherwise = failPayload "Undefined layer 3 proto"
 
 processTCP :: Payload -> (TCP, Payload)
 processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> (tcp, p)
   _ -> error "Unhandled parseTCP case"
+
+failPayload :: String -> IO Payload
+failPayload s = putStrLn s >> return B.empty
+
+removePayloadFail :: Monad m =>
+  Enumeratee a Payload m (Step Payload m b) -> Enumeratee a Payload m b
+removePayloadFail ene = ene =$= DEL.filter (not . B.null)
 
 {-
 process :: TCP -> Payload -> Payload

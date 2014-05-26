@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 import Control.Monad.IO.Class
+import Data.Maybe
 import Data.Serialize
 import Network.Pcap
 import System.Environment
@@ -55,13 +56,13 @@ packetEnumerator h = list
       k (Chunks $ if hdrCaptureLength hdr == 0 then [] else [pkt]) >>== list
     list step = returnI step
 
-dropCookedFrame :: LinkLength -> CookedPacket -> IO Payload
+dropCookedFrame :: LinkLength -> CookedPacket -> IO (Maybe Payload)
 dropCookedFrame hdrLen(PktHdr{..}, payload)
-  | hdrWireLength <= hdrCaptureLength = return $ B.drop hdrLen payload
+  | hdrWireLength <= hdrCaptureLength = return . Just $ B.drop hdrLen payload
   | otherwise = failPayload $
       concat ["Incomplete capture: ", show (hdrWireLength, hdrCaptureLength)]
 
-processIP :: Payload -> IO Payload
+processIP :: Payload -> IO (Maybe Payload)
 processIP payload = case runGetPartial parseIP payload of
   Done ip p -> go ip p
   _ -> failPayload "Unhandled parseIP case"
@@ -69,7 +70,7 @@ processIP payload = case runGetPartial parseIP payload of
     go IPv4{..} p
       | ip4MFFlag == MoreFragments = failPayload
           "Unable to handle fragmentation at IP level"
-      | ip4Proto == IPNextTCP = return p
+      | ip4Proto == IPNextTCP = return $ Just p
       | otherwise = failPayload "Undefined layer 3 proto"
 
 processTCP :: Payload -> (TCP, Payload)
@@ -77,12 +78,13 @@ processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> (tcp, p)
   _ -> error "Unhandled parseTCP case"
 
-failPayload :: String -> IO Payload
-failPayload s = putStrLn s >> return B.empty
+failPayload :: String -> IO (Maybe a)
+failPayload s = putStrLn s >> return Nothing
 
 removePayloadFail :: Monad m =>
-  Enumeratee a Payload m (Step Payload m b) -> Enumeratee a Payload m b
-removePayloadFail ene = ene =$= DEL.filter (not . B.null)
+  Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->
+  Enumeratee a1 a3 m b
+removePayloadFail ene = ene =$= DEL.filter isJust =$= DEL.map fromJust
 
 {-
 process :: TCP -> Payload -> Payload

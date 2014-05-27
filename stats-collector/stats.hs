@@ -45,7 +45,7 @@ iterateeChain h hdrLen =
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$
   removePayloadFail (DEL.mapM processIP) =$
-  DEL.map processTCP =$
+  removePayloadFail (DEL.mapM processTCP) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -73,10 +73,10 @@ processIP payload = case runGetPartial parseIP payload of
       | ip4Proto == IPNextTCP = return $ Just p
       | otherwise = failPayload "Undefined layer 3 proto"
 
-processTCP :: Payload -> (TCP, Payload)
+processTCP :: Payload -> IO (Maybe (TCP, Payload))
 processTCP payload = case runGetPartial parseTCP payload of
-  Done tcp p -> (tcp, p)
-  _ -> error "Unhandled parseTCP case"
+  Done tcp p -> return $ Just (tcp, p)
+  _ -> failPayload "Unhandled parseTCP case"
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

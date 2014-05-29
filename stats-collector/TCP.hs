@@ -1,7 +1,7 @@
 {-
  - Parse TCP header conforming to http://tools.ietf.org/html/rfc793
  -}
-module TCP (TCP(..), parseTCP) where
+module TCP (TCP(..), parseTCP, TCPFlags(..)) where
 
 import Control.Monad
 import Data.Bits

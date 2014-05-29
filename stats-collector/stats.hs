@@ -10,6 +10,7 @@ import Data.Enumerator hiding (map, filter)
 
 import qualified Data.ByteString as B
 import qualified Data.Enumerator.List as DEL
+import qualified Data.Map.Strict as Map
 
 import Globals
 import IP
@@ -46,6 +47,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$
   removePayloadFail (DEL.mapM processIP) =$
   removePayloadFail (DEL.mapM processTCP) =$
+  removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -77,6 +79,26 @@ processTCP :: Payload -> IO (Maybe (TCP, Payload))
 processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> return $ Just (tcp, p)
   _ -> failPayload "Unhandled parseTCP case"
+
+processTCPConvs :: Map.Map Port (TCPConversationState, TCPConversation) ->
+  (TCP, Payload) ->
+  IO (Map.Map Port (TCPConversationState, TCPConversation),
+      Maybe TCPConversation)
+processTCPConvs m c@(TCP{..}, _)
+  | tcpSPort == gWebPort = update tcpDPort
+  | tcpDPort == gWebPort = update tcpSPort
+  | otherwise = do
+      putStrLn $ concat ["Unknown port pair ", show (tcpSPort, tcpDPort)]
+      return (m, Nothing)
+    where
+      update port = let m' = updateMap port in return (m', output m' port)
+      updateMap port = Map.insertWith insertFun port (Ongoing, [c]) m
+      insertFun (_, newc) (olds, oldc) = (state olds tcpFlags, oldc ++ newc)
+      state CloseFinACK _ = CloseACK
+      state s f = if TCPFIN `elem` f then succ s else s
+      output mp port = let v = mp Map.! port in getOutput v
+      getOutput (CloseACK, cv) = Just cv
+      getOutput _ = Nothing
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

@@ -48,6 +48,9 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM processIP) =$
   removePayloadFail (DEL.mapM processTCP) =$
   removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
+  -- TODO: We should check here for reordered frames, duplicate frames, duplicate chunks
+  --DEL.map (\x -> map fst x) =$
+  --DEL.map (\x -> (Prelude.length x, tcpSPort $ fst $ Prelude.head $ x)) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b

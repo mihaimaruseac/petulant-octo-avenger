@@ -49,7 +49,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM processTCP) =$
   removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
   -- TODO: We should check here for reordered frames, duplicate frames, duplicate chunks
-  --DEL.map (\x -> map fst x) =$
+  DEL.mapM (\x -> mapM_ (\(s,l) -> putStrLn $ show (tcpSPort s, tcpDPort s, tcpSeqNr s, tcpAckNr s, tcpFlags s, B.null l)) x) =$
   --DEL.map (\x -> (Prelude.length x, tcpSPort $ fst $ Prelude.head $ x)) =$
   printChunks False
 
@@ -98,6 +98,7 @@ processTCPConvs m c@(TCP{..}, _)
       updateMap port = Map.insertWith insertFun port (Ongoing, [c]) m
       insertFun (_, newc) (olds, oldc) = (state olds tcpFlags, oldc ++ newc)
       state CloseFinACK _ = CloseACK
+      state CloseACK _ = CloseACK -- succ CloseACK = undefined
       state s f = if TCPFIN `elem` f then succ s else s
       output mp port = let v = mp Map.! port in getOutput v
       getOutput (CloseACK, cv) = Just cv

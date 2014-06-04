@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 
 import Control.Monad.IO.Class
+import Data.List
 import Data.Maybe
 import Data.Serialize
 import Network.Pcap
@@ -48,6 +49,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM processIP) =$
   removePayloadFail (DEL.mapM processTCP) =$
   removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
+  DEL.map updateSeqNo =$
   -- TODO: We should check here for reordered frames, duplicate frames, duplicate chunks
   DEL.mapM (\x -> mapM_ (\(s,l) -> putStrLn $ show (tcpSPort s, tcpDPort s, tcpSeqNr s, tcpAckNr s, tcpFlags s, B.length l)) x) =$
   --DEL.map (\x -> (Prelude.length x, tcpSPort $ fst $ Prelude.head $ x)) =$
@@ -103,6 +105,19 @@ processTCPConvs m c@(TCP{..}, _)
       output mp port = let v = mp Map.! port in getOutput v
       getOutput (CloseACK, cv) = Just cv
       getOutput _ = Nothing
+
+updateSeqNo :: [(TCP, Payload)] -> [(TCP, Payload)]
+updateSeqNo l = map (\(t, p) -> (update t, p)) l
+  where
+    (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
+    reqSeq = fromMaybe 0 . listToMaybe . map (tcpSeqNr . fst) $ req
+    ansSeq = fromMaybe 0 . listToMaybe . map (tcpSeqNr . fst) $ ans
+    update t@TCP{..}
+      | tcpSPort == gWebPort = t { tcpSeqNr = fix tcpSeqNr ansSeq,
+                                   tcpAckNr = fix tcpAckNr reqSeq }
+      | otherwise            = t { tcpSeqNr = fix tcpSeqNr reqSeq,
+                                   tcpAckNr = fix tcpAckNr ansSeq }
+    fix x y = if x > y then x - y else 0
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

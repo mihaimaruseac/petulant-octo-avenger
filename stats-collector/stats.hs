@@ -50,9 +50,12 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM processTCP) =$
   removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
   DEL.map updateSeqNo =$
-  -- TODO: We should check here for reordered frames, duplicate frames, duplicate chunks
+  -- TODO: eliminate DUP packets
+  -- TODO: check for missed packets
+  -- TODO: cleanup ends of conversations (need only the FIN from the server)
+  -- TODO: check duplicated chunks
+  -- TODO: split chunks with multiple conversations
   DEL.mapM (\x -> mapM_ (\(s,l) -> putStrLn $ show (tcpSPort s, tcpDPort s, tcpSeqNr s, tcpAckNr s, tcpFlags s, B.length l)) x) =$
-  --DEL.map (\x -> (Prelude.length x, tcpSPort $ fst $ Prelude.head $ x)) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b

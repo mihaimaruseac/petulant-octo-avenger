@@ -27,7 +27,8 @@ main = do
 
 statsOn :: String -> IO ()
 statsOn universe = do
-  handle <- openLive "any" gSnapshotSize False 0
+  --handle <- openLive "any" gSnapshotSize False 0
+  handle <- openOffline "displayed.pcap"
   setFilter handle (buildFilter universe) True 0
   link <- datalink handle
   let hdrLen = linkHdrLen link
@@ -39,7 +40,8 @@ buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
 linkHdrLen :: Link -> LinkLength
-linkHdrLen DLT_LINUX_SLL = 16 -- TODO we should check that IP is next layer
+linkHdrLen DLT_LINUX_SLL = 16 -- TODO: we should check that IP is next layer
+linkHdrLen DLT_EN10MB = 14 -- TODO: same as above
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
 iterateeChain :: PcapHandle -> LinkLength -> Iteratee CookedPacket IO ()

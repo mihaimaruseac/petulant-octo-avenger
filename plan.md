@@ -2,22 +2,22 @@
 
 ## 1. Stats
 
-- :white_medium_square: personal stats
-- :white_medium_square: factions stats
-- :white_medium_square: monsters kills stats
-- :white_medium_square: pilots kills stats
-- :white_medium_square: alliances stats
-- :white_medium_square: top20 stats
-- :white_medium_square: respected factions stats
-- :white_medium_square: despised factions stats
-- :white_medium_square: alliance members stats
-- :white_medium_square: ships stats
-- :white_medium_square: buildings stats
+- [ ] personal stats
+- [ ] factions stats
+- [ ] monsters kills stats
+- [ ] pilots kills stats
+- [ ] alliances stats
+- [ ] top20 stats
+- [ ] respected factions stats
+- [ ] despised factions stats
+- [ ] alliance members stats
+- [ ] ships stats
+- [ ] buildings stats
 
 ## 2. Others
 
-- :white_check_mark: candies
+- [x] candies
 
 # Hypotheses
 
-- :white_check_mark: tcpdump/libpcap + zlib and intercept traffic
+- [x] tcpdump/libpcap + zlib and intercept traffic

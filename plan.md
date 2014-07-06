@@ -18,6 +18,16 @@
 
 - [x] candies
 
-# Hypotheses
+# Future
 
 - [x] tcpdump/libpcap + zlib and intercept traffic
+- [ ] eliminate DUP packets
+- [ ] check missed/ reordered packets
+- [ ] trim conversation to proper format
+- [ ] check duplicated chunks and chunks w/ multiple convos
+- [ ] extract HTTP layer
+- [ ] get HTTP layers
+- [ ] get HTTP main content
+- [ ] extract and unzip content
+- [ ] parse content
+- [ ] save to db

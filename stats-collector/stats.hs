@@ -52,6 +52,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM processTCP) =$
   removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
   DEL.map updateSeqNo =$
+  -- TODO: sort packets based on seq/ack numbers
   -- TODO: eliminate DUP packets
   -- TODO: check for missed packets
   -- TODO: cleanup ends of conversations (need only the FIN from the server)

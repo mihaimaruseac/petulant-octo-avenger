@@ -52,7 +52,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM processTCP) =$
   removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
   DEL.map updateSeqNo =$
-  -- TODO: sort packets based on seq/ack numbers
+  DEL.map sortPackets =$
   -- TODO: eliminate DUP packets
   -- TODO: check for missed packets
   -- TODO: cleanup ends of conversations (need only the FIN from the server)
@@ -124,6 +124,12 @@ updateSeqNo l = map (\(t, p) -> (update t, p)) l
       | otherwise            = t { tcpSeqNr = fix tcpSeqNr reqSeq,
                                    tcpAckNr = fix tcpAckNr ansSeq }
     fix x y = if x > y then x - y else 0
+
+sortPackets :: [(TCP, Payload)] -> [(TCP, Payload)]
+sortPackets = sortBy f
+  where
+    f (t1, _) (t2, _)
+      = (tcpSeqNr t1, tcpAckNr t1) `compare` (tcpSeqNr t2, tcpAckNr t2)
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

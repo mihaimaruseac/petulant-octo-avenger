@@ -128,8 +128,13 @@ updateSeqNo l = map (\(t, p) -> (update t, p)) l
 sortPackets :: [(TCP, Payload)] -> [(TCP, Payload)]
 sortPackets = sortBy f
   where
-    f (t1, _) (t2, _)
-      = (tcpSeqNr t1, tcpAckNr t1) `compare` (tcpSeqNr t2, tcpAckNr t2)
+    f (t1, _) (t2, _) = cmp
+      (tcpSPort t1, tcpDPort t1, tcpSeqNr t1, tcpAckNr t1)
+      (tcpSPort t2, tcpDPort t2, tcpSeqNr t2, tcpAckNr t2)
+    cmp (src, dst, sq, ack) (src', dst', sq', ack')
+      | src == src' && dst == dst' = (sq, ack) `compare` (sq', ack')
+      | src == dst' && dst == src' = (sq, ack) `compare` (ack', sq')
+      | otherwise = error "Impossible happened"
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

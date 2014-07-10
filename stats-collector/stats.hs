@@ -133,8 +133,7 @@ sortPackets = sortBy f
       (tcpSPort t2, tcpDPort t2, tcpSeqNr t2, tcpAckNr t2)
     cmp (src, dst, sq, ack) (src', dst', sq', ack')
       | src == src' && dst == dst' = (sq, ack) `compare` (sq', ack')
-      | src == dst' && dst == src' = (sq, ack) `compare` (ack', sq')
-      | otherwise = error "Impossible happened"
+      | otherwise                  = (sq, ack) `compare` (ack', sq')
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

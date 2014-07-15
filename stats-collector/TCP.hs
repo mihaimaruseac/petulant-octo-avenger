@@ -20,6 +20,15 @@ data TCP = TCP
   , tcpUrgPt :: Word16
   } deriving Show
 
+instance Eq TCP where
+  t1 == t2 = and
+    [ tcpSPort t1 == tcpSPort t2
+    , tcpDPort t1 == tcpDPort t2
+    , tcpSeqNr t1 == tcpSeqNr t2
+    , tcpAckNr t1 == tcpAckNr t2
+    , tcpFlags t1 == tcpFlags t2
+    ]
+
 data TCPFlags
   = TCPURG
   | TCPACK

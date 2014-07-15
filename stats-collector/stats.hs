@@ -53,7 +53,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
   DEL.map updateSeqNo =$
   DEL.map sortPackets =$
-  -- TODO: eliminate DUP packets
+  DEL.map removeDuplicates =$
   -- TODO: check for missed packets
   -- TODO: cleanup ends of conversations (need only the FIN from the server)
   -- TODO: check duplicated chunks
@@ -134,6 +134,9 @@ sortPackets = sortBy f
     cmp (src, dst, sq, ack) (src', dst', sq', ack')
       | src == src' && dst == dst' = (sq, ack) `compare` (sq', ack')
       | otherwise                  = (sq, ack) `compare` (ack', sq')
+
+removeDuplicates :: [(TCP, Payload)] -> [(TCP, Payload)]
+removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

@@ -126,14 +126,7 @@ updateSeqNo l = map (\(t, p) -> (update t, p)) l
     fix x y = if x > y then x - y else 0
 
 sortPackets :: [(TCP, Payload)] -> [(TCP, Payload)]
-sortPackets = sortBy f
-  where
-    f (t1, _) (t2, _) = cmp
-      (tcpSPort t1, tcpDPort t1, tcpSeqNr t1, tcpAckNr t1)
-      (tcpSPort t2, tcpDPort t2, tcpSeqNr t2, tcpAckNr t2)
-    cmp (src, dst, sq, ack) (src', dst', sq', ack')
-      | src == src' && dst == dst' = (sq, ack) `compare` (sq', ack')
-      | otherwise                  = (sq, ack) `compare` (ack', sq')
+sortPackets = sortBy (\(x, _) (y, _) -> x `compare` y)
 
 removeDuplicates :: [(TCP, Payload)] -> [(TCP, Payload)]
 removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)

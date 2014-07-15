@@ -29,6 +29,15 @@ instance Eq TCP where
     , tcpFlags t1 == tcpFlags t2
     ]
 
+instance Ord TCP where
+  t1 `compare` t2
+    | src == src' && dst == dst' = (sq, ack) `compare` (sq', ack')
+    | otherwise                  = (sq, ack) `compare` (ack', sq')
+    where
+      f x = (tcpSPort x, tcpDPort x, tcpSeqNr x, tcpAckNr x)
+      (src,  dst,  sq,  ack ) = f t1
+      (src', dst', sq', ack') = f t2
+
 data TCPFlags
   = TCPURG
   | TCPACK

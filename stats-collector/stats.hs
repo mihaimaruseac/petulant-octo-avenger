@@ -54,10 +54,8 @@ iterateeChain h hdrLen =
   DEL.map updateSeqNo =$
   DEL.map sortPackets =$
   DEL.map removeDuplicates =$
-  -- TODO: check for missed packets
-  -- TODO: cleanup ends of conversations (need only the FIN from the server)
+  DEL.map filterForContent =$
   -- TODO: check duplicated chunks
-  -- TODO: split chunks with multiple conversations
   DEL.mapM (\x -> mapM_ (\(s,l) -> putStrLn $ show (tcpSPort s, tcpDPort s, tcpSeqNr s, tcpAckNr s, tcpFlags s, B.length l)) x) =$
   printChunks False
 
@@ -130,6 +128,9 @@ sortPackets = sortBy (\(x, _) (y, _) -> x `compare` y)
 
 removeDuplicates :: [(TCP, Payload)] -> [(TCP, Payload)]
 removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)
+
+filterForContent :: [(TCP, Payload)] -> [(TCP, Payload)]
+filterForContent = filter (\(_, x) -> B.length x > 0)
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing

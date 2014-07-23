@@ -56,7 +56,7 @@ iterateeChain h hdrLen =
   DEL.map removeDuplicates =$
   DEL.map filterForContent =$
   DEL.unique =$
-  removePayloadFail (DEL.mapM processHTML) =$
+  removePayloadFail (DEL.mapM processHTTP) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -135,8 +135,8 @@ filterForContent = filter (\(_, x) -> B.length x > 0)
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing
 
-processHTML :: [(TCP, Payload)] -> IO (Maybe (Payload, Payload))
-processHTML l
+processHTTP :: [(TCP, Payload)] -> IO (Maybe (Payload, Payload))
+processHTTP l
   | length req > 1 = failPayload "One request only assumption failed"
   | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)
   where

@@ -55,7 +55,7 @@ iterateeChain h hdrLen =
   DEL.map sortPackets =$
   DEL.map removeDuplicates =$
   DEL.map filterForContent =$
-  -- TODO: check duplicated chunks
+  DEL.unique =$
   DEL.mapM (\x -> mapM_ (\(s,l) -> putStrLn $ show (tcpSPort s, tcpDPort s, tcpSeqNr s, tcpAckNr s, tcpFlags s, B.length l)) x) =$
   printChunks False
 

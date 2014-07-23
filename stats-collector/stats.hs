@@ -146,10 +146,3 @@ removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->
   Enumeratee a1 a3 m b
 removePayloadFail ene = ene =$= DEL.filter isJust =$= DEL.map fromJust
-
-{-
-process :: TCP -> Payload -> Payload
-process TCP{..} p = do
-  print (tcpSPort, tcpDPort, tcpFlags, tcpSeqNr, tcpAckNr)
-  print p
--}

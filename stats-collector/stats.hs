@@ -7,7 +7,7 @@ import Data.Serialize
 import Network.Pcap
 import System.Environment
 
-import Data.Enumerator hiding (map, filter)
+import Data.Enumerator hiding (map, filter, length, head)
 
 import qualified Data.ByteString as B
 import qualified Data.Enumerator.List as DEL
@@ -56,7 +56,7 @@ iterateeChain h hdrLen =
   DEL.map removeDuplicates =$
   DEL.map filterForContent =$
   DEL.unique =$
-  DEL.mapM (\x -> mapM_ (\(s,l) -> putStrLn $ show (tcpSPort s, tcpDPort s, tcpSeqNr s, tcpAckNr s, tcpFlags s, B.length l)) x) =$
+  removePayloadFail (DEL.mapM processHTML) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -134,6 +134,13 @@ filterForContent = filter (\(_, x) -> B.length x > 0)
 
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing
+
+processHTML :: [(TCP, Payload)] -> IO (Maybe (Payload, Payload))
+processHTML l
+  | length req > 1 = failPayload "One request only assumption failed"
+  | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)
+  where
+    (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
 
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->

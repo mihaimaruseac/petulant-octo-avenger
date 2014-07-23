@@ -21,10 +21,10 @@
 # Future
 
 - [x] tcpdump/libpcap + zlib and intercept traffic
-- [ ] eliminate DUP packets
-- [ ] check missed/ reordered packets
-- [ ] trim conversation to proper format
-- [ ] check duplicated chunks and chunks w/ multiple convos
+- [x] eliminate DUP packets
+- [x] check missed/ reordered packets
+- [x] trim conversation to proper format
+- [x] check duplicated chunks and chunks w/ multiple convos
 - [ ] extract HTTP layer
 - [ ] get HTTP layers
 - [ ] get HTTP main content

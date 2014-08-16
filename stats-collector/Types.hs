@@ -16,3 +16,6 @@ type SeqNo = Word32
 
 data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
   deriving (Eq, Show, Ord, Enum)
+
+data HTTPRequestType = GET | POST
+  deriving (Eq, Show, Ord, Enum)

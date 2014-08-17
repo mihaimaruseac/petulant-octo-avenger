@@ -1,4 +1,5 @@
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad.IO.Class
 import Data.List
@@ -57,6 +58,7 @@ iterateeChain h hdrLen =
   DEL.map filterForContent =$
   DEL.unique =$
   removePayloadFail (DEL.mapM processHTTP) =$
+  removePayloadFail (DEL.mapM tagRequest) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -141,6 +143,13 @@ processHTTP l
   | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
+
+tagRequest :: (Payload, Payload) -> IO (Maybe (HTTPRequestType, Payload, Payload))
+tagRequest (req, resp)
+  | rtype == "GET" = return $ Just (GET, rbody, resp)
+  | otherwise = failPayload $ concat ["Unknown/unexpected request ", show rtype]
+  where
+    (rtype, rbody) = B.breakSubstring " " req
 
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->

@@ -60,6 +60,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM processHTTP) =$
   removePayloadFail (DEL.mapM tagRequest) =$
   DEL.map extractURI =$
+  DEL.map extractHTTPHeaders =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -156,6 +157,13 @@ extractURI :: (HTTPRequestType, Payload, Payload) -> (HTTPRequestType, Payload, 
 extractURI (httpType, req, resp) = (httpType, B.tail uri, B.tail req', resp)
   where
     (uri, req') = B.breakSubstring " " req
+
+extractHTTPHeaders :: (HTTPRequestType, Payload, Payload, Payload)
+  -> (HTTPRequestType, Payload, Payload, Payload, Payload, Payload)
+extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, req', resph, resp')
+  where
+    (reqh, req') = B.breakSubstring "\r\n\r\n" req
+    (resph, resp') = B.breakSubstring "\r\n\r\n" resp
 
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->

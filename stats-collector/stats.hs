@@ -57,6 +57,7 @@ iterateeChain h hdrLen =
   DEL.map sortPackets =$
   DEL.map removeDuplicates =$
   DEL.map filterForContent =$
+  DEL.filter (/= []) =$
   DEL.unique =$
   removePayloadFail (DEL.mapM processHTTP) =$
   removePayloadFail (DEL.mapM tagRequest) =$

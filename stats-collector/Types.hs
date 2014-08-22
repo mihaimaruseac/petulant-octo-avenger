@@ -13,7 +13,16 @@ type CookedPacket = (PktHdr, B.ByteString)
 type TCPConversation = [(TCP, Payload)]
 type Port = Word16
 type SeqNo = Word32
-type Header = (Payload, Payload)
+
+type HeaderType = Payload
+type HeaderValue = Payload
+type Header = (HeaderType, HeaderValue)
+
+type RequestPayload = Payload
+type RequestHeader = Header
+type ResponsePayload = Payload
+type ResponseHeader = Header
+type URI = Payload
 
 data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
   deriving (Eq, Show, Ord, Enum)

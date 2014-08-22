@@ -141,21 +141,21 @@ filterForContent = filter (\(_, x) -> B.length x > 0)
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing
 
-processHTTP :: [(TCP, Payload)] -> IO (Maybe (Payload, Payload))
+processHTTP :: [(TCP, Payload)] -> IO (Maybe (RequestPayload, ResponsePayload))
 processHTTP l
   | length req > 1 = failPayload "One request only assumption failed"
   | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
 
-tagRequest :: (Payload, Payload) -> IO (Maybe (HTTPRequestType, Payload, Payload))
+tagRequest :: (RequestPayload, ResponsePayload) -> IO (Maybe (HTTPRequestType, RequestPayload, ResponsePayload))
 tagRequest (req, resp)
   | rtype == "GET" = return $ Just (GET, B.tail rbody, resp)
   | otherwise = failPayload $ concat ["Unknown/unexpected request ", show rtype]
   where
     (rtype, rbody) = B.breakSubstring " " req
 
-extractURI :: (HTTPRequestType, Payload, Payload) -> IO (Maybe (HTTPRequestType, Payload, Payload, Payload))
+extractURI :: (HTTPRequestType, RequestPayload, ResponsePayload) -> IO (Maybe (HTTPRequestType, URI, RequestPayload, ResponsePayload))
 extractURI (httpType, req, resp)
   | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, B.tail uri, B.tail req', B.drop 2 resp')
   | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]
@@ -163,15 +163,15 @@ extractURI (httpType, req, resp)
     (uri, req') = B.breakSubstring " " req
     (result, resp') = B.breakSubstring "\r\n" resp
 
-extractHTTPHeaders :: (HTTPRequestType, Payload, Payload, Payload)
-  -> (HTTPRequestType, Payload, Payload, Payload, Payload, Payload)
+extractHTTPHeaders :: (HTTPRequestType, URI, RequestPayload, ResponsePayload)
+  -> (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
 extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 req', resph, B.drop 4 resp')
   where
     (reqh, req') = B.breakSubstring "\r\n\r\n" req
     (resph, resp') = B.breakSubstring "\r\n\r\n" resp
 
-parseHTTPHeaders :: (HTTPRequestType, Payload, Payload, Payload, Payload, Payload)
-  -> (HTTPRequestType, Payload, [Header], Payload, [Header], Payload)
+parseHTTPHeaders :: (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
+  -> (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
 parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
   = (httpType, uri, fix hrq, req, fix hrsp, resp)
   where

@@ -173,10 +173,11 @@ extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 r
 parseHTTPHeaders :: (HTTPRequestType, Payload, Payload, Payload, Payload, Payload)
   -> (HTTPRequestType, Payload, [Header], Payload, [Header], Payload)
 parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
-  = (httpType, uri, hrq, req, hrsp, resp)
+  = (httpType, uri, fix hrq, req, fix hrsp, resp)
   where
     hrq = map B.tail $ tail $ C.split '\r' reqh
     hrsp = let w:ws = C.split '\r' resph in w : map B.tail ws
+    fix = map (\(x, y) -> (x, B.drop 2 y)) . map (B.breakSubstring ": ")
 
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->

@@ -143,9 +143,6 @@ removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)
 filterForContent :: [(TCP, Payload)] -> [(TCP, Payload)]
 filterForContent = filter (\(_, x) -> B.length x > 0)
 
-failPayload :: String -> IO (Maybe a)
-failPayload s = putStrLn s >> return Nothing
-
 processHTTP :: [(TCP, Payload)] -> IO (Maybe (RequestPayload, ResponsePayload))
 processHTTP l
   | length req > 1 = failPayload "One request only assumption failed"
@@ -206,6 +203,9 @@ chunkify payload
     (ch, chs) = B.splitAt l . B.drop 2 $ p
     toChunkLen = B.foldl' (\s v -> 16 * s + lv (fromInteger . toInteger $ v)) 0
     lv x = if x <= ord '9' then x - ord '0' else 10 + x - ord 'a'
+
+failPayload :: String -> IO (Maybe a)
+failPayload s = putStrLn s >> return Nothing
 
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->

@@ -160,7 +160,7 @@ extractURI (httpType, req, resp) = (httpType, B.tail uri, B.tail req', resp)
 
 extractHTTPHeaders :: (HTTPRequestType, Payload, Payload, Payload)
   -> (HTTPRequestType, Payload, Payload, Payload, Payload, Payload)
-extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, req', resph, resp')
+extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 req', resph, B.drop 4 resp')
   where
     (reqh, req') = B.breakSubstring "\r\n\r\n" req
     (resph, resp') = B.breakSubstring "\r\n\r\n" resp

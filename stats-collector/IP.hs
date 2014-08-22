@@ -56,7 +56,7 @@ parseIPv4 len = do
   return $ IPv4 len tos tlen idn dfFlag mfFlag (fo .&. 0x1fff) ttl proto chksum src dst
 
 parseIPv6 :: Int -> Get IP
-parseIPv6 = error $ "Parsing IPv6 is not implemented yet."
+parseIPv6 = error "Parsing IPv6 is not implemented yet."
 
 buildProtocol :: Word8 -> IPNextProtocol
 buildProtocol 6 = IPNextTCP

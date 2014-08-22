@@ -148,14 +148,16 @@ processHTTP l
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
 
-tagRequest :: (RequestPayload, ResponsePayload) -> IO (Maybe (HTTPRequestType, RequestPayload, ResponsePayload))
+tagRequest :: (RequestPayload, ResponsePayload)
+  -> IO (Maybe (HTTPRequestType, RequestPayload, ResponsePayload))
 tagRequest (req, resp)
   | rtype == "GET" = return $ Just (GET, B.tail rbody, resp)
   | otherwise = failPayload $ concat ["Unknown/unexpected request ", show rtype]
   where
     (rtype, rbody) = B.breakSubstring " " req
 
-extractURI :: (HTTPRequestType, RequestPayload, ResponsePayload) -> IO (Maybe (HTTPRequestType, URI, RequestPayload, ResponsePayload))
+extractURI :: (HTTPRequestType, RequestPayload, ResponsePayload)
+  -> IO (Maybe (HTTPRequestType, URI, RequestPayload, ResponsePayload))
 extractURI (httpType, req, resp)
   | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, B.tail uri, B.tail req', B.drop 2 resp')
   | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]

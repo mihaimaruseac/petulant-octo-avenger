@@ -25,9 +25,9 @@
 - [x] check missed/ reordered packets
 - [x] trim conversation to proper format
 - [x] check duplicated chunks and chunks w/ multiple convos
-- [ ] extract HTTP layer
-- [ ] get HTTP layers
-- [ ] get HTTP main content
+- [x] extract HTTP layer
+- [x] get HTTP layers
+- [x] get HTTP main content
 - [ ] extract and unzip content
 - [ ] parse content
 - [ ] save to db

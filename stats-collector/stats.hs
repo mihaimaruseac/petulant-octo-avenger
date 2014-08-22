@@ -1,7 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+import Codec.Compression.GZip
 import Control.Monad.IO.Class
+import Data.Char
 import Data.List
 import Data.Maybe
 import Data.Serialize
@@ -12,6 +14,7 @@ import Data.Enumerator hiding (map, filter, length, head)
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.Enumerator.List as DEL
 import qualified Data.Map.Strict as Map
 
@@ -64,6 +67,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM extractURI) =$
   DEL.map extractHTTPHeaders =$
   DEL.map parseHTTPHeaders =$
+  removePayloadFail (DEL.mapM gunzipBody) =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -181,6 +185,27 @@ parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
     hrq = map B.tail $ tail $ C.split '\r' reqh
     hrsp = let w:ws = C.split '\r' resph in w : map B.tail ws
     fix = map (\(x, y) -> (x, B.drop 2 y)) . map (B.breakSubstring ": ")
+
+gunzipBody :: (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
+  -> IO (Maybe (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload))
+gunzipBody (t, u, rh, rp, ah, ap)
+  | and [h == "gzip", h1 == "chunked"] = return $ Just (t, u, rh, rp, ah, BL.toStrict . decompress . BL.fromChunks . chunkify $ ap)
+  | otherwise = failPayload $ concat ["Unacceptable encoding ", show h, " / ", show h1]
+  where
+    h = searchHeader "Content-Encoding" ah
+    h1 = searchHeader "Transfer-Encoding" ah
+
+chunkify :: Payload -> [Payload]
+chunkify "" = []
+chunkify payload
+  | l /= 0 = ch : chunkify (B.drop 2 chs)
+  | otherwise = []
+  where
+    (l1, p) = B.breakSubstring "\r\n" payload
+    l = toChunkLen l1
+    (ch, chs) = B.splitAt l . B.drop 2 $ p
+    toChunkLen = B.foldl' (\s v -> 16 * s + lv (fromInteger . toInteger $ v)) 0
+    lv x = if x <= ord '9' then x - ord '0' else 10 + x - ord 'a'
 
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->

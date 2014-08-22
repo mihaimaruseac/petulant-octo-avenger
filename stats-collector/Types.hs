@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Types where
 
 import Data.Word
@@ -29,3 +31,6 @@ data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
 
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
+
+searchHeader :: Payload -> [Header] -> Payload
+searchHeader h hs = maybe "" id $ lookup h hs

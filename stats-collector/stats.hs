@@ -11,6 +11,7 @@ import System.Environment
 import Data.Enumerator hiding (map, filter, length, head)
 
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as C
 import qualified Data.Enumerator.List as DEL
 import qualified Data.Map.Strict as Map
 
@@ -61,6 +62,7 @@ iterateeChain h hdrLen =
   removePayloadFail (DEL.mapM tagRequest) =$
   DEL.map extractURI =$
   DEL.map extractHTTPHeaders =$
+  DEL.map parseHTTPHeaders =$
   printChunks False
 
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
@@ -164,6 +166,14 @@ extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 r
   where
     (reqh, req') = B.breakSubstring "\r\n\r\n" req
     (resph, resp') = B.breakSubstring "\r\n\r\n" resp
+
+parseHTTPHeaders :: (HTTPRequestType, Payload, Payload, Payload, Payload, Payload)
+  -> (HTTPRequestType, Payload, [Header], Payload, [Header], Payload)
+parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
+  = (httpType, uri, hrq, req, hrsp, resp)
+  where
+    hrq = map B.tail $ tail $ C.split '\r' reqh
+    hrsp = let w:ws = C.split '\r' resph in w : map B.tail ws
 
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->

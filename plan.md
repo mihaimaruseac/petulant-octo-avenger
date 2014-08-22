@@ -28,6 +28,6 @@
 - [x] extract HTTP layer
 - [x] get HTTP layers
 - [x] get HTTP main content
-- [ ] extract and unzip content
+- [x] extract and unzip content
 - [ ] parse content
 - [ ] save to db

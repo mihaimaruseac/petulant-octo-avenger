@@ -60,7 +60,7 @@ iterateeChain h hdrLen =
   DEL.unique =$
   removePayloadFail (DEL.mapM processHTTP) =$
   removePayloadFail (DEL.mapM tagRequest) =$
-  DEL.map extractURI =$
+  removePayloadFail (DEL.mapM extractURI) =$
   DEL.map extractHTTPHeaders =$
   DEL.map parseHTTPHeaders =$
   printChunks False
@@ -155,10 +155,13 @@ tagRequest (req, resp)
   where
     (rtype, rbody) = B.breakSubstring " " req
 
-extractURI :: (HTTPRequestType, Payload, Payload) -> (HTTPRequestType, Payload, Payload, Payload)
-extractURI (httpType, req, resp) = (httpType, B.tail uri, B.tail req', resp)
+extractURI :: (HTTPRequestType, Payload, Payload) -> IO (Maybe (HTTPRequestType, Payload, Payload, Payload))
+extractURI (httpType, req, resp)
+  | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, B.tail uri, B.tail req', B.drop 2 resp')
+  | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]
   where
     (uri, req') = B.breakSubstring " " req
+    (result, resp') = B.breakSubstring "\r\n" resp
 
 extractHTTPHeaders :: (HTTPRequestType, Payload, Payload, Payload)
   -> (HTTPRequestType, Payload, Payload, Payload, Payload, Payload)

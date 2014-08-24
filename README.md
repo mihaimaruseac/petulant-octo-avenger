@@ -1,11 +1,9 @@
-petulant-octo-avenger
-=====================
+petulant-octo-avenger :: Stats Collector
+========================================
 
-Small project for holding helpers for one MMORPG I play:
+Collect several statistics about the Artemis Universe of the MMORPG named
+Pardus (http://pardus.at) and generate shiny plots to display the evolution of
+the game.
 
-* parsing game stats
-* utility for parsing the logs for Artemis Games
-* utility for computing optimal trade route in Urfaa
-
-Public things will have full source code in here. Private things will be
-encrypted.
+This program doesn't access the server, instead it relies on the user to
+copy-paste the entire page.

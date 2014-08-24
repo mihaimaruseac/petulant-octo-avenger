@@ -14,10 +14,6 @@
 - [ ] ships stats
 - [ ] buildings stats
 
-## 2. Others
-
-- [x] candies
-
 # Future
 
 - [x] tcpdump/libpcap + zlib and intercept traffic

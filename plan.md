@@ -1,20 +1,4 @@
-# Plans for this project
-
-## 1. Stats
-
-- [ ] personal stats
-- [ ] factions stats
-- [ ] monsters kills stats
-- [ ] pilots kills stats
-- [ ] alliances stats
-- [ ] top20 stats
-- [ ] respected factions stats
-- [ ] despised factions stats
-- [ ] alliance members stats
-- [ ] ships stats
-- [ ] buildings stats
-
-# Future
+# Dev plan
 
 - [x] tcpdump/libpcap + zlib and intercept traffic
 - [x] eliminate DUP packets
@@ -27,3 +11,18 @@
 - [x] extract and unzip content
 - [ ] parse content
 - [ ] save to db
+
+# Stats to collect
+
+- [ ] personal stats
+- [ ] factions stats
+- [ ] monsters kills stats
+- [ ] pilots kills stats
+- [ ] alliances stats
+- [ ] top20 stats
+- [ ] respected factions stats
+- [ ] despised factions stats
+- [ ] alliance members stats
+- [ ] ships stats
+- [ ] buildings stats
+- [ ] pilot stats (name, faction, alliance...)

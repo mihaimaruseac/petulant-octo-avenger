@@ -11,6 +11,9 @@
 - [x] extract and unzip content
 - [ ] parse content
 - [ ] save to db
+  - [ ] define db layout
+  - [ ] ACID state?
+  - [ ] db gc
 
 # Stats to collect
 

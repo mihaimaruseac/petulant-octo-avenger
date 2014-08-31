@@ -10,7 +10,7 @@ import Data.Word
 
 data IP = IPv4
   { ip4Hlen :: Int
-  , ip4Tos :: Word8 -- TODO
+  , ip4Tos :: Word8 -- FUTURE
   , ip4Tlen :: Word16
   , ip4ID :: Word16
   , ip4DFFlag :: DF
@@ -19,8 +19,8 @@ data IP = IPv4
   , ip4TTL :: Word8
   , ip4Proto :: IPNextProtocol
   , ip4ChkSum :: Word16
-  , ip4SrcAddr :: Word32 -- TODO
-  , ip4DstAddr :: Word32 -- TODO
+  , ip4SrcAddr :: Word32 -- FUTURE
+  , ip4DstAddr :: Word32 -- FUTURE
   } deriving Show
 
 data DF = MayFragment | DontFragment deriving (Eq, Show)
@@ -52,7 +52,7 @@ parseIPv4 len = do
   chksum <- getWord16be
   src <- getWord32be
   dst <- getWord32be
-  skip (len - 20) -- TODO: parse options
+  skip (len - 20) -- FUTURE: parse options
   return $ IPv4 len tos tlen idn dfFlag mfFlag (fo .&. 0x1fff) ttl proto chksum src dst
 
 parseIPv6 :: Int -> Get IP

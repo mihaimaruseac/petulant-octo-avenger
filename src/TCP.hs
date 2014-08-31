@@ -60,7 +60,7 @@ parseTCP = do
   w <- getWord16be
   ck <- getWord16be
   urg <- getWord16be
-  skip (offset - 20) -- TODO: parse options
+  skip (offset - 20) -- FUTURE: parse options
   return $ TCP sp dp sq ack offset flags w ck urg
 
 getFlags :: Word16 -> [TCPFlags]

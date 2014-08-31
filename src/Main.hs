@@ -45,8 +45,8 @@ buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
 linkHdrLen :: Link -> LinkLength
-linkHdrLen DLT_LINUX_SLL = 16 -- TODO: we should check that IP is next layer
-linkHdrLen DLT_EN10MB = 14 -- TODO: same as above
+linkHdrLen DLT_LINUX_SLL = 16 -- FUTURE: we should check that IP is next layer
+linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
 linkHdrLen l = error $ concat ["Unknown link header ", show l]
 
 iterateeChain :: PcapHandle -> LinkLength -> Iteratee CookedPacket IO ()

@@ -117,14 +117,14 @@ removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)
 filterForContent :: TCPConversation -> TCPConversation
 filterForContent = filter (\(_, x) -> B.length x > 0)
 
-processHTTP :: TCPConversation -> IO (Maybe (RequestPayload, ResponsePayload))
+processHTTP :: TCPConversation -> IO (Maybe Request)
 processHTTP l
   | length req > 1 = failPayload "One request only assumption failed"
   | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
 
-tagRequest :: (RequestPayload, ResponsePayload)
+tagRequest :: Request
   -> IO (Maybe (HTTPRequestType, RequestPayload, ResponsePayload))
 tagRequest (req, resp)
   | rtype == "GET" = return $ Just (GET, B.tail rbody, resp)

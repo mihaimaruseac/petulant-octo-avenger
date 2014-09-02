@@ -28,6 +28,7 @@ type ResponseHeader = Header
 type URI = Payload
 
 type TCPPayload = (TCP, Payload)
+type Request = (RequestPayload, ResponsePayload)
 
 data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
   deriving (Eq, Show, Ord, Enum)

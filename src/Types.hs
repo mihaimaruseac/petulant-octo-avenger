@@ -33,7 +33,7 @@ type HTTPTaggedRequest = (HTTPRequestType, RequestPayload, ResponsePayload)
 type HTTPURIRequest = (HTTPRequestType, URI, RequestPayload, ResponsePayload)
 type ChanneledRequest = (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
 type ChanneledHeaderRequest = (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
-
+type TCPC = (TCPConversationState, TCPConversation)
 
 
 

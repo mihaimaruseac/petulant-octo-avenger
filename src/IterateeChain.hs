@@ -74,9 +74,9 @@ processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> return $ Just (tcp, p)
   _ -> failPayload "Unhandled parseTCP case"
 
-processTCPConvs :: Map.Map Port (TCPConversationState, TCPConversation) ->
+processTCPConvs :: Map.Map Port TCPC ->
   TCPPayload ->
-  IO (Map.Map Port (TCPConversationState, TCPConversation),
+  IO (Map.Map Port TCPC,
       Maybe TCPConversation)
 processTCPConvs m c@(TCP{..}, _)
   | tcpSPort == gWebPort = update tcpDPort

@@ -133,7 +133,7 @@ tagRequest (req, resp)
     (rtype, rbody) = B.breakSubstring " " req
 
 extractURI :: HTTPTaggedRequest
-  -> IO (Maybe (HTTPRequestType, URI, RequestPayload, ResponsePayload))
+  -> IO (Maybe HTTPURIRequest)
 extractURI (httpType, req, resp)
   | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, B.tail uri, B.tail req', B.drop 2 resp')
   | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]
@@ -141,7 +141,7 @@ extractURI (httpType, req, resp)
     (uri, req') = B.breakSubstring " " req
     (result, resp') = B.breakSubstring "\r\n" resp
 
-extractHTTPHeaders :: (HTTPRequestType, URI, RequestPayload, ResponsePayload)
+extractHTTPHeaders :: HTTPURIRequest
   -> (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
 extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 req', resph, B.drop 4 resp')
   where

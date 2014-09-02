@@ -11,8 +11,9 @@ import TCP
 
 type LinkLength = Int
 type Payload = B.ByteString
-type CookedPacket = (PktHdr, B.ByteString)
-type TCPConversation = [(TCP, Payload)]
+
+type CookedPacket = (PktHdr, Payload)
+type TCPConversation = [TCPPayload]
 type Port = Word16
 type SeqNo = Word32
 
@@ -25,6 +26,8 @@ type RequestHeader = Header
 type ResponsePayload = Payload
 type ResponseHeader = Header
 type URI = Payload
+
+type TCPPayload = (TCP, Payload)
 
 data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
   deriving (Eq, Show, Ord, Enum)

@@ -69,13 +69,13 @@ processIP payload = case runGetPartial parseIP payload of
       | ip4Proto == IPNextTCP = return $ Just p
       | otherwise = failPayload "Undefined layer 3 proto"
 
-processTCP :: Payload -> IO (Maybe (TCP, Payload))
+processTCP :: Payload -> IO (Maybe TCPPayload)
 processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> return $ Just (tcp, p)
   _ -> failPayload "Unhandled parseTCP case"
 
 processTCPConvs :: Map.Map Port (TCPConversationState, TCPConversation) ->
-  (TCP, Payload) ->
+  TCPPayload ->
   IO (Map.Map Port (TCPConversationState, TCPConversation),
       Maybe TCPConversation)
 processTCPConvs m c@(TCP{..}, _)
@@ -95,7 +95,7 @@ processTCPConvs m c@(TCP{..}, _)
       getOutput (CloseACK, cv) = Just cv
       getOutput _ = Nothing
 
-updateSeqNo :: [(TCP, Payload)] -> [(TCP, Payload)]
+updateSeqNo :: [TCPPayload] -> [TCPPayload]
 updateSeqNo l = map (\(t, p) -> (update t, p)) l
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
@@ -108,16 +108,16 @@ updateSeqNo l = map (\(t, p) -> (update t, p)) l
                                    tcpAckNr = fix tcpAckNr ansSeq }
     fix x y = if x > y then x - y else 0
 
-sortPackets :: [(TCP, Payload)] -> [(TCP, Payload)]
+sortPackets :: [TCPPayload] -> [TCPPayload]
 sortPackets = sortBy (\(x, _) (y, _) -> x `compare` y)
 
-removeDuplicates :: [(TCP, Payload)] -> [(TCP, Payload)]
+removeDuplicates :: [TCPPayload] -> [TCPPayload]
 removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)
 
-filterForContent :: [(TCP, Payload)] -> [(TCP, Payload)]
+filterForContent :: [TCPPayload] -> [TCPPayload]
 filterForContent = filter (\(_, x) -> B.length x > 0)
 
-processHTTP :: [(TCP, Payload)] -> IO (Maybe (RequestPayload, ResponsePayload))
+processHTTP :: [TCPPayload] -> IO (Maybe (RequestPayload, ResponsePayload))
 processHTTP l
   | length req > 1 = failPayload "One request only assumption failed"
   | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)

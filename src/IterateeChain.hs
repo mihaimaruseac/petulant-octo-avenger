@@ -142,13 +142,13 @@ extractURI (httpType, req, resp)
     (result, resp') = B.breakSubstring "\r\n" resp
 
 extractHTTPHeaders :: HTTPURIRequest
-  -> (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
+  -> ChanneledRequest
 extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 req', resph, B.drop 4 resp')
   where
     (reqh, req') = B.breakSubstring "\r\n\r\n" req
     (resph, resp') = B.breakSubstring "\r\n\r\n" resp
 
-parseHTTPHeaders :: (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
+parseHTTPHeaders :: ChanneledRequest
   -> (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
 parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
   = (httpType, uri, fix hrq, req, fix hrsp, resp)

@@ -149,7 +149,7 @@ extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 r
     (resph, resp') = B.breakSubstring "\r\n\r\n" resp
 
 parseHTTPHeaders :: ChanneledRequest
-  -> (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
+  -> ChanneledHeaderRequest
 parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
   = (httpType, uri, fix hrq, req, fix hrsp, resp)
   where
@@ -157,8 +157,8 @@ parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
     hrsp = let w:ws = C.split '\r' resph in w : map B.tail ws
     fix = map (\(x, y) -> (x, B.drop 2 y)) . map (B.breakSubstring ": ")
 
-gunzipBody :: (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
-  -> IO (Maybe (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload))
+gunzipBody :: ChanneledHeaderRequest
+  -> IO (Maybe ChanneledHeaderRequest)
 gunzipBody (t, u, rh, rp, ah, ap)
   | and [h == "gzip", h1 == "chunked"] = return $ Just (t, u, rh, rp, ah, BL.toStrict . decompress . BL.fromChunks . chunkify $ ap)
   | otherwise = failPayload $ concat ["Unacceptable encoding ", show h, " / ", show h1]

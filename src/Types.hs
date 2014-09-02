@@ -32,6 +32,10 @@ type Request = (RequestPayload, ResponsePayload)
 type HTTPTaggedRequest = (HTTPRequestType, RequestPayload, ResponsePayload)
 type HTTPURIRequest = (HTTPRequestType, URI, RequestPayload, ResponsePayload)
 type ChanneledRequest = (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
+type ChanneledHeaderRequest = (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
+
+
+
 
 data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
   deriving (Eq, Show, Ord, Enum)

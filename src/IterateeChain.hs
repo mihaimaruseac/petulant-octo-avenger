@@ -95,7 +95,7 @@ processTCPConvs m c@(TCP{..}, _)
       getOutput (CloseACK, cv) = Just cv
       getOutput _ = Nothing
 
-updateSeqNo :: [TCPPayload] -> [TCPPayload]
+updateSeqNo :: TCPConversation -> TCPConversation
 updateSeqNo l = map (\(t, p) -> (update t, p)) l
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
@@ -108,16 +108,16 @@ updateSeqNo l = map (\(t, p) -> (update t, p)) l
                                    tcpAckNr = fix tcpAckNr ansSeq }
     fix x y = if x > y then x - y else 0
 
-sortPackets :: [TCPPayload] -> [TCPPayload]
+sortPackets :: TCPConversation -> TCPConversation
 sortPackets = sortBy (\(x, _) (y, _) -> x `compare` y)
 
-removeDuplicates :: [TCPPayload] -> [TCPPayload]
+removeDuplicates :: TCPConversation -> TCPConversation
 removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)
 
-filterForContent :: [TCPPayload] -> [TCPPayload]
+filterForContent :: TCPConversation -> TCPConversation
 filterForContent = filter (\(_, x) -> B.length x > 0)
 
-processHTTP :: [TCPPayload] -> IO (Maybe (RequestPayload, ResponsePayload))
+processHTTP :: TCPConversation -> IO (Maybe (RequestPayload, ResponsePayload))
 processHTTP l
   | length req > 1 = failPayload "One request only assumption failed"
   | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)

@@ -74,10 +74,7 @@ processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> return $ Just (tcp, p)
   _ -> failPayload "Unhandled parseTCP case"
 
-processTCPConvs :: Map.Map Port TCPC ->
-  TCPPayload ->
-  IO (Map.Map Port TCPC,
-      Maybe TCPConversation)
+processTCPConvs :: Map.Map Port TCPC -> TCPPayload -> IO (Map.Map Port TCPC, Maybe TCPConversation)
 processTCPConvs m c@(TCP{..}, _)
   | tcpSPort == gWebPort = update tcpDPort
   | tcpDPort == gWebPort = update tcpSPort
@@ -124,16 +121,14 @@ processHTTP l
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
 
-tagRequest :: Request
-  -> IO (Maybe HTTPTaggedRequest)
+tagRequest :: Request -> IO (Maybe HTTPTaggedRequest)
 tagRequest (req, resp)
   | rtype == "GET" = return $ Just (GET, B.tail rbody, resp)
   | otherwise = failPayload $ concat ["Unknown/unexpected request ", show rtype]
   where
     (rtype, rbody) = B.breakSubstring " " req
 
-extractURI :: HTTPTaggedRequest
-  -> IO (Maybe HTTPURIRequest)
+extractURI :: HTTPTaggedRequest -> IO (Maybe HTTPURIRequest)
 extractURI (httpType, req, resp)
   | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, B.tail uri, B.tail req', B.drop 2 resp')
   | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]
@@ -141,15 +136,13 @@ extractURI (httpType, req, resp)
     (uri, req') = B.breakSubstring " " req
     (result, resp') = B.breakSubstring "\r\n" resp
 
-extractHTTPHeaders :: HTTPURIRequest
-  -> ChanneledRequest
+extractHTTPHeaders :: HTTPURIRequest -> ChanneledRequest
 extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 req', resph, B.drop 4 resp')
   where
     (reqh, req') = B.breakSubstring "\r\n\r\n" req
     (resph, resp') = B.breakSubstring "\r\n\r\n" resp
 
-parseHTTPHeaders :: ChanneledRequest
-  -> ChanneledHeaderRequest
+parseHTTPHeaders :: ChanneledRequest -> ChanneledHeaderRequest
 parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
   = (httpType, uri, fix hrq, req, fix hrsp, resp)
   where
@@ -157,8 +150,7 @@ parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
     hrsp = let w:ws = C.split '\r' resph in w : map B.tail ws
     fix = map (\(x, y) -> (x, B.drop 2 y)) . map (B.breakSubstring ": ")
 
-gunzipBody :: ChanneledHeaderRequest
-  -> IO (Maybe ChanneledHeaderRequest)
+gunzipBody :: ChanneledHeaderRequest -> IO (Maybe ChanneledHeaderRequest)
 gunzipBody (t, u, rh, rp, ah, ap)
   | and [h == "gzip", h1 == "chunked"] = return $ Just (t, u, rh, rp, ah, BL.toStrict . decompress . BL.fromChunks . chunkify $ ap)
   | otherwise = failPayload $ concat ["Unacceptable encoding ", show h, " / ", show h1]

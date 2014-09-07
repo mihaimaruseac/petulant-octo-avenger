@@ -2,8 +2,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Data.Enumerator hiding (map, filter, length, head)
-import System.Environment
 import Network.Pcap
+import System.Environment
 
 import Globals
 import IterateeChain

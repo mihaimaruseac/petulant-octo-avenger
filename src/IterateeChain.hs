@@ -20,8 +20,8 @@ import qualified Data.Map.Strict as Map
 
 import Globals
 import IP
-import Types
 import TCP
+import Types
 
 iterateeChain :: PcapHandle -> LinkLength -> Iteratee CookedPacket IO ()
 iterateeChain h hdrLen =

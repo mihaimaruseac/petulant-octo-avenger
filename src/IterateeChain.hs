@@ -4,13 +4,15 @@
 module IterateeChain (iterateeChain) where
 
 import Codec.Compression.GZip
+import Control.Arrow
 import Control.Monad.IO.Class
 import Data.Char
-import Data.Enumerator hiding (map, filter, length, head)
 import Data.List
 import Data.Maybe
 import Data.Serialize
 import Network.Pcap
+
+import Data.Enumerator hiding (map, filter, length, head)
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
@@ -53,10 +55,9 @@ packetEnumerator h = list
     list step = returnI step
 
 dropCookedFrame :: LinkLength -> CookedPacket -> IO (Maybe Payload)
-dropCookedFrame hdrLen(PktHdr{..}, payload)
+dropCookedFrame hdrLen (PktHdr{..}, payload)
   | hdrWireLength <= hdrCaptureLength = return . Just $ B.drop hdrLen payload
-  | otherwise = failPayload $
-      concat ["Incomplete capture: ", show (hdrWireLength, hdrCaptureLength)]
+  | otherwise = failPayload $ "Incomplete capture: " ++ show (hdrWireLength, hdrCaptureLength)
 
 processIP :: Payload -> IO (Maybe Payload)
 processIP payload = case runGetPartial parseIP payload of
@@ -79,7 +80,7 @@ processTCPConvs m c@(TCP{..}, _)
   | tcpSPort == gWebPort = update tcpDPort
   | tcpDPort == gWebPort = update tcpSPort
   | otherwise = do
-      putStrLn $ concat ["Unknown port pair ", show (tcpSPort, tcpDPort)]
+      putStrLn $ "Unknown port pair " ++ show (tcpSPort, tcpDPort)
       return (m, Nothing)
     where
       update port = let m' = updateMap port in return (m', output m' port)
@@ -93,9 +94,9 @@ processTCPConvs m c@(TCP{..}, _)
       getOutput _ = Nothing
 
 updateSeqNo :: TCPConversation -> TCPConversation
-updateSeqNo l = map (\(t, p) -> (update t, p)) l
+updateSeqNo conv = map (first update) conv
   where
-    (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
+    (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) conv
     reqSeq = fromMaybe 0 . listToMaybe . map (tcpSeqNr . fst) $ req
     ansSeq = fromMaybe 0 . listToMaybe . map (tcpSeqNr . fst) $ ans
     update t@TCP{..}
@@ -115,32 +116,34 @@ filterForContent :: TCPConversation -> TCPConversation
 filterForContent = filter (\(_, x) -> B.length x > 0)
 
 processHTTP :: TCPConversation -> IO (Maybe Request)
-processHTTP l
+processHTTP conv
   | length req > 1 = failPayload "One request only assumption failed"
   | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)
   where
-    (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) l
+    (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) conv
 
 tagRequest :: Request -> IO (Maybe HTTPTaggedRequest)
 tagRequest (req, resp)
   | rtype == "GET" = return $ Just (GET, B.tail rbody, resp)
-  | otherwise = failPayload $ concat ["Unknown/unexpected request ", show rtype]
+  | otherwise = failPayload $ "Unknown/unexpected request " ++ show rtype
   where
     (rtype, rbody) = B.breakSubstring " " req
 
 extractURI :: HTTPTaggedRequest -> IO (Maybe HTTPURIRequest)
 extractURI (httpType, req, resp)
-  | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, B.tail uri, B.tail req', B.drop 2 resp')
+  | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, f uri, f req', B.drop 2 resp')
   | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]
   where
     (uri, req') = B.breakSubstring " " req
     (result, resp') = B.breakSubstring "\r\n" resp
+    f = B.tail
 
 extractHTTPHeaders :: HTTPURIRequest -> ChanneledRequest
-extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, B.drop 4 req', resph, B.drop 4 resp')
+extractHTTPHeaders (httpType, uri, req, resp) = (httpType, uri, reqh, f req', resph, f resp')
   where
     (reqh, req') = B.breakSubstring "\r\n\r\n" req
     (resph, resp') = B.breakSubstring "\r\n\r\n" resp
+    f = B.drop 4
 
 parseHTTPHeaders :: ChanneledRequest -> ChanneledHeaderRequest
 parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
@@ -148,15 +151,16 @@ parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
   where
     hrq = map B.tail $ tail $ C.split '\r' reqh
     hrsp = let w:ws = C.split '\r' resph in w : map B.tail ws
-    fix = map (\(x, y) -> (x, B.drop 2 y)) . map (B.breakSubstring ": ")
+    fix = map (second (B.drop 2) . B.breakSubstring ": ")
 
 gunzipBody :: ChanneledHeaderRequest -> IO (Maybe ChanneledHeaderRequest)
 gunzipBody (t, u, rh, rp, ah, ap)
-  | and [h == "gzip", h1 == "chunked"] = return $ Just (t, u, rh, rp, ah, BL.toStrict . decompress . BL.fromChunks . chunkify $ ap)
+  | h == "gzip" && h1 == "chunked" = return $ Just (t, u, rh, rp, ah, f ap)
   | otherwise = failPayload $ concat ["Unacceptable encoding ", show h, " / ", show h1]
   where
     h = searchHeader "Content-Encoding" ah
     h1 = searchHeader "Transfer-Encoding" ah
+    f = BL.toStrict . decompress . BL.fromChunks . chunkify
 
 chunkify :: Payload -> [Payload]
 chunkify "" = []

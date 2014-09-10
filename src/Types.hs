@@ -2,6 +2,7 @@
 
 module Types where
 
+import Data.Maybe
 import Data.Word
 import Network.Pcap
 
@@ -38,4 +39,4 @@ data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
 searchHeader :: Payload -> [Header] -> Payload
-searchHeader h hs = maybe "" id $ lookup h hs
+searchHeader h hs = fromMaybe "" $ lookup h hs

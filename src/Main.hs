@@ -7,7 +7,6 @@ import System.Environment
 
 import Globals
 import IterateeChain
-import Types
 
 main :: IO ()
 main = do
@@ -30,7 +29,7 @@ statsOn universe = do
 buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
-linkHdrLen :: Link -> LinkLength
+linkHdrLen :: Link -> Int
 linkHdrLen DLT_LINUX_SLL = 16 -- FUTURE: we should check that IP is next layer
 linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
 linkHdrLen l = error $ "Unknown link header " ++ show l

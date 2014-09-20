@@ -25,7 +25,35 @@ import IP
 import TCP
 import Types
 
-iterateeChain :: PcapHandle -> LinkLength -> Iteratee CookedPacket IO ()
+type ChanneledHeaderRequest = (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
+type ChanneledRequest = (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
+type CookedPacket = (PktHdr, Payload)
+type HTTPTaggedRequest = (HTTPRequestType, RequestPayload, ResponsePayload)
+type HTTPURIRequest = (HTTPRequestType, URI, RequestPayload, ResponsePayload)
+type Header = (HeaderType, HeaderValue)
+type HeaderType = Payload
+type HeaderValue = Payload
+type Payload = B.ByteString
+type Request = (RequestPayload, ResponsePayload)
+type RequestHeader = Header
+type RequestPayload = Payload
+type ResponseHeader = Header
+type ResponsePayload = Payload
+type TCPC = (TCPConversationState, TCPConversation)
+type TCPConversation = [TCPPayload]
+type TCPPayload = (TCP, Payload)
+type URI = Payload
+
+data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
+  deriving (Eq, Show, Ord, Enum)
+
+data HTTPRequestType = GET | POST
+  deriving (Eq, Show, Ord, Enum)
+
+searchHeader :: Payload -> [Header] -> Payload
+searchHeader h hs = fromMaybe "" $ lookup h hs
+
+iterateeChain :: PcapHandle -> Int -> Iteratee CookedPacket IO ()
 iterateeChain h hdrLen =
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$
@@ -54,7 +82,7 @@ packetEnumerator h = list
       k (Chunks $ if hdrCaptureLength hdr == 0 then [] else [pkt]) >>== list
     list step = returnI step
 
-dropCookedFrame :: LinkLength -> CookedPacket -> IO (Maybe Payload)
+dropCookedFrame :: Int -> CookedPacket -> IO (Maybe Payload)
 dropCookedFrame hdrLen (PktHdr{..}, payload)
   | hdrWireLength <= hdrCaptureLength = return . Just $ B.drop hdrLen payload
   | otherwise = failPayload $ "Incomplete capture: " ++ show (hdrWireLength, hdrCaptureLength)

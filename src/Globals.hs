@@ -1,6 +1,6 @@
 module Globals where
 
-import Types
+import TCP
 
 gSnapshotSize :: Int
 gSnapshotSize = 1000000000

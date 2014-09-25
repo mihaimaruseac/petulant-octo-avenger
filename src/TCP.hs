@@ -1,18 +1,21 @@
 {-
  - Parse TCP header conforming to http://tools.ietf.org/html/rfc793
  -}
-module TCP (TCP(..), parseTCP, TCPFlags(..)) where
+module TCP (TCP(..), parseTCP, TCPFlags(..), Port) where
 
 import Control.Monad
 import Data.Bits
 import Data.Serialize
 import Data.Word
 
+type Port = Word16
+type SeqNo = Word32
+
 data TCP = TCP
-  { tcpSPort :: Word16
-  , tcpDPort :: Word16
-  , tcpSeqNr :: Word32
-  , tcpAckNr :: Word32
+  { tcpSPort :: Port
+  , tcpDPort :: Port
+  , tcpSeqNr :: SeqNo
+  , tcpAckNr :: SeqNo
   , tcpDtOff :: Int
   , tcpFlags :: [TCPFlags]
   , tcpWindw :: Word16

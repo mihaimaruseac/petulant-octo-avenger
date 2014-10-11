@@ -23,7 +23,6 @@ import qualified Data.Map.Strict as Map
 import Globals
 import IP
 import TCP
-import Types
 
 type ChanneledHeaderRequest = (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
 type ChanneledRequest = (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)

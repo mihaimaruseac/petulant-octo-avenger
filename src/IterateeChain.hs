@@ -49,9 +49,6 @@ data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
-searchHeader :: Payload -> [Header] -> Payload
-searchHeader h hs = fromMaybe "" $ lookup h hs
-
 iterateeChain :: PcapHandle -> Int -> Iteratee CookedPacket IO ()
 iterateeChain h hdrLen =
   packetEnumerator h $$
@@ -188,6 +185,9 @@ gunzipBody (t, u, rh, rp, ah, ap)
     h = searchHeader "Content-Encoding" ah
     h1 = searchHeader "Transfer-Encoding" ah
     f = BL.toStrict . decompress . BL.fromChunks . chunkify
+
+searchHeader :: Payload -> [Header] -> Payload
+searchHeader h hs = fromMaybe "" $ lookup h hs
 
 chunkify :: Payload -> [Payload]
 chunkify "" = []

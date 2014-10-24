@@ -12,12 +12,12 @@ import Data.Maybe
 import Data.Serialize
 import Network.Pcap
 
-import Data.Enumerator hiding (map, filter, length, head)
+-- import Data.Enumerator hiding (map, filter, length, head)
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Enumerator.List as DEL
+-- import qualified Data.Enumerator.List as DEL
 import qualified Data.Map.Strict as Map
 
 import Globals
@@ -49,8 +49,9 @@ data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
-iterateeChain :: PcapHandle -> Int -> Iteratee CookedPacket IO ()
-iterateeChain h hdrLen =
+--iterateeChain :: PcapHandle -> Int -> Iteratee CookedPacket IO ()
+iterateeChain h hdrLen = undefined
+{-
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$
   removePayloadFail (DEL.mapM processIP) =$
@@ -69,7 +70,9 @@ iterateeChain h hdrLen =
   DEL.map parseHTTPHeaders =$
   removePayloadFail (DEL.mapM gunzipBody) =$
   printChunks False
+  -}
 
+{-
 packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
 packetEnumerator h = list
   where
@@ -77,6 +80,7 @@ packetEnumerator h = list
       pkt@(hdr, _) <- liftIO $ nextBS h
       k (Chunks $ if hdrCaptureLength hdr == 0 then [] else [pkt]) >>== list
     list step = returnI step
+    -}
 
 dropCookedFrame :: Int -> CookedPacket -> IO (Maybe Payload)
 dropCookedFrame hdrLen (PktHdr{..}, payload)
@@ -204,7 +208,9 @@ chunkify payload
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing
 
+{-
 removePayloadFail :: Monad m =>
   Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->
   Enumeratee a1 a3 m b
 removePayloadFail ene = ene =$= DEL.filter isJust =$= DEL.map fromJust
+-}

@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module ProcessChain (processChain) where
+module iterateeChain (processChain) where
 
 import Codec.Compression.GZip
 import Control.Arrow

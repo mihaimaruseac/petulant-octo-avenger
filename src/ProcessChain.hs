@@ -7,6 +7,7 @@ import Codec.Compression.GZip
 import Control.Arrow
 import Control.Monad.IO.Class
 import Data.Char
+import Data.Conduit
 import Data.List
 import Data.Maybe
 import Data.Serialize
@@ -72,15 +73,20 @@ processChain h hdrLen = undefined
   printChunks False
   -}
 
-{-
-packetEnumerator :: MonadIO m => PcapHandle -> Enumerator CookedPacket m b
+packetEnumerator :: MonadIO m => PcapHandle -> Source m [CookedPacket]
 packetEnumerator h = list
+  where
+    list = do
+      pkt@(hdr, _) <- liftIO $ nextBS h
+      yield (if hdrCaptureLength hdr == 0 then [] else [pkt]) >> list
+
+{-list
   where
     list (Continue k) = do
       pkt@(hdr, _) <- liftIO $ nextBS h
       k (Chunks $ if hdrCaptureLength hdr == 0 then [] else [pkt]) >>== list
     list step = returnI step
-    -}
+--    -}
 
 dropCookedFrame :: Int -> CookedPacket -> IO (Maybe Payload)
 dropCookedFrame hdrLen (PktHdr{..}, payload)

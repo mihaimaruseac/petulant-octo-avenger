@@ -18,7 +18,7 @@ import Network.Pcap
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as BL
--- import qualified Data.Enumerator.List as DEL
+import qualified Data.Conduit.List as CL
 import qualified Data.Map.Strict as Map
 
 import Globals
@@ -72,6 +72,9 @@ processChain h hdrLen = undefined
   removePayloadFail (DEL.mapM gunzipBody) =$
   printChunks False
   -}
+
+debugSink :: Show i => Sink i IO ()
+debugSink = CL.mapM_ print
 
 packetEnumerator :: MonadIO m => PcapHandle -> Source m [CookedPacket]
 packetEnumerator h = list

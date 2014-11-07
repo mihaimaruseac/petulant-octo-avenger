@@ -50,8 +50,8 @@ data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
---processChain :: PcapHandle -> Int -> Iteratee CookedPacket IO ()
-processChain h hdrLen = undefined
+processChain :: PcapHandle -> Int -> IO ()
+processChain h hdrLen = packetEnumerator h $$ debugSink
 {-
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$

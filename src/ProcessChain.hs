@@ -51,7 +51,9 @@ data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
 processChain :: PcapHandle -> Int -> IO ()
-processChain h hdrLen = packetEnumerator h $$ debugSink
+processChain h hdrLen = id -- TODO: change to runResourceT??
+  $  packetEnumerator h
+  $$ debugSink
 {-
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$

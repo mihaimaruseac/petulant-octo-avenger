@@ -5,7 +5,7 @@ import Network.Pcap
 import System.Environment
 
 import Globals
-import IterateeChain
+import ProcessChain
 
 main :: IO ()
 main = do
@@ -23,7 +23,7 @@ statsOn universe = do
   let hdrLen = linkHdrLen link
   putStrLn $ "Capturing on " ++ universe
   putStrLn "Press ^C to end"
-  --run_ $ iterateeChain handle hdrLen
+  processChain handle hdrLen
 
 buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]

@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module IterateeChain (iterateeChain) where
+module ProcessChain (processChain) where
 
 import Codec.Compression.GZip
 import Control.Arrow
@@ -49,8 +49,8 @@ data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
---iterateeChain :: PcapHandle -> Int -> Iteratee CookedPacket IO ()
-iterateeChain h hdrLen = undefined
+--processChain :: PcapHandle -> Int -> Iteratee CookedPacket IO ()
+processChain h hdrLen = undefined
 {-
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$

@@ -93,17 +93,13 @@ processChain h hdrLen = id -- TODO: change to runResourceT??
   =$= DCC.map filterForContent
   =$= DCC.filter (/= [])
   =$= unique
+  =$= removePayloadFail (DCC.mapM processHTTP)
+  =$= removePayloadFail (DCC.mapM tagRequest)
+  =$= removePayloadFail (DCC.mapM extractURI)
+  =$= DCC.map extractHTTPHeaders
+  =$= DCC.map parseHTTPHeaders
+  =$= removePayloadFail (DCC.mapM gunzipBody)
   $$  debugSink
-
-{-
-  removePayloadFail (DEL.mapM processHTTP) =$
-  removePayloadFail (DEL.mapM tagRequest) =$
-  removePayloadFail (DEL.mapM extractURI) =$
-  DEL.map extractHTTPHeaders =$
-  DEL.map parseHTTPHeaders =$
-  removePayloadFail (DEL.mapM gunzipBody) =$
-  printChunks False
-  -}
 
 debugSink :: Show i => Sink i IO ()
 debugSink = CL.mapM_ print

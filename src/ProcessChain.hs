@@ -86,14 +86,10 @@ processChain h hdrLen = id -- TODO: change to runResourceT??
   =$= removePayloadFail (DCC.mapM processIP)
   =$= removePayloadFail (DCC.mapM processTCP)
   =$= DCC.concatMapAccumM processTCPConvs Map.empty
+  =$= DCC.map updateSeqNo
   $$  debugSink
 
 {-
-  packetEnumerator h $$
-  removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$
-  removePayloadFail (DEL.mapM processIP) =$
-  removePayloadFail (DEL.mapM processTCP) =$
-  removePayloadFail (DEL.mapAccumM processTCPConvs Map.empty) =$
   DEL.map updateSeqNo =$
   DEL.map sortPackets =$
   DEL.map removeDuplicates =$

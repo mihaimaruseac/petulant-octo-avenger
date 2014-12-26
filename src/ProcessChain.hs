@@ -60,12 +60,21 @@ data HTTPRequestType = GET | POST
   processChain handle hdrLen
   -}
 
+processChain :: String -> IO ()
+processChain u = do
+  putStrLn $ "Capturing on " ++ u
+  putStrLn "Press ^C to end"
+  --processChain . buildFilter $ u
+
+buildFilter :: String -> String
+buildFilter universe = concat ["host ", universe, ".pardus.at"]
+
 linkHdrLen :: Link -> Int
 linkHdrLen DLT_LINUX_SLL = 16 -- FUTURE: we should check that IP is next layer
 linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
 linkHdrLen l = error $ "Unknown link header " ++ show l
 
-processChain flter = undefined
+--processChain flter = undefined
 
 setupHandle flter = do
   --handle <- openLive "any" gSnapshotSize False 0

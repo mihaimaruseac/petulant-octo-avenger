@@ -10,5 +10,5 @@ main :: IO ()
 main = do
   args <- getArgs
   case args of
-    [] -> processChain gDefaultUniverse
-    u:_ -> processChain u
+    [] -> statsOn gDefaultUniverse
+    u:_ -> statsOn u

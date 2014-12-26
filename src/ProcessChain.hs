@@ -1,11 +1,12 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module ProcessChain (processChain) where
+module ProcessChain (statsOn) where
 
 import Codec.Compression.GZip
 import Control.Arrow
 import Control.Monad.IO.Class
+import Control.Monad.Trans.Resource
 import Data.Char
 import Data.Conduit
 import Data.List
@@ -18,6 +19,7 @@ import Network.Pcap
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Conduit.Combinators as DCC
 import qualified Data.Conduit.List as CL
 import qualified Data.Map.Strict as Map
 
@@ -49,49 +51,39 @@ data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
 
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
-{-do
-  --handle <- openLive "any" gSnapshotSize False 0
-  handle <- openOffline "displayed.pcap"
-  setFilter handle (buildFilter universe) True 0
-  link <- datalink handle
-  let hdrLen = linkHdrLen link
-  putStrLn $ "Capturing on " ++ universe
-  putStrLn "Press ^C to end"
-  processChain handle hdrLen
-  -}
 
-processChain :: String -> IO ()
-processChain u = do
+statsOn :: String -> IO ()
+statsOn u = do
+  setupMsgs u
+  h <- openHandle u
+  processChain h
+
+setupMsgs :: String -> IO ()
+setupMsgs u = do
   putStrLn $ "Capturing on " ++ u
   putStrLn "Press ^C to end"
-  --processChain . buildFilter $ u
+
+openHandle u = do
+  --handle <- openLive "any" gSnapshotSize False 0 -- TODO: the real one
+  handle <- openOffline "displayed.pcap"
+  setFilter handle (buildFilter u) True 0
+  return handle
 
 buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
+-- let hdrLen = linkHdrLen link
 linkHdrLen :: Link -> Int
 linkHdrLen DLT_LINUX_SLL = 16 -- FUTURE: we should check that IP is next layer
 linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
 linkHdrLen l = error $ "Unknown link header " ++ show l
 
---processChain flter = undefined
-
-setupHandle flter = do
-  --handle <- openLive "any" gSnapshotSize False 0
-  handle <- openOffline "displayed.pcap"
-  setFilter handle flter True 0
-  link <- datalink handle
-  --let hdrLen = linkHdrLen link
-  return handle
-  -- processChain handle hdrLen
-
---processChain :: PcapHandle -> Int -> IO ()
-{-
-processChain h hdrLen = id -- TODO: change to runResourceT??
+processChain :: PcapHandle -> IO ()
+processChain h = id -- TODO: change to runResourceT??
   $   packetEnumerator h
-  =$= mapOutputMaybe (\x -> Nothing)
+  -- =$= mapOutputMaybe (\x -> Nothing)
   $$  debugSink
-  -}
+
 {-
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$

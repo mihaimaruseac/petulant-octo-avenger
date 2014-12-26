@@ -49,11 +49,40 @@ data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
 
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
+{-do
+  --handle <- openLive "any" gSnapshotSize False 0
+  handle <- openOffline "displayed.pcap"
+  setFilter handle (buildFilter universe) True 0
+  link <- datalink handle
+  let hdrLen = linkHdrLen link
+  putStrLn $ "Capturing on " ++ universe
+  putStrLn "Press ^C to end"
+  processChain handle hdrLen
+  -}
 
-processChain :: PcapHandle -> Int -> IO ()
+linkHdrLen :: Link -> Int
+linkHdrLen DLT_LINUX_SLL = 16 -- FUTURE: we should check that IP is next layer
+linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
+linkHdrLen l = error $ "Unknown link header " ++ show l
+
+processChain flter = undefined
+
+setupHandle flter = do
+  --handle <- openLive "any" gSnapshotSize False 0
+  handle <- openOffline "displayed.pcap"
+  setFilter handle flter True 0
+  link <- datalink handle
+  --let hdrLen = linkHdrLen link
+  return handle
+  -- processChain handle hdrLen
+
+--processChain :: PcapHandle -> Int -> IO ()
+{-
 processChain h hdrLen = id -- TODO: change to runResourceT??
-  $  packetEnumerator h
-  $$ debugSink
+  $   packetEnumerator h
+  =$= mapOutputMaybe (\x -> Nothing)
+  $$  debugSink
+  -}
 {-
   packetEnumerator h $$
   removePayloadFail (DEL.mapM (dropCookedFrame hdrLen)) =$

@@ -5,6 +5,7 @@ module ProcessChain (statsOn) where
 
 import Codec.Compression.GZip
 import Control.Arrow
+import Control.Exception
 import Control.Monad.IO.Class
 import Data.Char
 import Data.Conduit
@@ -53,9 +54,15 @@ data HTTPRequestType = GET | POST
 statsOn :: String -> IO ()
 statsOn u = do
   setupMsgs u
-  h <- openHandle u
+  bracket (openHandle u) fini work
+
+work :: PcapHandle -> IO ()
+work h = do
   link <- datalink h
   processChain h (linkHdrLen link)
+
+fini :: PcapHandle -> IO ()
+fini h = putStrLn "Fini"
 
 setupMsgs :: String -> IO ()
 setupMsgs u = do
@@ -64,10 +71,10 @@ setupMsgs u = do
 
 openHandle :: String -> IO PcapHandle
 openHandle u = do
-  --handle <- openLive "any" gSnapshotSize False 0 -- TODO: the real one
-  handle <- openOffline "displayed.pcap"
-  setFilter handle (buildFilter u) True 0
-  return handle
+  --h <- openLive "any" gSnapshotSize False 0 -- TODO: the real one
+  h <- openOffline "displayed.pcap"
+  setFilter h (buildFilter u) True 0
+  return h
 
 buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]

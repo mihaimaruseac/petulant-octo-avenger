@@ -87,14 +87,13 @@ processChain h hdrLen = id -- TODO: change to runResourceT??
   =$= removePayloadFail (DCC.mapM processTCP)
   =$= DCC.concatMapAccumM processTCPConvs Map.empty
   =$= DCC.map updateSeqNo
+  =$= DCC.map sortPackets
+  =$= DCC.map removeDuplicates
+  =$= DCC.map filterForContent
+  =$= DCC.filter (/= [])
   $$  debugSink
 
 {-
-  DEL.map updateSeqNo =$
-  DEL.map sortPackets =$
-  DEL.map removeDuplicates =$
-  DEL.map filterForContent =$
-  DEL.filter (/= []) =$
   DEL.unique =$
   removePayloadFail (DEL.mapM processHTTP) =$
   removePayloadFail (DEL.mapM tagRequest) =$

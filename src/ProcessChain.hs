@@ -22,6 +22,7 @@ import qualified Data.ByteString.Lazy as BL
 import qualified Data.Conduit.Combinators as DCC
 import qualified Data.Conduit.List as CL
 import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
 
 import Globals
 import IP
@@ -91,10 +92,10 @@ processChain h hdrLen = id -- TODO: change to runResourceT??
   =$= DCC.map removeDuplicates
   =$= DCC.map filterForContent
   =$= DCC.filter (/= [])
+  =$= unique
   $$  debugSink
 
 {-
-  DEL.unique =$
   removePayloadFail (DEL.mapM processHTTP) =$
   removePayloadFail (DEL.mapM tagRequest) =$
   removePayloadFail (DEL.mapM extractURI) =$
@@ -242,3 +243,9 @@ failPayload s = putStrLn s >> return Nothing
 
 removePayloadFail :: Monad m => ConduitM i (Maybe o) m r -> ConduitM i o m r
 removePayloadFail = mapOutputMaybe id
+
+unique :: (Ord a, Monad m) => Conduit a m a
+unique = DCC.concatMapAccum step Set.empty where
+  step x s
+    | x `Set.member` s = (s, [])
+    | otherwise = (x `Set.insert` s, [x])

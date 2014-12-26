@@ -83,6 +83,7 @@ processChain :: PcapHandle -> Int -> IO ()
 processChain h hdrLen = id -- TODO: change to runResourceT??
   $   packetEnumerator h
   =$= removePayloadFail (DCC.mapM (dropCookedFrame hdrLen))
+  =$= removePayloadFail (DCC.mapM processIP)
   $$  debugSink
 
 {-

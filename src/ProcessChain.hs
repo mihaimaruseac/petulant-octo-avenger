@@ -85,6 +85,7 @@ processChain h hdrLen = id -- TODO: change to runResourceT??
   =$= removePayloadFail (DCC.mapM (dropCookedFrame hdrLen))
   =$= removePayloadFail (DCC.mapM processIP)
   =$= removePayloadFail (DCC.mapM processTCP)
+  =$= DCC.concatMapAccumM processTCPConvs Map.empty
   $$  debugSink
 
 {-
@@ -139,13 +140,13 @@ processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> return $ Just (tcp, p)
   _ -> failPayload "Unhandled parseTCP case"
 
-processTCPConvs :: Map.Map Port TCPC -> TCPPayload -> IO (Map.Map Port TCPC, Maybe TCPConversation)
-processTCPConvs m c@(TCP{..}, _)
+processTCPConvs :: TCPPayload -> Map.Map Port TCPC -> IO (Map.Map Port TCPC, [TCPConversation])
+processTCPConvs c@(TCP{..}, _) m
   | tcpSPort == gWebPort = update tcpDPort
   | tcpDPort == gWebPort = update tcpSPort
   | otherwise = do
       putStrLn $ "Unknown port pair " ++ show (tcpSPort, tcpDPort)
-      return (m, Nothing)
+      return (m, [])
     where
       update port = let m' = updateMap port in return (m', output m' port)
       updateMap port = Map.insertWith insertFun port (Ongoing, [c]) m
@@ -154,8 +155,8 @@ processTCPConvs m c@(TCP{..}, _)
       state CloseACK _ = CloseACK -- succ CloseACK = undefined
       state s f = if TCPFIN `elem` f then succ s else s
       output mp port = let v = mp Map.! port in getOutput v
-      getOutput (CloseACK, cv) = Just cv
-      getOutput _ = Nothing
+      getOutput (CloseACK, cv) = [cv]
+      getOutput _ = []
 
 updateSeqNo :: TCPConversation -> TCPConversation
 updateSeqNo conv = map (first update) conv

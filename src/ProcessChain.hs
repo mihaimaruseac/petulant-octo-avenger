@@ -6,15 +6,12 @@ module ProcessChain (statsOn) where
 import Codec.Compression.GZip
 import Control.Arrow
 import Control.Monad.IO.Class
-import Control.Monad.Trans.Resource
 import Data.Char
 import Data.Conduit
 import Data.List
 import Data.Maybe
 import Data.Serialize
 import Network.Pcap
-
--- import Data.Enumerator hiding (map, filter, length, head)
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
@@ -81,8 +78,7 @@ linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
 linkHdrLen l = error $ "Unknown link header " ++ show l
 
 processChain :: PcapHandle -> Int -> IO ()
-processChain h hdrLen = id -- TODO: change to runResourceT??
-  $   packetEnumerator h
+processChain h hdrLen = packetEnumerator h
   =$= removePayloadFail (DCC.mapM (dropCookedFrame hdrLen))
   =$= removePayloadFail (DCC.mapM processIP)
   =$= removePayloadFail (DCC.mapM processTCP)
@@ -144,7 +140,7 @@ processTCPConvs c@(TCP{..}, _) m
       updateMap port = Map.insertWith insertFun port (Ongoing, [c]) m
       insertFun (_, newc) (olds, oldc) = (state olds tcpFlags, oldc ++ newc)
       state CloseFinACK _ = CloseACK
-      state CloseACK _ = CloseACK -- succ CloseACK = undefined
+      state CloseACK _ = CloseACK -- EXPLAIN: succ CloseACK = undefined
       state s f = if TCPFIN `elem` f then succ s else s
       output mp port = let v = mp Map.! port in getOutput v
       getOutput (CloseACK, cv) = [cv]

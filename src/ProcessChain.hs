@@ -63,6 +63,7 @@ setupMsgs u = do
   putStrLn $ "Capturing on " ++ u
   putStrLn "Press ^C to end"
 
+openHandle :: String -> IO PcapHandle
 openHandle u = do
   --handle <- openLive "any" gSnapshotSize False 0 -- TODO: the real one
   handle <- openOffline "displayed.pcap"

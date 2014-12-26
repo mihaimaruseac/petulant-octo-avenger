@@ -56,7 +56,8 @@ statsOn :: String -> IO ()
 statsOn u = do
   setupMsgs u
   h <- openHandle u
-  processChain h
+  link <- datalink h
+  processChain h (linkHdrLen link)
 
 setupMsgs :: String -> IO ()
 setupMsgs u = do
@@ -73,16 +74,15 @@ openHandle u = do
 buildFilter :: String -> String
 buildFilter universe = concat ["host ", universe, ".pardus.at"]
 
--- let hdrLen = linkHdrLen link
 linkHdrLen :: Link -> Int
 linkHdrLen DLT_LINUX_SLL = 16 -- FUTURE: we should check that IP is next layer
 linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
 linkHdrLen l = error $ "Unknown link header " ++ show l
 
-processChain :: PcapHandle -> IO ()
-processChain h = id -- TODO: change to runResourceT??
+processChain :: PcapHandle -> Int -> IO ()
+processChain h hdrLen = id -- TODO: change to runResourceT??
   $   packetEnumerator h
-  -- =$= mapOutputMaybe (\x -> Nothing)
+  =$= removePayloadFail (DCC.mapM (dropCookedFrame hdrLen))
   $$  debugSink
 
 {-
@@ -242,9 +242,5 @@ chunkify payload
 failPayload :: String -> IO (Maybe a)
 failPayload s = putStrLn s >> return Nothing
 
-{-
-removePayloadFail :: Monad m =>
-  Enumeratee a1 (Maybe a3) m (Step (Maybe a3) m (Step a3 m b)) ->
-  Enumeratee a1 a3 m b
-removePayloadFail ene = ene =$= DEL.filter isJust =$= DEL.map fromJust
--}
+removePayloadFail :: Monad m => ConduitM i (Maybe o) m r -> ConduitM i o m r
+removePayloadFail = mapOutputMaybe id

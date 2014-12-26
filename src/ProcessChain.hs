@@ -62,12 +62,15 @@ work h = do
   processChain h (linkHdrLen link)
 
 fini :: PcapHandle -> IO ()
-fini h = putStrLn "Fini"
+fini h = do
+  stats <- statistics h
+  print stats
+  putStrLn "Fini"
 
 setupMsgs :: String -> IO ()
 setupMsgs u = do
   putStrLn $ "Capturing on " ++ u
-  putStrLn "Press ^C to end"
+  putStrLn "Press ^C to end (and wait until next packet is captured)"
 
 openHandle :: String -> IO PcapHandle
 openHandle u = do

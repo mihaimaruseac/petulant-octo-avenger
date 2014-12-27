@@ -10,6 +10,7 @@
 - [x] get HTTP main content
 - [x] extract and unzip content
 - [ ] parse content
+  - [ ] Extract HTML info from HTML + HTTP tags.
 - [ ] save to db
   - [ ] define db layout
   - [ ] ACID state?

@@ -25,6 +25,7 @@ import qualified Data.Set as Set
 import Globals
 import IP
 import TCP
+import Tag
 
 type ChanneledHeaderRequest = (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
 type ChanneledRequest = (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
@@ -105,6 +106,7 @@ processChain h hdrLen = packetEnumerator h
   =$= DCC.map extractHTTPHeaders
   =$= DCC.map parseHTTPHeaders
   =$= removePayloadFail (DCC.mapM gunzipBody)
+  =$= tag
   $$  debugSink
 
 debugSink :: Show i => Sink i IO ()

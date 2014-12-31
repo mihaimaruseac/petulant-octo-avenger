@@ -26,30 +26,18 @@ import Globals
 import IP
 import TCP
 import Tag
+import Types
 
-type ChanneledHeaderRequest = (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
 type ChanneledRequest = (HTTPRequestType, URI, RequestPayload, RequestPayload, ResponsePayload, ResponsePayload)
 type CookedPacket = (PktHdr, Payload)
 type HTTPTaggedRequest = (HTTPRequestType, RequestPayload, ResponsePayload)
 type HTTPURIRequest = (HTTPRequestType, URI, RequestPayload, ResponsePayload)
-type Header = (HeaderType, HeaderValue)
-type HeaderType = Payload
-type HeaderValue = Payload
-type Payload = B.ByteString
 type Request = (RequestPayload, ResponsePayload)
-type RequestHeader = Header
-type RequestPayload = Payload
-type ResponseHeader = Header
-type ResponsePayload = Payload
 type TCPC = (TCPConversationState, TCPConversation)
 type TCPConversation = [TCPPayload]
 type TCPPayload = (TCP, Payload)
-type URI = Payload
 
 data TCPConversationState = Ongoing | CloseFin | CloseFinACK | CloseACK
-  deriving (Eq, Show, Ord, Enum)
-
-data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
 statsOn :: String -> IO ()

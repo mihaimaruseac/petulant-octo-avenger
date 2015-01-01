@@ -1,8 +1,8 @@
-module Tag (tag) where
+module Tag (tagAndStore) where
 
 import Data.Conduit
 
 import Types
 
-tag :: Monad m => Conduit ChanneledHeaderRequest m ChanneledHeaderRequest
-tag = undefined
+tagAndStore :: Monad m => Conduit ChanneledHeaderRequest m ChanneledHeaderRequest
+tagAndStore = undefined

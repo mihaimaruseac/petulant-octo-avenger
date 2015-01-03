@@ -6,6 +6,7 @@ import Types
 
 --tagAndStore :: Monad m => Conduit ChanneledHeaderRequest m ChanneledHeaderRequest
 --tagAndStore :: Conduit ChanneledHeaderRequest IO ChanneledHeaderRequest
+tagAndStore :: ChanneledHeaderRequest -> ChanneledHeaderRequest
 tagAndStore = undefined {-do
   (Just i) <- await
   yield i-}

@@ -1,12 +1,8 @@
 module Tag (tagAndStore) where
 
-import Data.Conduit
-
 import Types
 
---tagAndStore :: Monad m => Conduit ChanneledHeaderRequest m ChanneledHeaderRequest
---tagAndStore :: Conduit ChanneledHeaderRequest IO ChanneledHeaderRequest
-tagAndStore :: ChanneledHeaderRequest -> ChanneledHeaderRequest
-tagAndStore = undefined {-do
-  (Just i) <- await
-  yield i-}
+tagAndStore :: ChanneledHeaderRequest -> IO ChanneledHeaderRequest
+tagAndStore e = do
+  print e
+  return e

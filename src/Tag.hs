@@ -2,7 +2,13 @@ module Tag (tagAndStore) where
 
 import Types
 
-tagAndStore :: ChanneledHeaderRequest -> IO ChanneledHeaderRequest
+data TaggedInfo
+  = Fail ChanneledHeaderRequest
+
+instance Show TaggedInfo where
+  show (Fail chr) = '#' : ' ' : show chr
+
+tagAndStore :: ChanneledHeaderRequest -> IO TaggedInfo
 tagAndStore e = do
-  print e
-  return e
+  print $ Fail e
+  return $ Fail e

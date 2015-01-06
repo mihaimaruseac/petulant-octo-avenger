@@ -8,7 +8,5 @@ data TaggedInfo
 instance Show TaggedInfo where
   show (Fail chr) = '#' : ' ' : show chr
 
-tagAndStore :: ChanneledHeaderRequest -> IO TaggedInfo
-tagAndStore e = do
-  print $ Fail e
-  return $ Fail e
+tagAndStore :: ChanneledHeaderRequest -> TaggedInfo
+tagAndStore = Fail

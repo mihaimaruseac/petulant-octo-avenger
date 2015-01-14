@@ -17,4 +17,5 @@ instance Show TaggedInfo where
   show (OK dbc) = show dbc
 
 tagAndStore :: ChanneledHeaderRequest -> TaggedInfo
-tagAndStore e@(rt, uri, rqhs, rqp, rphs, rpp) = OK $ Game $ B.length rpp
+tagAndStore e@(rt, uri, rqhs, rqp, rphs, rpp)
+  | otherwise = Fail e

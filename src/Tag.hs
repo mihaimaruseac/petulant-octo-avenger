@@ -23,4 +23,5 @@ instance Show TaggedInfo where
 tagAndStore :: ChanneledHeaderRequest -> TaggedInfo
 tagAndStore e@(rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "game.php" = OK Pass
+  | uri == "menu.php" = OK Pass
   | otherwise = Fail e

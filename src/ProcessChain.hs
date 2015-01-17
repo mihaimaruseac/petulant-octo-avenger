@@ -94,7 +94,7 @@ processChain h hdrLen = packetEnumerator h
   =$= DCC.map extractHTTPHeaders
   =$= DCC.map parseHTTPHeaders
   =$= removePayloadFail (DCC.mapM gunzipBody)
-  =$= DCC.map tagAndStore
+  =$= DCC.concatMap tagAndStore
   $$  debugSink
 
 debugSink :: Show i => Sink i IO ()

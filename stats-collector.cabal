@@ -43,5 +43,6 @@ executable stats-collector
     cereal >= 0.4,
     pcap >= 0.4,
     resourcet >= 1.1,
+    tagsoup >= 0.13,
     transformers >= 0.3,
     zlib >= 0.5

@@ -13,6 +13,7 @@ import Data.List
 import Data.Maybe
 import Data.Serialize
 import Network.Pcap
+import Text.HTML.TagSoup
 
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
@@ -93,6 +94,7 @@ processChain h hdrLen = packetEnumerator h
   =$= DCC.map extractHTTPHeaders
   =$= DCC.map parseHTTPHeaders
   =$= removePayloadFail (DCC.mapM gunzipBody)
+  =$= DCC.map tagHTML
   =$= DCC.concatMap tagAndStore
   $$  debugSink
 
@@ -216,6 +218,9 @@ gunzipBody (t, u, rh, rp, ah, ap)
     h = searchHeader "Content-Encoding" ah
     h1 = searchHeader "Transfer-Encoding" ah
     f = BL.toStrict . decompress . BL.fromChunks . chunkify
+
+tagHTML :: ChanneledHeaderRequest -> TaggedHeaderRequest
+tagHTML (t, u, rh, rp, ah, ap) = (t, u, rh, rp, ah, parseTags ap)
 
 searchHeader :: Payload -> [Header] -> Payload
 searchHeader h hs = fromMaybe "" $ lookup h hs

@@ -63,8 +63,7 @@ setupMsgs u = do
 
 openHandle :: String -> IO PcapHandle
 openHandle u = do
-  --h <- openLive "any" gSnapshotSize False 0 -- TODO: the real one
-  h <- openOffline "displayed.pcap"
+  h <- openLive "any" gSnapshotSize False 0
   setFilter h (buildFilter u) True 0
   return h
 

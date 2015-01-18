@@ -20,7 +20,7 @@ instance Show TaggedInfo where
 
 tagAndStore :: ChanneledHeaderRequest -> [TaggedInfo]
 tagAndStore e@(rt, uri, rqhs, rqp, rphs, rpp)
-  | uri == "game.php" = map (OK . Game) [1, 2, 42]
+  | uri == "game.php" = []
   | uri == "menu.php" = []
   | uri == "msgframe.php" = [] -- TODO: parse "Players online: <int>" field
   | otherwise = [Fail e]

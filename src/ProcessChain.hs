@@ -123,7 +123,7 @@ processIP payload = case runGetPartial parseIP payload of
           "Unable to handle fragmentation at IP level"
       | ip4Proto == IPNextTCP = return $ Just p
       | otherwise = failPayload "Undefined layer 3 proto"
-    go i@IPv6{..} p
+    go IPv6{..} p
       | ip6Proto == IPNextTCP = return $ Just p
       | otherwise = failPayload "Undefined layer 3 proto"
 

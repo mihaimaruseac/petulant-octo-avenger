@@ -189,6 +189,7 @@ tagRequest (req, resp)
 extractURI :: HTTPTaggedRequest -> IO (Maybe HTTPURIRequest)
 extractURI (httpType, req, resp)
   | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, f uri, f req', B.drop 2 resp')
+  | "302 Found" `B.isSuffixOf` result = return Nothing -- ignore 302 (redirection) error codes
   | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]
   where
     (uri, req') = B.breakSubstring " " req

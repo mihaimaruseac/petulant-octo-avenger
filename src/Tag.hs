@@ -13,6 +13,7 @@ import Debug.Trace
 
 data DBCommand
   = POnline Int
+  | Debug Payload
   | MM [Tag Payload]
   deriving Show
 
@@ -29,6 +30,7 @@ tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "game.php" = []
   | uri == "menu.php" = []
   | uri == "msgframe.php" = map OK . parseMsgFrame $ resTags
+  | uri == "overview_stats.php" = map OK . parseOverviewStats $ resTags
   | otherwise = [Fail (rt, uri, rqhs, rqp, rphs, renderTags resTags)]
   where
     resTags = sanitize rpp
@@ -51,6 +53,9 @@ parseMsgFrame tags = case extract tags of
     aTag = TagOpen "a" []
     textTag = TagText ""
     extractPO = C.readInt . last . C.words . fromTagText
+
+parseOverviewStats :: [Tag Payload] -> [DBCommand]
+parseOverviewStats tags = [Debug $ renderTags tags]
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

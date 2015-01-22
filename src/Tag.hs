@@ -31,9 +31,18 @@ tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "menu.php" = []
   | uri == "msgframe.php" = map OK . parseMsgFrame $ resTags
   | uri == "overview_stats.php" = map OK . parseOverviewStats $ resTags
-  | otherwise = [Fail (rt, uri, rqhs, rqp, rphs, renderTags resTags)]
+  | otherwise = [Fail (rt, uri, rqhs, rqp, rphs, render resTags)]
   where
     resTags = sanitize rpp
+
+render :: [Tag Payload] -> Payload
+render tags = renderTagsOptions options tags
+  where
+    options = RenderOptions
+      { optEscape = id
+      , optMinimize = const False
+      , optRawTag = const False
+      }
 
 sanitize :: [Tag Payload] -> [Tag Payload]
 sanitize = filter (/= TagText "") . map sanitizeTag
@@ -55,7 +64,7 @@ parseMsgFrame tags = case extract tags of
     extractPO = C.readInt . last . C.words . fromTagText
 
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
-parseOverviewStats tags = [Debug $ renderTags tags]
+parseOverviewStats tags = [Debug $ render tags]
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

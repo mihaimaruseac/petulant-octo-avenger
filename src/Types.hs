@@ -4,6 +4,7 @@ import Text.HTML.TagSoup (Tag)
 
 import qualified Data.ByteString as B
 
+{-- Types for parsing the wire content and transforming it to HTML. --}
 type ChanneledHeaderRequest = (HTTPRequestType, URI, [RequestHeader], RequestPayload, [ResponseHeader], ResponsePayload)
 type Header = (HeaderType, HeaderValue)
 type HeaderType = Payload
@@ -18,3 +19,20 @@ type URI = Payload
 
 data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
+
+{-- Types for getting the data out of HTML and into the DB. --}
+type PlayersOnline = Int
+
+data DBCommand
+  = POnline PlayersOnline
+  | Debug Payload
+  | MM [Tag Payload]
+  deriving Show
+
+data TaggedInfo
+  = Fail ChanneledHeaderRequest
+  | OK DBCommand
+
+instance Show TaggedInfo where
+  show (Fail chr) = '#' : ' ' : show chr
+  show (OK dbc) = show dbc

@@ -11,20 +11,6 @@ import Types
 
 import Debug.Trace
 
-data DBCommand
-  = POnline Int
-  | Debug Payload
-  | MM [Tag Payload]
-  deriving Show
-
-data TaggedInfo
-  = Fail ChanneledHeaderRequest
-  | OK DBCommand
-
-instance Show TaggedInfo where
-  show (Fail chr) = '#' : ' ' : show chr
-  show (OK dbc) = show dbc
-
 tagAndStore :: TaggedHeaderRequest -> [TaggedInfo]
 tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "game.php" = []

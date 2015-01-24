@@ -22,9 +22,11 @@ data HTTPRequestType = GET | POST
 
 {-- Types for getting the data out of HTML and into the DB. --}
 type PlayersOnline = Int
+type CompetencyLevel = Int
 
 data DBCommand
   = POnline PlayersOnline
+  | PFstats CompetencyLevel
   | Debug Payload
   | MM [Tag Payload]
   deriving Show

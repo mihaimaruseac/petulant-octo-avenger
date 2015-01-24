@@ -50,7 +50,7 @@ parseMsgFrame tags = case extract tags of
     extractPO = C.readInt . last . C.words . fromTagText
 
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
-parseOverviewStats = concat . ([parseFactionLevels] <*>)
+parseOverviewStats = undefined --concat . ([parseFactionLevels] <*>)
 
 parseFactionLevels :: [Tag Payload] -> [DBCommand]
 parseFactionLevels tags = [Debug $ render tags]

@@ -2,6 +2,7 @@
 
 module Tag (tagAndStore) where
 
+import Control.Monad.State
 import Data.Maybe
 import Text.HTML.TagSoup
 

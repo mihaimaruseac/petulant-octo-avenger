@@ -55,8 +55,10 @@ parseOverviewStats = evalState parseFactionLevels --undefined --concat . ([parse
 
 parseFactionLevels :: State [Tag Payload] [DBCommand]
 parseFactionLevels = do
-  tags <- get
-  return [Debug $ render tags]
+  mtags <- fmap (searchByTags [TagText "Plyaer Stats"]) get
+  case mtags of
+    Just tags -> return [Debug $ render tags]
+    Nothing -> return []
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

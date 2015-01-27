@@ -55,7 +55,7 @@ parseOverviewStats = evalState parseFactionLevels --undefined --concat . ([parse
 
 parseFactionLevels :: State [Tag Payload] [DBCommand]
 parseFactionLevels = do
-  mtags <- fmap (searchByTags [TagText "Plyaer Stats"]) get
+  mtags <- fmap (searchByTags [TagText "Player Stats"]) get
   case mtags of
     Just tags -> return [Debug $ render tags]
     Nothing -> return []

@@ -26,7 +26,7 @@ type CompetencyLevel = Int
 
 data DBCommand
   = POnline PlayersOnline
-  | PFstats CompetencyLevel
+  | Competency CompetencyLevel
   | Debug Payload
   | MM [Tag Payload]
   deriving Show

@@ -55,10 +55,13 @@ parseOverviewStats = evalState parseFactionLevels --undefined --concat . ([parse
 
 parseFactionLevels :: State [Tag Payload] [DBCommand]
 parseFactionLevels = do
-  mtags <- fmap (searchByTags [TagText "Player Stats"]) get
+  let kTags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
+  mtags <- fmap (searchByTags kTags) get
   case mtags of
-    Just tags -> return [Debug $ render tags]
-    Nothing -> return []
+    Just (t:tags) -> do
+      put tags
+      return [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ t]
+    _ -> return []
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

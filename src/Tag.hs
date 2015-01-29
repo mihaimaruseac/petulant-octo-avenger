@@ -51,17 +51,20 @@ parseMsgFrame tags = case extract tags of
     extractPO = C.readInt . last . C.words . fromTagText
 
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
-parseOverviewStats = evalState parseFactionLevels --undefined --concat . ([parseFactionLevels] <*>)
+parseOverviewStats = evalState $ do
+  parseFactionLevels kTags build [] --undefined --concat . ([parseFactionLevels] <*>)
+  where
+    kTags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
+    build t = [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ t]
 
-parseFactionLevels :: State [Tag Payload] [DBCommand]
-parseFactionLevels = do
-  let kTags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
+parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> a -> State [Tag Payload] a
+parseFactionLevels kTags build def = do
   mtags <- fmap (searchByTags kTags) get
   case mtags of
     Just (t:tags) -> do
       put tags
-      return [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ t]
-    _ -> return []
+      return $ build t
+    _ -> return def
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

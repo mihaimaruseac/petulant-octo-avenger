@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tag (tagAndStore) where
+module Tag where --(tagAndStore) where
 
 import Control.Monad.State
+import Control.Monad.Trans.Maybe
 import Data.Maybe
 import Text.HTML.TagSoup
 
@@ -10,7 +11,13 @@ import qualified Data.ByteString.Char8 as C
 
 import Types
 
-import Debug.Trace
+type MState s = MaybeT (State s)
+
+runMState :: MaybeT (State s) a -> s -> (Maybe a, s)
+runMState = runState . runMaybeT
+
+evalMState :: s -> MaybeT (State s) a -> Maybe a
+evalMState i m = fst . runMState m $ i
 
 tagAndStore :: TaggedHeaderRequest -> [TaggedInfo]
 tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
@@ -51,20 +58,21 @@ parseMsgFrame tags = case extract tags of
     extractPO = C.readInt . last . C.words . fromTagText
 
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
-parseOverviewStats = evalState $ do
+parseOverviewStats t = fromMaybe [] $ evalMState t $ do
   parseFactionLevels kTags build [] --undefined --concat . ([parseFactionLevels] <*>)
   where
     kTags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
-    build t = [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ t]
+    build tg = [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ tg]
 
-parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> a -> State [Tag Payload] a
-parseFactionLevels kTags build def = do
+parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> a -> MState [Tag Payload] a
+parseFactionLevels kTags build def = undefined {-do
   mtags <- fmap (searchByTags kTags) get
   case mtags of
     Just (t:tags) -> do
       put tags
       return $ build t
     _ -> return def
+    -}
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

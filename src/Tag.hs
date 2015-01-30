@@ -65,14 +65,13 @@ parseOverviewStats t = fromMaybe [] $ evalMState t $ do
     build tg = [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ tg]
 
 parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> a -> MState [Tag Payload] a
-parseFactionLevels kTags build def = undefined {-do
+parseFactionLevels kTags build def = do
   mtags <- fmap (searchByTags kTags) get
   case mtags of
     Just (t:tags) -> do
       put tags
       return $ build t
     _ -> return def
-    -}
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

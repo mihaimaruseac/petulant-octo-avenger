@@ -3,7 +3,7 @@
 module Tag where --(tagAndStore) where
 
 import Control.Monad.State
-import Control.Monad.Trans.Maybe
+--import Control.Monad.Trans.Maybe
 import Data.Maybe
 import Text.HTML.TagSoup
 
@@ -11,20 +11,22 @@ import qualified Data.ByteString.Char8 as C
 
 import Types
 
-type MState s = MaybeT (State s)
+type MState s = StateT s Maybe
 
-runMState :: MaybeT (State s) a -> s -> (Maybe a, s)
-runMState = runState . runMaybeT
+runMState :: MState s a -> s -> Maybe (a, s)
+runMState m = {- ??? . -} runStateT m
 
-evalMState :: s -> MaybeT (State s) a -> Maybe a
-evalMState i m = fst . runMState m $ i
+evalMState :: MState s a -> s -> Maybe a
+evalMState m i = case runMState m i of
+  Just (a, _) -> Just a
+  _ -> Nothing
 
 tagAndStore :: TaggedHeaderRequest -> [TaggedInfo]
 tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "game.php" = []
   | uri == "menu.php" = []
   | uri == "msgframe.php" = map OK . parseMsgFrame $ resTags
-  | uri == "overview_stats.php" = map OK . parseOverviewStats $ resTags
+  -- | uri == "overview_stats.php" = map OK . parseOverviewStats $ resTags
   | otherwise = [Fail (rt, uri, rqhs, rqp, rphs, render resTags)]
   where
     resTags = sanitize rpp
@@ -58,12 +60,14 @@ parseMsgFrame tags = case extract tags of
     extractPO = C.readInt . last . C.words . fromTagText
 
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
-parseOverviewStats t = fromMaybe [] $ evalMState t $ do
+parseOverviewStats t = undefined {-fromMaybe [] $ evalMState t $ do
   parseFactionLevels kTags build
   where
     kTags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
     build tg = [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ tg]
 
+-}
+{-
 parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> MState [Tag Payload] a
 parseFactionLevels kTags build = do
   mtags <- fmap (searchByTags kTags) get
@@ -72,6 +76,7 @@ parseFactionLevels kTags build = do
       put tags
       return $ build t
     _ -> fail ""
+    -}
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

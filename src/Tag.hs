@@ -16,11 +16,9 @@ tagAndStore :: TaggedHeaderRequest -> [DBCommand]
 tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "game.php" = []
   | uri == "menu.php" = []
-  | uri == "msgframe.php" = parseMsgFrame $ resTags
-  | uri == "overview_stats.php" = parseOverviewStats $ resTags
-  | otherwise = [] --TODO: Fail (rt, uri, rqhs, rqp, rphs, render resTags)]
-  where
-    resTags = sanitize rpp
+  | uri == "msgframe.php" = parseMsgFrame $ rpp
+  | uri == "overview_stats.php" = parseOverviewStats $ rpp
+  | otherwise = [] --TODO: Fail (rt, uri, rqhs, rqp, rphs, render rpp)]
 
 render :: [Tag Payload] -> Payload
 render tags = renderTagsOptions options tags
@@ -30,14 +28,6 @@ render tags = renderTagsOptions options tags
       , optMinimize = const False
       , optRawTag = const False
       }
-
-sanitize :: [Tag Payload] -> [Tag Payload]
-sanitize = filter (/= TagText "") . map sanitizeTag
-
-sanitizeTag :: Tag Payload -> Tag Payload
-sanitizeTag t
-  | isTagText t = TagText . C.unwords . C.words . fromTagText $ t
-  | otherwise = t
 
 parseMsgFrame :: [Tag Payload] -> [DBCommand]
 parseMsgFrame tags = case extract tags of

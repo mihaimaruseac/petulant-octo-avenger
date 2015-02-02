@@ -221,7 +221,15 @@ gunzipBody (t, u, rh, rp, ah, ap)
     f = BL.toStrict . decompress . BL.fromChunks . chunkify
 
 tagHTML :: ChanneledHeaderRequest -> TaggedHeaderRequest
-tagHTML (t, u, rh, rp, ah, ap) = (t, u, rh, rp, ah, parseTags ap)
+tagHTML (t, u, rh, rp, ah, ap) = (t, u, rh, rp, ah, sanitize $ parseTags ap)
+
+sanitize :: [Tag Payload] -> [Tag Payload]
+sanitize = filter (/= TagText "") . map sanitizeTag
+
+sanitizeTag :: Tag Payload -> Tag Payload
+sanitizeTag t
+  | isTagText t = TagText . C.unwords . C.words . fromTagText $ t
+  | otherwise = t
 
 searchHeader :: Payload -> [Header] -> Payload
 searchHeader h hs = fromMaybe "" $ lookup h hs

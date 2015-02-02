@@ -82,13 +82,10 @@ processChain h hdrLen = packetEnumerator h
   =$= DCC.map (dropCookedFrame hdrLen) =$= filterError
   =$= DCC.map processIP =$= filterError
   =$= DCC.map processTCP =$= filterError
-  =$= DCC.concatMapAccumM processTCPConvs Map.empty
+  =$= DCC.concatMapAccum processTCPConvs Map.empty =$= filterError =$= CL.catMaybes
   =$= DCC.map updateSeqNo
-  =$= DCC.map sortPackets
-  =$= DCC.map removeDuplicates
-  =$= DCC.map filterForContent
-  =$= DCC.filter (/= [])
-  =$= unique
+  =$= DCC.map sortPackets =$= DCC.map removeDuplicates
+  =$= DCC.map filterForContent =$= DCC.filter (/= []) =$= unique
   =$= DCC.map processHTTP =$= filterError
   =$= DCC.map tagRequest =$= filterError
   =$= DCC.map extractURI =$= filterError =$= CL.catMaybes
@@ -132,23 +129,21 @@ processTCP payload = case runGetPartial parseTCP payload of
   Done tcp p -> return (tcp, p)
   _ -> throwError UnhandledParseTCP
 
-processTCPConvs :: TCPPayload -> Map.Map Port TCPC -> IO (Map.Map Port TCPC, [TCPConversation])
+processTCPConvs :: TCPPayload -> Map.Map Port TCPC -> (Map.Map Port TCPC, [StatsM (Maybe TCPConversation)])
 processTCPConvs c@(TCP{..}, _) m
   | tcpSPort == gWebPort = update tcpDPort
   | tcpDPort == gWebPort = update tcpSPort
-  | otherwise = do
-      putStrLn $ "# Unknown port pair " ++ show (tcpSPort, tcpDPort)
-      return (m, [])
+  | otherwise = (m, [throwError $ UnknownPortPair tcpSPort tcpDPort])
     where
-      update port = let m' = updateMap port in return (m', output m' port)
+      update port = let m' = updateMap port in (m', [output m' port])
       updateMap port = Map.insertWith insertFun port (Ongoing, [c]) m
       insertFun (_, newc) (olds, oldc) = (state olds tcpFlags, oldc ++ newc)
       state CloseFinACK _ = CloseACK
       state CloseACK _ = CloseACK -- EXPLAIN: succ CloseACK = undefined
       state s f = if TCPFIN `elem` f then succ s else s
       output mp port = let v = mp Map.! port in getOutput v
-      getOutput (CloseACK, cv) = [cv]
-      getOutput _ = []
+      getOutput (CloseACK, cv) = return $ Just cv
+      getOutput _ = return Nothing
 
 updateSeqNo :: TCPConversation -> TCPConversation
 updateSeqNo conv = map (first update) conv

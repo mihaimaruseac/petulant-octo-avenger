@@ -18,6 +18,7 @@ data StatsError
   | UnhandledParseIP
   | UnhandledParseTCP
   | UnknownPortPair Port Port
+  | UnhandledHTMLRequest TaggedHeaderRequest
 
 instance Error StatsError where
   strMsg s = OtherError s
@@ -29,6 +30,7 @@ instance Show StatsError where
   show (UnacceptableEncoding h h1) = concat ["# Unacceptable encoding ", show h, " / ", show h1]
   show (UnexpectedHTTPRequest t) = "# Unknown/unexpected request " ++ show t
   show (UnknownPortPair sp dp) = "# Unknown port pair " ++ show (sp, dp)
+  show (UnhandledHTMLRequest thr) = "# Don't know to parse " ++ show thr
   show FragmentationError = "# Unable to handle fragmentation at IP level"
   show MoreRequestsInConversation = "# One request only assumption failed"
   show UndefinedLayer3Protocol = "# Undefined layer 3 proto"

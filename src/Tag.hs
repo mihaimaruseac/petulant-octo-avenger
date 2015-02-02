@@ -2,23 +2,23 @@
 
 module Tag where --(tagAndStore) where
 
---import Control.Monad.Error
+import Control.Monad.Error (throwError)
 import Control.Monad.State
---import Control.Monad.Trans.Maybe
 import Data.Maybe
 import Text.HTML.TagSoup
 
 import qualified Data.ByteString.Char8 as C
 
+import Errors
 import Types
 
-tagAndStore :: TaggedHeaderRequest -> [DBCommand]
-tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
-  | uri == "game.php" = []
-  | uri == "menu.php" = []
-  | uri == "msgframe.php" = parseMsgFrame $ rpp
-  | uri == "overview_stats.php" = parseOverviewStats $ rpp
-  | otherwise = [] --TODO: Fail (rt, uri, rqhs, rqp, rphs, render rpp)]
+tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
+tagAndStore thr@(_, uri, _, _, _, rpp)
+  | uri == "game.php" = return []
+  | uri == "menu.php" = return []
+  | uri == "msgframe.php" = return $ parseMsgFrame $ rpp
+  | uri == "overview_stats.php" = return $ parseOverviewStats $ rpp
+  | otherwise = throwError $ UnhandledHTMLRequest thr
 
 render :: [Tag Payload] -> Payload
 render tags = renderTagsOptions options tags

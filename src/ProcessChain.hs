@@ -93,7 +93,7 @@ processChain h hdrLen = packetEnumerator h
   =$= DCC.map parseHTTPHeaders
   =$= DCC.map gunzipBody =$= filterError
   =$= DCC.map tagHTML
-  =$= DCC.concatMap tagAndStore
+  =$= DCC.map tagAndStore =$= filterError =$= DCC.concat
   $$  debugSink
 
 debugSink :: Show i => Sink i IO ()

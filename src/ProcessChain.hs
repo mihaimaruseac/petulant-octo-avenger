@@ -6,7 +6,7 @@ module ProcessChain (statsOn) where
 import Codec.Compression.GZip
 import Control.Arrow
 import Control.Exception
-import Control.Monad.IO.Class
+import Control.Monad.Error
 import Data.Char
 import Data.Conduit
 import Data.List
@@ -23,6 +23,7 @@ import qualified Data.Conduit.List as CL
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 
+import Errors
 import Globals
 import IP
 import TCP
@@ -55,12 +56,12 @@ fini :: PcapHandle -> IO ()
 fini h = do
   stats <- statistics h
   print stats
-  putStrLn "Fini"
+  putStrLn "# Fini"
 
 setupMsgs :: String -> IO ()
 setupMsgs u = do
-  putStrLn $ "Capturing on " ++ u
-  putStrLn "Press ^C to end (and wait until next packet is captured)"
+  putStrLn $ "# Capturing on " ++ u
+  putStrLn "# Press ^C to end (and wait until next packet is captured)"
 
 openHandle :: String -> IO PcapHandle
 openHandle u = do
@@ -74,13 +75,13 @@ buildFilter universe = concat ["host ", universe, ".pardus.at"]
 linkHdrLen :: Link -> Int
 linkHdrLen DLT_LINUX_SLL = 16 -- FUTURE: we should check that IP is next layer
 linkHdrLen DLT_EN10MB = 14 -- FUTURE: same as above
-linkHdrLen l = error $ "Unknown link header " ++ show l
+linkHdrLen l = error $ "# Unknown link header " ++ show l
 
 processChain :: PcapHandle -> Int -> IO ()
 processChain h hdrLen = packetEnumerator h
-  =$= removePayloadFail (DCC.mapM (dropCookedFrame hdrLen))
-  =$= removePayloadFail (DCC.mapM processIP)
-  =$= removePayloadFail (DCC.mapM processTCP)
+  =$= DCC.map (dropCookedFrame hdrLen) =$= filterError
+  =$= DCC.map processIP =$= filterError
+  =$= DCC.map processTCP =$= filterError
   =$= DCC.concatMapAccumM processTCPConvs Map.empty
   =$= DCC.map updateSeqNo
   =$= DCC.map sortPackets
@@ -88,12 +89,12 @@ processChain h hdrLen = packetEnumerator h
   =$= DCC.map filterForContent
   =$= DCC.filter (/= [])
   =$= unique
-  =$= removePayloadFail (DCC.mapM processHTTP)
-  =$= removePayloadFail (DCC.mapM tagRequest)
-  =$= removePayloadFail (DCC.mapM extractURI)
+  =$= DCC.map processHTTP =$= filterError
+  =$= DCC.map tagRequest =$= filterError
+  =$= DCC.map extractURI =$= filterError =$= CL.catMaybes
   =$= DCC.map extractHTTPHeaders
   =$= DCC.map parseHTTPHeaders
-  =$= removePayloadFail (DCC.mapM gunzipBody)
+  =$= DCC.map gunzipBody =$= filterError
   =$= DCC.map tagHTML
   =$= DCC.concatMap tagAndStore
   $$  debugSink
@@ -108,36 +109,35 @@ packetEnumerator h = list
       pkt@(hdr, _) <- liftIO $ nextBS h
       if hdrCaptureLength hdr == 0 then list else yield pkt >> list
 
-dropCookedFrame :: Int -> CookedPacket -> IO (Maybe Payload)
+dropCookedFrame :: Int -> CookedPacket -> StatsM Payload
 dropCookedFrame hdrLen (PktHdr{..}, payload)
-  | hdrWireLength <= hdrCaptureLength = return . Just $ B.drop hdrLen payload
-  | otherwise = failPayload $ "Incomplete capture: " ++ show (hdrWireLength, hdrCaptureLength)
+  | hdrWireLength <= hdrCaptureLength = return $ B.drop hdrLen payload
+  | otherwise = throwError $ IncompleteCapture hdrWireLength hdrCaptureLength
 
-processIP :: Payload -> IO (Maybe Payload)
+processIP :: Payload -> StatsM Payload
 processIP payload = case runGetPartial parseIP payload of
   Done ip p -> go ip p
-  _ -> failPayload "Unhandled parseIP case"
+  _ -> throwError UnhandledParseIP
   where
     go IPv4{..} p
-      | ip4MFFlag == MoreFragments = failPayload
-          "Unable to handle fragmentation at IP level"
-      | ip4Proto == IPNextTCP = return $ Just p
-      | otherwise = failPayload "Undefined layer 3 proto"
+      | ip4MFFlag == MoreFragments = throwError FragmentationError
+      | ip4Proto == IPNextTCP = return p
+      | otherwise = throwError UndefinedLayer3Protocol
     go IPv6{..} p
-      | ip6Proto == IPNextTCP = return $ Just p
-      | otherwise = failPayload "Undefined layer 3 proto"
+      | ip6Proto == IPNextTCP = return p
+      | otherwise = throwError UndefinedLayer3Protocol
 
-processTCP :: Payload -> IO (Maybe TCPPayload)
+processTCP :: Payload -> StatsM TCPPayload
 processTCP payload = case runGetPartial parseTCP payload of
-  Done tcp p -> return $ Just (tcp, p)
-  _ -> failPayload "Unhandled parseTCP case"
+  Done tcp p -> return (tcp, p)
+  _ -> throwError UnhandledParseTCP
 
 processTCPConvs :: TCPPayload -> Map.Map Port TCPC -> IO (Map.Map Port TCPC, [TCPConversation])
 processTCPConvs c@(TCP{..}, _) m
   | tcpSPort == gWebPort = update tcpDPort
   | tcpDPort == gWebPort = update tcpSPort
   | otherwise = do
-      putStrLn $ "Unknown port pair " ++ show (tcpSPort, tcpDPort)
+      putStrLn $ "# Unknown port pair " ++ show (tcpSPort, tcpDPort)
       return (m, [])
     where
       update port = let m' = updateMap port in return (m', output m' port)
@@ -172,25 +172,25 @@ removeDuplicates = nubBy (\(x, p) (y, q) -> x == y && B.length p == B.length q)
 filterForContent :: TCPConversation -> TCPConversation
 filterForContent = filter (\(_, x) -> B.length x > 0)
 
-processHTTP :: TCPConversation -> IO (Maybe Request)
+processHTTP :: TCPConversation -> StatsM Request
 processHTTP conv
-  | length req > 1 = failPayload "One request only assumption failed"
-  | otherwise = return $ Just (head $ map snd req, B.concat $ map snd ans)
+  | length req > 1 = throwError MoreRequestsInConversation
+  | otherwise = return (head $ map snd req, B.concat $ map snd ans)
   where
     (req, ans) = partition (\(TCP{..}, _) -> tcpDPort == gWebPort) conv
 
-tagRequest :: Request -> IO (Maybe HTTPTaggedRequest)
+tagRequest :: Request -> StatsM HTTPTaggedRequest
 tagRequest (req, resp)
-  | rtype == "GET" = return $ Just (GET, B.tail rbody, resp)
-  | otherwise = failPayload $ "Unknown/unexpected request " ++ show rtype
+  | rtype == "GET" = return (GET, B.tail rbody, resp)
+  | otherwise = throwError $ UnexpectedHTTPRequest rtype
   where
     (rtype, rbody) = B.breakSubstring " " req
 
-extractURI :: HTTPTaggedRequest -> IO (Maybe HTTPURIRequest)
+extractURI :: HTTPTaggedRequest -> StatsM (Maybe HTTPURIRequest)
 extractURI (httpType, req, resp)
   | "200 OK" `B.isSuffixOf` result = return $ Just (httpType, f uri, f req', B.drop 2 resp')
   | "302 Found" `B.isSuffixOf` result = return Nothing -- ignore 302 (redirection) error codes
-  | otherwise = failPayload $ concat ["Request to ", show uri, " failed with ", show result]
+  | otherwise = throwError $ HTTPError uri result
   where
     (uri, req') = B.breakSubstring " " req
     (result, resp') = B.breakSubstring "\r\n" resp
@@ -211,10 +211,10 @@ parseHTTPHeaders (httpType, uri, reqh, req, resph, resp)
     hrsp = let w:ws = C.split '\r' resph in w : map B.tail ws
     fix = map (second (B.drop 2) . B.breakSubstring ": ")
 
-gunzipBody :: ChanneledHeaderRequest -> IO (Maybe ChanneledHeaderRequest)
+gunzipBody :: ChanneledHeaderRequest -> StatsM ChanneledHeaderRequest
 gunzipBody (t, u, rh, rp, ah, ap)
-  | h == "gzip" && h1 == "chunked" = return $ Just (t, u, rh, rp, ah, f ap)
-  | otherwise = failPayload $ concat ["Unacceptable encoding ", show h, " / ", show h1]
+  | h == "gzip" && h1 == "chunked" = return (t, u, rh, rp, ah, f ap)
+  | otherwise = throwError $ UnacceptableEncoding h h1
   where
     h = searchHeader "Content-Encoding" ah
     h1 = searchHeader "Transfer-Encoding" ah
@@ -246,11 +246,14 @@ chunkify payload
     toChunkLen = B.foldl' (\s v -> 16 * s + lv (fromInteger . toInteger $ v)) 0
     lv x = if x <= ord '9' then x - ord '0' else 10 + x - ord 'a'
 
-failPayload :: String -> IO (Maybe a)
-failPayload s = putStrLn ('#':' ':s) >> return Nothing
+filterError :: ConduitM (StatsM o) o IO ()
+filterError = do
+  i <- await
+  case i of
+    Just (Right v) -> yield v >> filterError
+    Just (Left e) -> lift (print e) >> filterError
+    _ -> return ()
 
-removePayloadFail :: Monad m => ConduitM i (Maybe o) m r -> ConduitM i o m r
-removePayloadFail = mapOutputMaybe id
 
 unique :: (Ord a, Monad m) => Conduit a m a
 unique = DCC.concatMapAccum step Set.empty where

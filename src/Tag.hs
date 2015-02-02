@@ -19,15 +19,6 @@ tagAndStore thr@(_, uri, _, _, _, rpp)
   | uri `elem` ["game.php", "menu.php"] = return []
   | otherwise = throwError $ UnhandledHTMLRequest thr
 
-render :: [Tag Payload] -> Payload
-render tags = renderTagsOptions options tags
-  where
-    options = RenderOptions
-      { optEscape = id
-      , optMinimize = const False
-      , optRawTag = const False
-      }
-
 parseMsgFrame :: [Tag Payload] -> [DBCommand]
 parseMsgFrame tags = case extract tags of
   Just (x, _) -> [POnline x]

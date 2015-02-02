@@ -12,13 +12,13 @@ import qualified Data.ByteString.Char8 as C
 
 import Types
 
-tagAndStore :: TaggedHeaderRequest -> [TaggedInfo]
+tagAndStore :: TaggedHeaderRequest -> [DBCommand]
 tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "game.php" = []
   | uri == "menu.php" = []
-  | uri == "msgframe.php" = map OK . parseMsgFrame $ resTags
-  | uri == "overview_stats.php" = map OK . parseOverviewStats $ resTags
-  | otherwise = [Fail (rt, uri, rqhs, rqp, rphs, render resTags)]
+  | uri == "msgframe.php" = parseMsgFrame $ resTags
+  | uri == "overview_stats.php" = parseOverviewStats $ resTags
+  | otherwise = [] --TODO: Fail (rt, uri, rqhs, rqp, rphs, render resTags)]
   where
     resTags = sanitize rpp
 

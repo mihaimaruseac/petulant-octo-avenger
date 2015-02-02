@@ -239,7 +239,7 @@ chunkify payload
     lv x = if x <= ord '9' then x - ord '0' else 10 + x - ord 'a'
 
 failPayload :: String -> IO (Maybe a)
-failPayload s = putStrLn s >> return Nothing
+failPayload s = putStrLn ('#':' ':s) >> return Nothing
 
 removePayloadFail :: Monad m => ConduitM i (Maybe o) m r -> ConduitM i o m r
 removePayloadFail = mapOutputMaybe id

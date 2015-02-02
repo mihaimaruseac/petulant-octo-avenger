@@ -30,11 +30,3 @@ data DBCommand
   | Debug Payload
   | MM [Tag Payload]
   deriving Show
-
-data TaggedInfo
-  = Fail ChanneledHeaderRequest
-  | OK DBCommand
-
-instance Show TaggedInfo where
-  show (Fail chr) = '#' : ' ' : show chr
-  show (OK dbc) = show dbc

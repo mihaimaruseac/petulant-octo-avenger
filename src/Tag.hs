@@ -2,6 +2,7 @@
 
 module Tag where --(tagAndStore) where
 
+--import Control.Monad.Error
 import Control.Monad.State
 --import Control.Monad.Trans.Maybe
 import Data.Maybe
@@ -11,29 +12,12 @@ import qualified Data.ByteString.Char8 as C
 
 import Types
 
-{-
- - State: used to keep track of context: tags to be matched upon.
- - Maybe: Nothing if a tag couldn't be matched, or is invalid.
- -
- - Computation should fail completely on the page if a tag wasn't matched?
- - Should give back an error? Use IO?
- -}
-type MState s = StateT s Maybe
-
-runMState :: MState s a -> s -> Maybe (a, s)
-runMState m = {- ??? . -} runStateT m
-
-evalMState :: MState s a -> s -> Maybe a
-evalMState m i = case runMState m i of
-  Just (a, _) -> Just a
-  _ -> Nothing
-
 tagAndStore :: TaggedHeaderRequest -> [TaggedInfo]
 tagAndStore (rt, uri, rqhs, rqp, rphs, rpp)
   | uri == "game.php" = []
   | uri == "menu.php" = []
   | uri == "msgframe.php" = map OK . parseMsgFrame $ resTags
-  -- | uri == "overview_stats.php" = map OK . parseOverviewStats $ resTags
+  | uri == "overview_stats.php" = map OK . parseOverviewStats $ resTags
   | otherwise = [Fail (rt, uri, rqhs, rqp, rphs, render resTags)]
   where
     resTags = sanitize rpp
@@ -67,15 +51,13 @@ parseMsgFrame tags = case extract tags of
     extractPO = C.readInt . last . C.words . fromTagText
 
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
-parseOverviewStats t = undefined {-fromMaybe [] $ evalMState t $ do
+parseOverviewStats t = (flip evalState) t $ do
   parseFactionLevels kTags build
   where
     kTags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
     build tg = [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ tg]
 
--}
-{-
-parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> MState [Tag Payload] a
+parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> State [Tag Payload] a
 parseFactionLevels kTags build = do
   mtags <- fmap (searchByTags kTags) get
   case mtags of
@@ -83,7 +65,6 @@ parseFactionLevels kTags build = do
       put tags
       return $ build t
     _ -> fail ""
-    -}
 
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just

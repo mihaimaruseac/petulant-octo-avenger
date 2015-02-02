@@ -14,10 +14,9 @@ import Types
 
 tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
 tagAndStore thr@(_, uri, _, _, _, rpp)
-  | uri == "game.php" = return []
-  | uri == "menu.php" = return []
   | uri == "msgframe.php" = return $ parseMsgFrame $ rpp
   | uri == "overview_stats.php" = return $ parseOverviewStats $ rpp
+  | uri `elem` ["game.php", "menu.php"] = return []
   | otherwise = throwError $ UnhandledHTMLRequest thr
 
 render :: [Tag Payload] -> Payload

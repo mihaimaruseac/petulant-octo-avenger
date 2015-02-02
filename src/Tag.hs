@@ -11,6 +11,13 @@ import qualified Data.ByteString.Char8 as C
 
 import Types
 
+{-
+ - State: used to keep track of context: tags to be matched upon.
+ - Maybe: Nothing if a tag couldn't be matched, or is invalid.
+ -
+ - Computation should fail completely on the page if a tag wasn't matched?
+ - Should give back an error? Use IO?
+ -}
 type MState s = StateT s Maybe
 
 runMState :: MState s a -> s -> Maybe (a, s)

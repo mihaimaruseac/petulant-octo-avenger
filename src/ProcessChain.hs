@@ -219,7 +219,7 @@ tagHTML :: ChanneledHeaderRequest -> TaggedHeaderRequest
 tagHTML (t, u, rh, rp, ah, ap) = (t, u, rh, rp, ah, sanitize $ parseTags ap)
 
 sanitize :: [Tag Payload] -> [Tag Payload]
-sanitize = filter (/= TagText "") . map sanitizeTag
+sanitize = filter (/= TagText "") . map sanitizeTag . canonicalizeTags
 
 sanitizeTag :: Tag Payload -> Tag Payload
 sanitizeTag t

@@ -12,6 +12,9 @@ import qualified Data.ByteString.Char8 as C
 import Errors
 import Types
 
+tagAndStore = undefined
+
+{-
 tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
 tagAndStore thr@(_, uri, _, _, _, rpp)
   | uri == "msgframe.php" = return $ parseMsgFrame $ rpp
@@ -45,12 +48,19 @@ parseFactionLevels kTags build = do
       put tags
       return $ build t
     _ -> fail ""
+    -}
 
+{-
 searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
 searchByTags [] = Just
 searchByTags (t:ts) = \tags -> do
   tags' <- searchByTag t tags
   searchByTags ts tags'
+  -}
 
-searchByTag :: Tag Payload -> [Tag Payload] -> Maybe [Tag Payload]
-searchByTag t = listToMaybe . sections (~== t)
+findNthTag :: Int -> Tag Payload -> [Tag Payload] -> StatsM [Tag Payload]
+findNthTag n t tags
+  | n <= 0 = throwError $ OtherError "# Coding error! Should never require non-positive tags!"
+  | otherwise = case drop (n - 1) . sections (~== t) $ tags of
+    (x:xs) -> return x
+    _ -> throwError $ NoSuchTag n t

@@ -12,6 +12,16 @@ import qualified Data.ByteString.Char8 as C
 import Errors
 import Types
 
+type StatsSM a = StateT [Tag Payload] StatsM a
+
+runStatsSM :: [Tag Payload] -> StatsSM a -> StatsM (a, [Tag Payload])
+runStatsSM tags m = runStateT m tags
+
+evalStatsSM :: [Tag Payload] -> StatsSM a -> StatsM a
+evalStatsSM tags m = case runStatsSM tags m of
+  Right (a, _) -> return a
+  Left e -> throwError e
+
 tagAndStore = undefined
 
 {-
@@ -58,9 +68,12 @@ searchByTags (t:ts) = \tags -> do
   searchByTags ts tags'
   -}
 
-findNthTag :: Int -> Tag Payload -> [Tag Payload] -> StatsM [Tag Payload]
-findNthTag n t tags
+findNthTag :: Int -> Tag Payload -> StatsSM [Tag Payload]
+findNthTag n t
   | n <= 0 = throwError $ OtherError "# Coding error! Should never require non-positive tags!"
-  | otherwise = case drop (n - 1) . sections (~== t) $ tags of
-    (x:xs) -> return x
-    _ -> throwError $ NoSuchTag n t
+  | otherwise = do
+    tags <- get
+    case drop (n - 1) . sections (~== t) $ tags of
+      (x:y:_) -> put y >> return x
+      (x:_) -> put [] >> return x
+      _ -> throwError $ NoSuchTag n t

@@ -68,14 +68,14 @@ searchByTags (t:ts) = \tags -> do
   searchByTags ts tags'
   -}
 
-findTag :: Tag Payload -> StatsSM [Tag Payload]
+findTag :: Tag Payload -> StatsSM (Tag Payload)
 findTag = findNthTag 1
 
-findNthTag :: Int -> Tag Payload -> StatsSM [Tag Payload]
+findNthTag :: Int -> Tag Payload -> StatsSM (Tag Payload)
 findNthTag n t
   | n <= 0 = throwError $ OtherError "# Coding error! Should never require non-positive tags!"
   | otherwise = do
     tags <- get
     case drop (n - 1) . sections (~== t) $ tags of
-      (x:_) -> put (drop 1 x) >> return x
+      (x:_) -> put (drop 1 x) >> return (head x)
       _ -> throwError $ NoSuchTag n t

@@ -77,6 +77,5 @@ findNthTag n t
   | otherwise = do
     tags <- get
     case drop (n - 1) . sections (~== t) $ tags of
-      (x:y:_) -> put y >> return x
-      (x:_) -> put [] >> return x
+      (x:_) -> put (drop 1 x) >> return x
       _ -> throwError $ NoSuchTag n t

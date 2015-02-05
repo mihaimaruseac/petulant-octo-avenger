@@ -68,6 +68,9 @@ searchByTags (t:ts) = \tags -> do
   searchByTags ts tags'
   -}
 
+findTag :: Tag Payload -> StatsSM [Tag Payload]
+findTag = findNthTag 1
+
 findNthTag :: Int -> Tag Payload -> StatsSM [Tag Payload]
 findNthTag n t
   | n <= 0 = throwError $ OtherError "# Coding error! Should never require non-positive tags!"

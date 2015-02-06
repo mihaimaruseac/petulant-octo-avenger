@@ -68,6 +68,10 @@ searchByTags (t:ts) = \tags -> do
   searchByTags ts tags'
   -}
 
+searchByTags :: [Tag Payload] -> StatsSM (Tag Payload)
+searchByTags [] = throwError $ OtherError "# Coding error! Should always have at least on tag to search for!"
+searchByTags tgs = foldM (flip (const . findTag)) undefined tgs
+
 findTag :: Tag Payload -> StatsSM (Tag Payload)
 findTag = findNthTag 1
 
@@ -77,5 +81,5 @@ findNthTag n t
   | otherwise = do
     tags <- get
     case drop (n - 1) . sections (~== t) $ tags of
-      (x:_) -> put (drop 1 x) >> return (head x)
+      (x:_) -> put (tail x) >> return (head x)
       _ -> throwError $ NoSuchTag n t

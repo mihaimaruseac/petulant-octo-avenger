@@ -70,13 +70,17 @@ searchByTags (t:ts) = \tags -> do
 
 searchByTags :: [Tag Payload] -> StatsSM (Tag Payload)
 searchByTags [] = throwError $ OtherError "# Coding error! Should always have at least on tag to search for!"
-searchByTags tgs = foldM (flip (const . findTag)) undefined tgs
+searchByTags tgs = foldM (flip $ const . findTag) undefined tgs
+
+searchByTagsN :: [(Int, Tag Payload)] -> StatsSM (Tag Payload)
+searchByTagsN [] = throwError $ OtherError "# Coding error! Should always have at least on tag to search for!"
+searchByTagsN tgs = foldM (flip $ const . uncurry findTagN) undefined tgs
 
 findTag :: Tag Payload -> StatsSM (Tag Payload)
-findTag = findNthTag 1
+findTag = findTagN 1
 
-findNthTag :: Int -> Tag Payload -> StatsSM (Tag Payload)
-findNthTag n t
+findTagN :: Int -> Tag Payload -> StatsSM (Tag Payload)
+findTagN n t
   | n <= 0 = throwError $ OtherError "# Coding error! Should never require non-positive tags!"
   | otherwise = do
     tags <- get

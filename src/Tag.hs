@@ -60,14 +60,6 @@ parseFactionLevels kTags build = do
     _ -> fail ""
     -}
 
-{-
-searchByTags :: [Tag Payload] -> [Tag Payload] -> Maybe [Tag Payload]
-searchByTags [] = Just
-searchByTags (t:ts) = \tags -> do
-  tags' <- searchByTag t tags
-  searchByTags ts tags'
-  -}
-
 searchByTags :: [Tag Payload] -> StatsSM (Tag Payload)
 searchByTags [] = throwError $ OtherError "# Coding error! Should always have at least on tag to search for!"
 searchByTags tgs = foldM (flip $ const . findTag) undefined tgs

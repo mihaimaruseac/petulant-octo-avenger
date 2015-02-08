@@ -9,9 +9,11 @@ import TCP (Port)
 
 data StatsError
   = IncompleteCapture Word32 Word32 -- wire length, capture length
+  | CodingError String
   | FragmentationError
   | HTTPError Payload Payload
   | MoreRequestsInConversation
+  | NoAttribute (Tag Payload) Payload
   | NoSuchTag Int (Tag Payload) -- number of aparitions
   | OtherError String
   | UnacceptableEncoding Payload Payload
@@ -26,8 +28,10 @@ instance Error StatsError where
   strMsg s = OtherError s
 
 instance Show StatsError where
+  show (CodingError s) = concat ["# Coding error: ", s, "!"]
   show (HTTPError u r) = concat ["# Request to ", show u, " failed ", show r]
   show (IncompleteCapture wl cl) = "# Incomplete capture: " ++ show (wl, cl)
+  show (NoAttribute tag attrib) = concat ["# No attribute ", show attrib, " of tag ", show tag]
   show (NoSuchTag n t) = concat ["# Tag ", show t, " not found at least ", show n, " times"]
   show (OtherError s) = s
   show (UnacceptableEncoding h h1) = concat ["# Unacceptable encoding ", show h, " / ", show h1]

@@ -58,6 +58,19 @@ parseFactionLevels kTags build = do
     _ -> fail ""
     -}
 
+extractTagText :: Tag Payload -> StatsSM Payload
+extractTagText tag
+  | not (isTagText tag) = throwError $ CodingError "Should always get tag text from TagText tags"
+  | otherwise = return $ fromTagText tag
+
+extractAttrib :: Payload -> Tag Payload -> StatsSM Payload
+extractAttrib attrib tag
+  | not (isTagOpen tag) = throwError $ CodingError "Should always get attribute from open tags"
+  | t == "" = throwError $ NoAttribute tag attrib
+  | otherwise = return t
+  where
+    t = fromAttrib attrib tag
+
 obtainFieldInfo :: [Tag Payload] -> (Tag Payload -> StatsSM a) -> StatsSM a
 obtainFieldInfo tgs f = searchByTags tgs >>= f
 
@@ -65,11 +78,11 @@ obtainFieldInfoN :: [(Int, Tag Payload)] -> (Tag Payload -> StatsSM a) -> StatsS
 obtainFieldInfoN tgs f = searchByTagsN tgs >>= f
 
 searchByTags :: [Tag Payload] -> StatsSM (Tag Payload)
-searchByTags [] = throwError $ OtherError "# Coding error! Should always have at least on tag to search for!"
+searchByTags [] = throwError $ CodingError "Should always have at least on tag to search for"
 searchByTags tgs = foldM (flip $ const . findTag) undefined tgs
 
 searchByTagsN :: [(Int, Tag Payload)] -> StatsSM (Tag Payload)
-searchByTagsN [] = throwError $ OtherError "# Coding error! Should always have at least on tag to search for!"
+searchByTagsN [] = throwError $ CodingError "Should always have at least on tag to search for"
 searchByTagsN tgs = foldM (flip $ const . uncurry findTagN) undefined tgs
 
 findTag :: Tag Payload -> StatsSM (Tag Payload)
@@ -77,7 +90,7 @@ findTag = findTagN 1
 
 findTagN :: Int -> Tag Payload -> StatsSM (Tag Payload)
 findTagN n t
-  | n <= 0 = throwError $ OtherError "# Coding error! Should never require non-positive tags!"
+  | n <= 0 = throwError $ CodingError "Should never require non-positive tags"
   | otherwise = do
     tags <- get
     case drop (n - 1) . sections (~== t) $ tags of

@@ -25,7 +25,7 @@ evalStatsSM s m = case runStatsSM s m of
 tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
 tagAndStore thr@(_, uri, _, _, _, rpp)
   | uri == "msgframe.php" = evalStatsSM rpp parseMsgFrame
-  -- | uri == "overview_stats.php" = return $ parseOverviewStats $ rpp
+  | uri == "overview_stats.php" = evalStatsSM rpp parseOverviewStats
   | uri `elem` ["game.php", "menu.php"] = return []
   | otherwise = throwError $ UnhandledHTMLRequest thr
 
@@ -35,18 +35,8 @@ parseMsgFrame = obtainFieldInfo tags build
     tags = [TagOpen "img" [("id", "universe")], TagOpen "a" [], TagText ""]
     build t = extractTagText t >>= readAtEnd C.readInt >>= return . return . POnline
 
-debug :: (Show a) => a -> StatsM [DBCommand]
-debug =  return . return . Debug . C.pack . show
-{-case extract tags of
-  Just (x, _) -> [POnline x]
-  _ -> []
-  where
-    extract = \t -> searchByTags [imgTag, aTag, textTag] t >>= (extractPO . head)
-    imgTag = TagOpen "img" [("id", "universe")]
-    aTag = TagOpen "a" []
-    textTag = TagText ""
-    extractPO = C.readInt . last . C.words . fromTagText
-    -}
+parseOverviewStats :: StatsPSM [DBCommand]
+parseOverviewStats = undefined
 
 {-
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
@@ -65,6 +55,9 @@ parseFactionLevels kTags build = do
       return $ build t
     _ -> fail ""
     -}
+
+debug :: (Show a) => a -> StatsM [DBCommand]
+debug =  return . return . Debug . C.pack . show
 
 readAtStart :: Payload -> StatsSM Payload a -> StatsM a
 readAtStart rm = evalStatsSM rm

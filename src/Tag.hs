@@ -23,16 +23,14 @@ evalStatsSM s m = case runStatsSM s m of
   Left e -> throwError e
 
 tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
-tagAndStore thr@(_, uri, _, _, _, rpp) = undefined {-
-  | uri == "msgframe.php" = return $ parseMsgFrame $ rpp
-  | uri == "overview_stats.php" = return $ parseOverviewStats $ rpp
+tagAndStore thr@(_, uri, _, _, _, rpp)
+  | uri == "msgframe.php" = evalStatsSM rpp parseMsgFrame
+  -- | uri == "overview_stats.php" = return $ parseOverviewStats $ rpp
   | uri `elem` ["game.php", "menu.php"] = return []
   | otherwise = throwError $ UnhandledHTMLRequest thr
-  -- -}
 
-{-
-parseMsgFrame :: [Tag Payload] -> [DBCommand]
-parseMsgFrame tags = case extract tags of
+parseMsgFrame :: StatsPSM [DBCommand]
+parseMsgFrame {-tags-} = undefined {-case extract tags of
   Just (x, _) -> [POnline x]
   _ -> []
   where
@@ -41,7 +39,9 @@ parseMsgFrame tags = case extract tags of
     aTag = TagOpen "a" []
     textTag = TagText ""
     extractPO = C.readInt . last . C.words . fromTagText
+    -}
 
+{-
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
 parseOverviewStats t = (flip evalState) t $ do
   parseFactionLevels kTags build
@@ -71,7 +71,7 @@ readAtStartM f = do
 
 readAtEnd :: Payload -> (Payload -> Maybe (a, Payload)) -> StatsM a
 readAtEnd w f = case f w' of
-  Just (i, w'') -> return i
+  Just (i, _) -> return i
   Nothing -> throwError $ CannotParseTagContent w
   where
     w' = last . C.words $ w

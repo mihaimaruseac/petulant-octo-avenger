@@ -4,7 +4,6 @@ module Tag where --(tagAndStore) where
 
 import Control.Monad.Error (throwError)
 import Control.Monad.State
-import Data.Maybe
 import Text.HTML.TagSoup
 
 import qualified Data.ByteString.Char8 as C

@@ -9,6 +9,7 @@ import TCP (Port)
 
 data StatsError
   = IncompleteCapture Word32 Word32 -- wire length, capture length
+  | CannotParseTagContent Payload
   | CodingError String
   | FragmentationError
   | HTTPError Payload Payload
@@ -28,6 +29,7 @@ instance Error StatsError where
   strMsg s = OtherError s
 
 instance Show StatsError where
+  show (CannotParseTagContent p) = concat ["# Text ", show p, " doesn't have the required format"]
   show (CodingError s) = concat ["# Coding error: ", s, "!"]
   show (HTTPError u r) = concat ["# Request to ", show u, " failed ", show r]
   show (IncompleteCapture wl cl) = "# Incomplete capture: " ++ show (wl, cl)

@@ -59,10 +59,22 @@ parseFactionLevels kTags build = do
     _ -> fail ""
     -}
 
-{-
-readIntAtStart :: Payload -> StatsM Int
-readIntAtStart w = C.readInt
--}
+readAtStart :: Payload -> StatsSM Payload a -> StatsM a
+readAtStart rm = evalStatsSM rm
+
+readAtStartM :: (Payload -> Maybe (a, Payload)) -> StatsSM Payload a
+readAtStartM f = do
+  p <- get
+  case f p of
+    Just (i, p') -> put p' >> return i
+    Nothing -> throwError $ CannotParseTagContent p
+
+readAtEnd :: Payload -> (Payload -> Maybe (a, Payload)) -> StatsM a
+readAtEnd w f = case f w' of
+  Just (i, w'') -> return i
+  Nothing -> throwError $ CannotParseTagContent w
+  where
+    w' = last . C.words $ w
 
 extractTagText :: Tag Payload -> StatsM Payload
 extractTagText tag

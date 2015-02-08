@@ -30,7 +30,13 @@ tagAndStore thr@(_, uri, _, _, _, rpp)
   | otherwise = throwError $ UnhandledHTMLRequest thr
 
 parseMsgFrame :: StatsPSM [DBCommand]
-parseMsgFrame {-tags-} = undefined {-case extract tags of
+parseMsgFrame = obtainFieldInfo tags $ debug
+  where
+    tags = [TagOpen "img" [("id", "universe")], TagOpen "a" [], TagText ""]
+
+debug :: Tag Payload -> StatsM [DBCommand]
+debug =  return . return . Debug . C.pack . show
+{-case extract tags of
   Just (x, _) -> [POnline x]
   _ -> []
   where

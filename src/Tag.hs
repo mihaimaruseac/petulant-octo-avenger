@@ -30,11 +30,12 @@ tagAndStore thr@(_, uri, _, _, _, rpp)
   | otherwise = throwError $ UnhandledHTMLRequest thr
 
 parseMsgFrame :: StatsPSM [DBCommand]
-parseMsgFrame = obtainFieldInfo tags $ debug
+parseMsgFrame = obtainFieldInfo tags build
   where
     tags = [TagOpen "img" [("id", "universe")], TagOpen "a" [], TagText ""]
+    build t = extractTagText t >>= readAtEnd C.readInt >>= return . return . POnline
 
-debug :: Tag Payload -> StatsM [DBCommand]
+debug :: (Show a) => a -> StatsM [DBCommand]
 debug =  return . return . Debug . C.pack . show
 {-case extract tags of
   Just (x, _) -> [POnline x]
@@ -75,8 +76,8 @@ readAtStartM f = do
     Just (i, p') -> put p' >> return i
     Nothing -> throwError $ CannotParseTagContent p
 
-readAtEnd :: Payload -> (Payload -> Maybe (a, Payload)) -> StatsM a
-readAtEnd w f = case f w' of
+readAtEnd :: (Payload -> Maybe (a, Payload)) -> Payload -> StatsM a
+readAtEnd f w = case f w' of
   Just (i, _) -> return i
   Nothing -> throwError $ CannotParseTagContent w
   where

@@ -58,12 +58,17 @@ parseFactionLevels kTags build = do
     _ -> fail ""
     -}
 
-extractTagText :: Tag Payload -> StatsSM Payload
+{-
+readIntAtStart :: Payload -> StatsM Int
+readIntAtStart w = C.readInt
+-}
+
+extractTagText :: Tag Payload -> StatsM Payload
 extractTagText tag
   | not (isTagText tag) = throwError $ CodingError "Should always get tag text from TagText tags"
   | otherwise = return $ fromTagText tag
 
-extractAttrib :: Payload -> Tag Payload -> StatsSM Payload
+extractAttrib :: Payload -> Tag Payload -> StatsM Payload
 extractAttrib attrib tag
   | not (isTagOpen tag) = throwError $ CodingError "Should always get attribute from open tags"
   | t == "" = throwError $ NoAttribute tag attrib
@@ -71,11 +76,11 @@ extractAttrib attrib tag
   where
     t = fromAttrib attrib tag
 
-obtainFieldInfo :: [Tag Payload] -> (Tag Payload -> StatsSM a) -> StatsSM a
-obtainFieldInfo tgs f = searchByTags tgs >>= f
+obtainFieldInfo :: [Tag Payload] -> (Tag Payload -> StatsM a) -> StatsSM a
+obtainFieldInfo tgs f = searchByTags tgs >>= (lift . f)
 
-obtainFieldInfoN :: [(Int, Tag Payload)] -> (Tag Payload -> StatsSM a) -> StatsSM a
-obtainFieldInfoN tgs f = searchByTagsN tgs >>= f
+obtainFieldInfoN :: [(Int, Tag Payload)] -> (Tag Payload -> StatsM a) -> StatsSM a
+obtainFieldInfoN tgs f = searchByTagsN tgs >>= (lift . f)
 
 searchByTags :: [Tag Payload] -> StatsSM (Tag Payload)
 searchByTags [] = throwError $ CodingError "Should always have at least on tag to search for"

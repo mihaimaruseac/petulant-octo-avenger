@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Tag where --(tagAndStore) where
+module Tag {-(tagAndStore)-} where
 
 import Control.Monad.Error (throwError)
 import Control.Monad.State
@@ -21,16 +21,15 @@ evalStatsSM tags m = case runStatsSM tags m of
   Right (a, _) -> return a
   Left e -> throwError e
 
-tagAndStore = undefined
-
-{-
 tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
-tagAndStore thr@(_, uri, _, _, _, rpp)
+tagAndStore thr@(_, uri, _, _, _, rpp) = undefined {-
   | uri == "msgframe.php" = return $ parseMsgFrame $ rpp
   | uri == "overview_stats.php" = return $ parseOverviewStats $ rpp
   | uri `elem` ["game.php", "menu.php"] = return []
   | otherwise = throwError $ UnhandledHTMLRequest thr
+  -- -}
 
+{-
 parseMsgFrame :: [Tag Payload] -> [DBCommand]
 parseMsgFrame tags = case extract tags of
   Just (x, _) -> [POnline x]

@@ -59,9 +59,6 @@ parseFactionLevels kTags build = do
 debug :: (Show a) => a -> StatsM [DBCommand]
 debug =  return . return . Debug . C.pack . show
 
-readAtStart :: Payload -> StatsSM Payload a -> StatsM a
-readAtStart rm = evalStatsSM rm
-
 readAtStartM :: (Payload -> Maybe (a, Payload)) -> StatsSM Payload a
 readAtStartM f = do
   p <- get

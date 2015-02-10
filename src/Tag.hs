@@ -36,7 +36,10 @@ parseMsgFrame = obtainFieldInfo tags build
     build t = extractTagText t >>= readAtEnd C.readInt >>= return . return . POnline
 
 parseOverviewStats :: StatsPSM [DBCommand]
-parseOverviewStats = undefined
+parseOverviewStats = obtainFieldInfo tags build
+  where
+    tags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
+    build t = extractAttrib "title" t >>= readAtStartIgnore C.readInt >>= debug
 
 {-
 parseOverviewStats :: [Tag Payload] -> [DBCommand]
@@ -59,12 +62,10 @@ parseFactionLevels kTags build = do
 debug :: (Show a) => a -> StatsM [DBCommand]
 debug =  return . return . Debug . C.pack . show
 
-readAtStartM :: (Payload -> Maybe (a, Payload)) -> StatsSM Payload a
-readAtStartM f = do
-  p <- get
-  case f p of
-    Just (i, p') -> put p' >> return i
-    Nothing -> throwError $ CannotParseTagContent p
+readAtStartIgnore :: (Payload -> Maybe (a, Payload)) -> Payload -> StatsM a
+readAtStartIgnore f w = case f w of
+  Just (i, _) -> return i
+  Nothing -> throwError $ CannotParseTagContent w
 
 readAtEnd :: (Payload -> Maybe (a, Payload)) -> Payload -> StatsM a
 readAtEnd f w = case f w' of

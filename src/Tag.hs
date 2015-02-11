@@ -36,10 +36,12 @@ parseMsgFrame = obtainFieldInfo tags build
     build t = extractTagText t >>= readAtEnd C.readInt >>= return . return . POnline
 
 parseOverviewStats :: StatsPSM [DBCommand]
-parseOverviewStats = obtainFieldInfo tags build
+parseOverviewStats = do
+  cl <- obtainFieldInfo tags build
+  lift $ debug cl
   where
     tags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
-    build t = extractAttrib "title" t >>= readAtStartIgnore C.readInt >>= debug
+    build t = extractAttrib "title" t >>= readAtStartIgnore C.readInt -- >>= debug
 
 {-
 parseOverviewStats :: [Tag Payload] -> [DBCommand]

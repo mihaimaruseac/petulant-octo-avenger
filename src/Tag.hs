@@ -38,7 +38,8 @@ parseMsgFrame = obtainFieldInfo tags build
 parseOverviewStats :: StatsPSM [DBCommand]
 parseOverviewStats = do
   cl <- obtainFieldInfo tags build
-  lift $ debug cl
+  cv <- obtainFieldInfoN [(2, TagOpen "td" [])] build
+  lift $ debug (cl, cv)
   where
     tags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
     build t = extractAttrib "title" t >>= readAtStartIgnore C.readInt -- >>= debug

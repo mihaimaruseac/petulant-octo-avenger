@@ -42,25 +42,7 @@ parseOverviewStats = do
   lift $ debug (cl, cv)
   where
     tags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
-    build t = extractAttrib "title" t >>= readAtStartIgnore C.readInt -- >>= debug
-
-{-
-parseOverviewStats :: [Tag Payload] -> [DBCommand]
-parseOverviewStats t = (flip evalState) t $ do
-  parseFactionLevels kTags build
-  where
-    kTags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
-    build tg = [Competency . fst . fromJust . C.readInt . fromAttrib "title" $ tg]
-
-parseFactionLevels :: [Tag Payload] -> (Tag Payload -> a) -> State [Tag Payload] a
-parseFactionLevels kTags build = do
-  mtags <- fmap (searchByTags kTags) get
-  case mtags of
-    Just (t:tags) -> do
-      put tags
-      return $ build t
-    _ -> fail ""
-    -}
+    build t = extractAttrib "title" t >>= readAtStartIgnore C.readInt
 
 debug :: (Show a) => a -> StatsM [DBCommand]
 debug =  return . return . Debug . C.pack . show

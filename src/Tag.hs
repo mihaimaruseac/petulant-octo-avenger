@@ -37,15 +37,24 @@ parseMsgFrame = obtainFieldInfo tags build
 
 parseOverviewStats :: StatsPSM [DBCommand]
 parseOverviewStats = do
-  cl <- obtainFieldInfo tags build
-  cv <- obtainFieldInfoN [(2, TagOpen "td" [])] build
-  lift $ debug (cl, cv)
+  (cl, cv) <- parseRank "Competency:" C.readInt
+  (fl, fv) <- parseRank "Progress:" readRank
+  lift . debug $ ((cl, cv), (fl, fv))
+
+parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> StatsPSM (a, Int)
+parseRank title readFun = do
+  name <- obtainFieldInfo tags (build readFun)
+  val <- obtainFieldInfoN [(2, TagOpen "td" [])] (build C.readInt)
+  return (name, val)
   where
-    tags = [TagText "Competency:", TagOpen "td" [], TagOpen "img" []]
-    build t = extractAttrib "title" t >>= readAtStartIgnore C.readInt
+    tags = [TagText title, TagOpen "td" [], TagOpen "img" []]
+    build rf t = extractAttrib "title" t >>= readAtStartIgnore rf
 
 debug :: (Show a) => a -> StatsM [DBCommand]
 debug =  return . return . Debug . C.pack . show
+
+readRank :: Payload -> Maybe (Payload, Payload)
+readRank s = Just (head . C.words $ s, "") -- ignore the remaining of the string
 
 readAtStartIgnore :: (Payload -> Maybe (a, Payload)) -> Payload -> StatsM a
 readAtStartIgnore f w = case f w of

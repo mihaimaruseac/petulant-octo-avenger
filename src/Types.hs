@@ -23,10 +23,14 @@ data HTTPRequestType = GET | POST
 {-- Types for getting the data out of HTML and into the DB. --}
 type PlayersOnline = Int
 type CompetencyLevel = Int
+type CompetencyPercentage = Int
+type FactionLevel = Payload -- TODO: change to Int
+type FactionPercentage = Int
 
 data DBCommand
   = POnline PlayersOnline
-  | Competency CompetencyLevel
+  | Competency CompetencyLevel CompetencyPercentage
+  | Faction FactionLevel FactionPercentage
   | Debug Payload
   | MM [Tag Payload]
   deriving Show

@@ -39,7 +39,7 @@ parseOverviewStats :: StatsPSM [DBCommand]
 parseOverviewStats = do
   (cl, cv) <- parseRank "Competency:" C.readInt
   (fl, fv) <- parseRank "Progress:" readRank
-  lift . debug $ ((cl, cv), (fl, fv))
+  return [Competency cl cv, Faction fl fv]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> StatsPSM (a, Int)
 parseRank title readFun = do
@@ -53,6 +53,7 @@ parseRank title readFun = do
 debug :: (Show a) => a -> StatsM [DBCommand]
 debug =  return . return . Debug . C.pack . show
 
+-- TODO: make it work by returning rank level instead of rank name
 readRank :: Payload -> Maybe (Payload, Payload)
 readRank s = Just (head . C.words $ s, "") -- ignore the remaining of the string
 

@@ -37,15 +37,15 @@ parseMsgFrame = obtainFieldInfo tags build
 
 parseOverviewStats :: StatsPSM [DBCommand]
 parseOverviewStats = do
-  (cl, cv) <- parseRank "Competency:" C.readInt
-  (fl, fv) <- parseRank "Progress:" readRank
-  return [Competency cl cv, Faction fl fv]
+  cCmd <- parseRank "Competency:" C.readInt Competency
+  fCmd <- parseRank "Progress:" readRank Faction
+  return [cCmd, fCmd]
 
-parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> StatsPSM (a, Int)
-parseRank title readFun = do
+parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
+parseRank title readFun buildFun = do
   name <- obtainFieldInfo tags (build readFun)
   val <- obtainFieldInfoN [(2, TagOpen "td" [])] (build C.readInt)
-  return (name, val)
+  return $ buildFun name val
   where
     tags = [TagText title, TagOpen "td" [], TagOpen "img" []]
     build rf t = extractAttrib "title" t >>= readAtStartIgnore rf

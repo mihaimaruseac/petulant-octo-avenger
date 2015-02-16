@@ -50,8 +50,8 @@ parseRank title readFun buildFun = do
     tags = [TagText title, TagOpen "td" [], TagOpen "img" []]
     build rf t = extractAttrib "title" t >>= readAtStartIgnore rf
 
-debug :: (Show a) => a -> StatsM [DBCommand]
-debug =  return . return . Debug . C.pack . show
+debug :: (Monad m, Show a) => a -> m DBCommand
+debug = return . Debug . C.pack . show
 
 -- TODO: make it work by returning rank level instead of rank name
 readRank :: Payload -> Maybe (Payload, Payload)

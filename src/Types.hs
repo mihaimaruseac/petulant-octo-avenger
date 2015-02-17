@@ -26,10 +26,12 @@ type CompetencyLevel = Int
 type CompetencyPercentage = Int
 type FactionLevel = Payload -- TODO: change to Int
 type FactionPercentage = Int
+type AP = Int
 
 data DBCommand
   = POnline PlayersOnline
   | Competency CompetencyLevel CompetencyPercentage
+  | AP AP
   | Faction FactionLevel FactionPercentage
   | Debug Payload
   | MM [Tag Payload]

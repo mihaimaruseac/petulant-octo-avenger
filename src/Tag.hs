@@ -11,6 +11,8 @@ import qualified Data.ByteString.Char8 as C
 import Errors
 import Types
 
+import Debug.Trace
+
 type StatsSM s a = StateT s StatsM a
 type StatsPSM a = StatsSM [Tag Payload] a
 
@@ -39,7 +41,8 @@ parseOverviewStats :: StatsPSM [DBCommand]
 parseOverviewStats = do
   cCmd <- parseRank "Competency:" C.readInt Competency
   fCmd <- parseRank "Progress:" readRank Faction
-  return [cCmd, fCmd]
+  fAP <- parseLabelInfo "APs played:" AP
+  return [cCmd, fCmd, fAP]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
 parseRank title readFun buildFun = do
@@ -49,6 +52,13 @@ parseRank title readFun buildFun = do
   where
     tags = [TagText title, TagOpen "td" [], TagOpen "img" []]
     build rf t = extractAttrib "title" t >>= readAtStartIgnore rf
+
+parseLabelInfo :: Payload -> (Int -> DBCommand) -> StatsPSM DBCommand
+parseLabelInfo title buildFun = do
+  t <- obtainFieldInfo [TagText title, TagText ""] build
+  return $ buildFun t
+  where
+    build t = extractTagText t >>= readAtStartIgnore C.readInt . C.concat . C.split ','
 
 debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show

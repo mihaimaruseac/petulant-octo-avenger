@@ -21,18 +21,18 @@ data HTTPRequestType = GET | POST
   deriving (Eq, Show, Ord, Enum)
 
 {-- Types for getting the data out of HTML and into the DB. --}
-type PlayersOnline = Int
+type AP = Int
 type CompetencyLevel = Int
 type CompetencyPercentage = Int
 type FactionLevel = Payload -- TODO: change to Int
 type FactionPercentage = Int
-type AP = Int
+type PlayersOnline = Int
 
 data DBCommand
-  = POnline PlayersOnline
+  = AP AP
   | Competency CompetencyLevel CompetencyPercentage
-  | AP AP
   | Faction FactionLevel FactionPercentage
+  | POnline PlayersOnline
   | Debug Payload
   | MM [Tag Payload]
   deriving Show

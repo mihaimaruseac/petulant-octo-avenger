@@ -5,14 +5,15 @@ import Data.Word
 import Text.HTML.TagSoup
 
 import Types
+
 import TCP (Port)
 
 data StatsError
-  = IncompleteCapture Word32 Word32 -- wire length, capture length
-  | CannotParseTagContent Payload
+  = CannotParseTagContent Payload
   | CodingError String
   | FragmentationError
   | HTTPError Payload Payload
+  | IncompleteCapture Word32 Word32 -- wire length, capture length
   | MoreRequestsInConversation
   | NoAttribute (Tag Payload) Payload
   | NoSuchTag Int (Tag Payload) -- number of aparitions

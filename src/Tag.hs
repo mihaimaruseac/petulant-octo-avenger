@@ -2,6 +2,7 @@
 
 module Tag {-(tagAndStore)-} where
 
+import Control.Applicative ((<$>))
 import Control.Monad.Error (throwError)
 import Control.Monad.State
 import Text.HTML.TagSoup
@@ -35,7 +36,7 @@ parseMsgFrame :: StatsPSM [DBCommand]
 parseMsgFrame = obtainFieldInfo tags build
   where
     tags = [TagOpen "img" [("id", "universe")], TagOpen "a" [], TagText ""]
-    build t = extractTagText t >>= readAtEnd C.readInt >>= return . return . POnline
+    build t = return . POnline <$> (extractTagText t >>= readAtEnd C.readInt)
 
 parseOverviewStats :: StatsPSM [DBCommand]
 parseOverviewStats = do

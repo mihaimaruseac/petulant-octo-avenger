@@ -27,7 +27,7 @@ data StatsError
   | UnknownPortPair Port Port
 
 instance Error StatsError where
-  strMsg s = OtherError s
+  strMsg = OtherError
 
 instance Show StatsError where
   show (CannotParseTagContent p) = concat ["# Text ", show p, " doesn't have the required format"]

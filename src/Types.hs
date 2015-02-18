@@ -22,17 +22,26 @@ data HTTPRequestType = GET | POST
 
 {-- Types for getting the data out of HTML and into the DB. --}
 type AP = Int
+type ASP = Int
+type ATP = Double
 type CompetencyLevel = Int
 type CompetencyPercentage = Int
+type Credits = Int
 type FactionLevel = Payload -- TODO: change to Int
 type FactionPercentage = Int
 type PlayersOnline = Int
+type XP = Int
 
 data DBCommand
   = AP AP
+  | ASP ASP
+  | ATP ATP
   | Competency CompetencyLevel CompetencyPercentage
-  | Faction FactionLevel FactionPercentage
-  | POnline PlayersOnline
+  | Credits Credits
   | Debug Payload
+  | Faction FactionLevel FactionPercentage
   | MM [Tag Payload]
+  | POnline PlayersOnline
+  | Turnover Credits
+  | XP XP
   deriving Show

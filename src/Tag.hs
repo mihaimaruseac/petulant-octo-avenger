@@ -42,8 +42,13 @@ parseOverviewStats :: StatsPSM [DBCommand]
 parseOverviewStats = do
   cCmd <- parseRank "Competency:" C.readInt Competency
   fCmd <- parseRank "Progress:" readRank Faction
-  fAP <- parseLabelInfo "APs played:" AP
-  return [cCmd, fCmd, fAP]
+  apCmd <- parseLabelInfo "APs played:" readLongNumber AP
+  credCmd <- parseLabelInfo "Credits:" readLongNumber Credits
+  turnoverCmd <- parseLabelInfo "Turnover:" readLongNumber Turnover
+  xpCmd <- parseLabelInfo "Experience:" readLongNumber XP
+  aspCmd <- parseLabelInfo "ASPs:" C.readInt ASP
+  atpCmd <- parseLabelInfo "ATPs:" readPardusDouble ATP
+  return [cCmd, fCmd, apCmd, credCmd, turnoverCmd, xpCmd, aspCmd, atpCmd]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
 parseRank title readFun buildFun = do
@@ -54,12 +59,12 @@ parseRank title readFun buildFun = do
     tags = [TagText title, TagOpen "td" [], TagOpen "img" []]
     build rf t = extractAttrib "title" t >>= readAtStartIgnore rf
 
-parseLabelInfo :: Payload -> (Int -> DBCommand) -> StatsPSM DBCommand
-parseLabelInfo title buildFun = do
-  t <- obtainFieldInfo [TagText title, TagText ""] build
+parseLabelInfo :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> DBCommand) -> StatsPSM DBCommand
+parseLabelInfo title readFun buildFun = do
+  t <- obtainFieldInfo [TagText title, TagText ""] $ build readFun
   return $ buildFun t
   where
-    build t = extractTagText t >>= readAtStartIgnore C.readInt . C.concat . C.split ','
+    build rf t = extractTagText t >>= readAtStartIgnore rf
 
 debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show
@@ -67,6 +72,14 @@ debug = return . Debug . C.pack . show
 -- TODO: make it work by returning rank level instead of rank name
 readRank :: Payload -> Maybe (Payload, Payload)
 readRank s = Just (head . C.words $ s, "") -- ignore the remaining of the string
+
+readLongNumber :: Payload -> Maybe (Int, Payload)
+readLongNumber = C.readInt . C.concat . C.split ','
+
+readPardusDouble :: Payload -> Maybe (Double, Payload)
+readPardusDouble x = case map C.readInteger . C.split '.' $ x of
+  [Just (i, ""), Just (f, "")] -> Just (fromInteger i + (fromInteger f)/100, "")
+  _ -> Nothing
 
 readAtStartIgnore :: (Payload -> Maybe (a, Payload)) -> Payload -> StatsM a
 readAtStartIgnore f w = case f w of

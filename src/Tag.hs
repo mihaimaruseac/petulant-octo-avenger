@@ -77,9 +77,11 @@ readLongNumber :: Payload -> Maybe (Int, Payload)
 readLongNumber = C.readInt . C.concat . C.split ','
 
 readPardusDouble :: Payload -> Maybe (Double, Payload)
-readPardusDouble x = case map C.readInteger . C.split '.' $ x of
-  [Just (i, ""), Just (f, "")] -> Just (fromInteger i + (fromInteger f)/100, "")
-  _ -> Nothing
+readPardusDouble x = do
+  (i, p) <- C.readInteger x
+  guard $ C.head p == '.'
+  (f, r) <- C.readInteger $ C.drop 1 p
+  return (fromInteger i + (fromInteger f) / 100, r)
 
 readAtStartIgnore :: (Payload -> Maybe (a, Payload)) -> Payload -> StatsM a
 readAtStartIgnore f w = case f w of

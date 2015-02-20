@@ -29,8 +29,18 @@ tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
 tagAndStore thr@(_, uri, _, _, _, rpp)
   | uri == "msgframe.php" = evalStatsSM rpp parseMsgFrame
   | uri == "overview_stats.php" = evalStatsSM rpp parseOverviewStats
-  | uri `elem` ["game.php", "menu.php"] = return []
+  | uri `elem` ignorabimus = return []
   | otherwise = throwError $ UnhandledHTMLRequest thr
+  where
+    ignorabimus =
+      [ "game.php"
+      , "menu.php"
+      , "overview_jobs.php"
+      , "overview_payment_log.php"
+      , "overview_buildings.php"
+      , "overview_ship.php"
+      ]
+
 
 parseMsgFrame :: StatsPSM [DBCommand]
 parseMsgFrame = obtainFieldInfo tags build

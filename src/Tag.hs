@@ -58,8 +58,8 @@ parseOverviewStats = do
   xpCmd <- parseLabelInfo "Experience:" readLongNumber XP
   aspCmd <- parseLabelInfo "ASPs:" C.readInt ASP
   atpCmd <- parseLabelInfo "ATPs:" readPardusDouble ATP
-  s <- parseReputation
-  return [cCmd, fCmd, apCmd, credCmd, turnoverCmd, xpCmd, aspCmd, atpCmd, Debug $ C.pack $show s]
+  repCmd <- parseReputation
+  return [cCmd, fCmd, apCmd, credCmd, turnoverCmd, xpCmd, aspCmd, atpCmd, repCmd]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
 parseRank title readFun buildFun = do
@@ -79,11 +79,8 @@ parseLabelInfo title readFun buildFun = do
 
 parseReputation :: StatsPSM DBCommand
 parseReputation = do
-  f <- obtainFieldInfo (tags "fed") build
-  e <- obtainFieldInfo (tags "emp") build
-  u <- obtainFieldInfo (tags "uni") build
-  a <- obtainFieldInfo (tags "avg") build
-  debug (f, e, u, a)
+  f:e:u:a:_ <- mapM (\x -> obtainFieldInfo (tags x) build) ["fed", "emp", "uni", "avg"]
+  return $ Rep f e u a
   where
     tags s = [TagOpen "span" [("id", C.concat ["rep", s, "_current"])], TagText ""]
     build t = extractTagText t >>= readAtStartIgnore C.readInt

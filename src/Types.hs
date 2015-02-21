@@ -30,6 +30,10 @@ type Credits = Int
 type FactionLevel = Payload -- TODO: change to Int
 type FactionPercentage = Int
 type PlayersOnline = Int
+type RepF = Int
+type RepE = Int
+type RepU = Int
+type RepA = Int
 type XP = Int
 
 data DBCommand
@@ -42,6 +46,7 @@ data DBCommand
   | Faction FactionLevel FactionPercentage
   | MM [Tag Payload]
   | POnline PlayersOnline
+  | Rep RepF RepE RepU RepA
   | Turnover Credits
   | XP XP
   deriving Show

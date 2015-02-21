@@ -79,11 +79,13 @@ parseLabelInfo title readFun buildFun = do
 
 parseReputation :: StatsPSM DBCommand
 parseReputation = do
-  t <- obtainFieldInfo tags build
-  s <- get
-  debug (t, s)
+  f <- obtainFieldInfo (tags "fed") build
+  e <- obtainFieldInfo (tags "emp") build
+  u <- obtainFieldInfo (tags "uni") build
+  a <- obtainFieldInfo (tags "avg") build
+  debug (f, e, u, a)
   where
-    tags = [TagOpen "span" [("id", "repfed_current")], TagText ""]
+    tags s = [TagOpen "span" [("id", C.concat ["rep", s, "_current"])], TagText ""]
     build t = extractTagText t >>= readAtStartIgnore C.readInt
 
 debug :: (Monad m, Show a) => a -> m DBCommand

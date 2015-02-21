@@ -58,7 +58,8 @@ parseOverviewStats = do
   xpCmd <- parseLabelInfo "Experience:" readLongNumber XP
   aspCmd <- parseLabelInfo "ASPs:" C.readInt ASP
   atpCmd <- parseLabelInfo "ATPs:" readPardusDouble ATP
-  return [cCmd, fCmd, apCmd, credCmd, turnoverCmd, xpCmd, aspCmd, atpCmd]
+  s <- parseReputation
+  return [cCmd, fCmd, apCmd, credCmd, turnoverCmd, xpCmd, aspCmd, atpCmd, Debug $ C.pack $show s]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
 parseRank title readFun buildFun = do
@@ -75,6 +76,15 @@ parseLabelInfo title readFun buildFun = do
   return $ buildFun t
   where
     build rf t = extractTagText t >>= readAtStartIgnore rf
+
+parseReputation :: StatsPSM DBCommand
+parseReputation = do
+  t <- obtainFieldInfo tags build
+  s <- get
+  debug (t, s)
+  where
+    tags = [TagOpen "span" [("id", "repfed_current")], TagText ""]
+    build t = extractTagText t >>= readAtStartIgnore C.readInt
 
 debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show

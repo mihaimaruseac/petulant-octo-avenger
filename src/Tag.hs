@@ -87,7 +87,7 @@ debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show
 
 readTagThenTextStart :: Tag Payload -> (Payload -> Maybe (a, Payload)) -> StatsPSM a
-readTagThenTextStart tag rf = obtainFieldInfo [tag, TagText ""] $ build
+readTagThenTextStart tag rf = obtainFieldInfo [tag, TagText ""] build
   where
     build t = extractTagText t >>= readAtStartIgnore rf
 
@@ -103,7 +103,7 @@ readPardusDouble x = do
   (i, p) <- C.readInteger x
   guard $ C.head p == '.'
   (f, r) <- C.readInteger $ C.drop 1 p
-  return (fromInteger i + (fromInteger f) / 100, r)
+  return (fromInteger i + fromInteger f / 100, r)
 
 readAtStartIgnore :: (Payload -> Maybe (a, Payload)) -> Payload -> StatsM a
 readAtStartIgnore f w = case f w of

@@ -72,21 +72,24 @@ parseRank title readFun buildFun = do
 
 parseLabelInfo :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> DBCommand) -> StatsPSM DBCommand
 parseLabelInfo title readFun buildFun = do
-  t <- obtainFieldInfo [TagText title, TagText ""] $ build readFun
+  t <- readTagThenTextStart (TagText title) readFun
   return $ buildFun t
-  where
-    build rf t = extractTagText t >>= readAtStartIgnore rf
 
 parseReputation :: StatsPSM DBCommand
 parseReputation = do
-  f:e:u:a:_ <- mapM (\x -> obtainFieldInfo (tags x) build) ["fed", "emp", "uni", "avg"]
+  f:e:u:a:_ <- mapM rd ["fed", "emp", "uni", "avg"]
   return $ Rep f e u a
   where
-    tags s = [TagOpen "span" [("id", C.concat ["rep", s, "_current"])], TagText ""]
-    build t = extractTagText t >>= readAtStartIgnore C.readInt
+    rd x = readTagThenTextStart (buildT x) C.readInt
+    buildT s = TagOpen "span" [("id", C.concat ["rep", s, "_current"])]
 
 debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show
+
+readTagThenTextStart :: Tag Payload -> (Payload -> Maybe (a, Payload)) -> StatsPSM a
+readTagThenTextStart tag rf = obtainFieldInfo [tag, TagText ""] $ build
+  where
+    build t = extractTagText t >>= readAtStartIgnore rf
 
 -- TODO: make it work by returning rank level instead of rank name
 readRank :: Payload -> Maybe (Payload, Payload)

@@ -49,17 +49,17 @@ parseMsgFrame = obtainFieldInfo tags build
     build t = return . POnline <$> (extractTagText t >>= readAtEnd C.readInt)
 
 parseOverviewStats :: StatsPSM [DBCommand]
-parseOverviewStats = do
-  cCmd <- parseRank "Competency:" C.readInt Competency
-  fCmd <- parseRank "Progress:" readRank Faction
-  apCmd <- parseLabelInfo "APs played:" readLongNumber AP
-  credCmd <- parseLabelInfo "Credits:" readLongNumber Credits
-  turnoverCmd <- parseLabelInfo "Turnover:" readLongNumber Turnover
-  xpCmd <- parseLabelInfo "Experience:" readLongNumber XP
-  aspCmd <- parseLabelInfo "ASPs:" C.readInt ASP
-  atpCmd <- parseLabelInfo "ATPs:" readPardusDouble ATP
-  repCmd <- parseReputation
-  return [cCmd, fCmd, apCmd, credCmd, turnoverCmd, xpCmd, aspCmd, atpCmd, repCmd]
+parseOverviewStats = sequence
+  [ parseRank "Competency:" C.readInt Competency
+  , parseRank "Progress:" readRank Faction
+  , parseLabelInfo "APs played:" readLongNumber AP
+  , parseLabelInfo "Credits:" readLongNumber Credits
+  , parseLabelInfo "Turnover:" readLongNumber Turnover
+  , parseLabelInfo "Experience:" readLongNumber XP
+  , parseLabelInfo "ASPs:" C.readInt ASP
+  , parseLabelInfo "ATPs:" readPardusDouble ATP
+  , parseReputation
+  ]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
 parseRank title readFun buildFun = do

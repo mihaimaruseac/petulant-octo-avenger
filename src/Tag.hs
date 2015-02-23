@@ -59,6 +59,14 @@ parseOverviewStats = sequence
   , parseLabelInfo "ASPs:" C.readInt ASP
   , parseLabelInfo "ATPs:" readPardusDouble ATP
   , parseReputation
+  , parseLabelInfo "Other pilots killed:" C.readInt PilotKill
+  , parseLabelInfo "War Medals earned:" C.readInt WarMedals
+  , parseLabelInfo "Own ship destroyed:" C.readInt PilotDeath
+  , parseLabelInfo "Bounties collected:" C.readInt Bounties
+  , parseLabelInfo "'Kill' Bounties:" C.readInt KillBounties
+  , parseLabelInfo "'Destroy' Bounties:" C.readInt DestroyBounties
+  , parseLabelInfo "Total NPCs killed:" readLongNumber NPCKill
+  , parseLabelInfo "Combat Ribbons earned:" C.readInt Ribbons
   ]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand

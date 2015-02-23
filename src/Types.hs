@@ -24,29 +24,40 @@ data HTTPRequestType = GET | POST
 type AP = Int
 type ASP = Int
 type ATP = Double
+type Bounties = Int
 type CompetencyLevel = Int
 type CompetencyPercentage = Int
 type Credits = Int
 type FactionLevel = Payload -- TODO: change to Int
 type FactionPercentage = Int
+type KDCount = Int
+type Medals = Int
 type PlayersOnline = Int
-type RepF = Int
-type RepE = Int
-type RepU = Int
 type RepA = Int
+type RepE = Int
+type RepF = Int
+type RepU = Int
 type XP = Int
 
 data DBCommand
   = AP AP
   | ASP ASP
   | ATP ATP
+  | Bounties Bounties
   | Competency CompetencyLevel CompetencyPercentage
   | Credits Credits
   | Debug Payload
+  | DestroyBounties Bounties
   | Faction FactionLevel FactionPercentage
+  | KillBounties Bounties
   | MM [Tag Payload]
+  | NPCKill KDCount
   | POnline PlayersOnline
+  | PilotDeath KDCount
+  | PilotKill KDCount
   | Rep RepF RepE RepU RepA
+  | Ribbons Medals
   | Turnover Credits
+  | WarMedals Medals
   | XP XP
   deriving Show

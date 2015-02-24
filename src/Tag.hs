@@ -67,6 +67,7 @@ parseOverviewStats = sequence
   , parseLabelInfo "'Destroy' Bounties:" C.readInt DestroyBounties
   , parseLabelInfo "Total NPCs killed:" readLongNumber NPCKill
   , parseLabelInfo "Combat Ribbons earned:" C.readInt Ribbons
+  , parseKills
   ]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
@@ -90,6 +91,11 @@ parseReputation = do
   where
     rd x = readTagThenTextStart (buildT x) C.readInt
     buildT s = TagOpen "span" [("id", C.concat ["rep", s, "_current"])]
+
+parseKills :: StatsPSM DBCommand
+parseKills = do
+  s <- get
+  debug s
 
 debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show

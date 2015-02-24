@@ -94,6 +94,7 @@ parseReputation = do
 
 parseKills :: StatsPSM DBCommand
 parseKills = do
+  _ <- findTag (TagOpen "td" [("colspan", "")]) -- ignore first td
   s <- get
   debug s
 

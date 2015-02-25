@@ -167,6 +167,6 @@ findTagN n t
   | n <= 0 = throwError $ CodingError "Should never require non-positive tags"
   | otherwise = do
     tags <- get
-    case drop (n - 1) . partitions (~== t) $ tags of
+    case drop (n - 1) . sections (~== t) $ tags of
       (x:_) -> put (tail x) >> return (head x)
       _ -> throwError $ NoSuchTag n t

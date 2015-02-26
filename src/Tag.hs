@@ -95,7 +95,6 @@ parseReputation = do
 
 parseKills :: StatsPSM DBCommand
 parseKills = do
-  _ <- findTag (TagOpen "td" [("colspan", "")]) -- ignore first td
   s <- getUntilTag (TagOpen "td" [("valign", "top"), ("align", "center")])
   debug $ filter (~== (TagText "" :: Tag Payload)) s
 

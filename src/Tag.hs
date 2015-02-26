@@ -5,6 +5,7 @@ module Tag {-(tagAndStore)-} where
 import Control.Applicative ((<$>))
 import Control.Monad.Error (throwError)
 import Control.Monad.State
+import Data.List
 import Text.HTML.TagSoup
 
 import qualified Data.ByteString.Char8 as C
@@ -159,8 +160,20 @@ searchByTagsN :: [(Int, Tag Payload)] -> StatsPSM (Tag Payload)
 searchByTagsN [] = throwError $ CodingError "Should always have at least on tag to search for"
 searchByTagsN tgs = foldM (flip $ const . uncurry findTagN) undefined tgs
 
+getUntilTag :: Tag Payload -> StatsPSM [Tag Payload]
+getUntilTag = getUntilTagN 1
+
 findTag :: Tag Payload -> StatsPSM (Tag Payload)
 findTag = findTagN 1
+
+getUntilTagN :: Int -> Tag Payload -> StatsPSM [Tag Payload]
+getUntilTagN n t
+  | n <= 0 = throwError $ CodingError "Should never require non-positive tags"
+  | otherwise = do
+    tags <- get
+    case drop (n - 1). fst . partition ((~==t) . snd) . zip [0..] $ tags of
+      ((x,_):_) -> put (drop x tags) >> return (take x tags)
+      _ -> throwError $ NoSuchTag n t
 
 findTagN :: Int -> Tag Payload -> StatsPSM (Tag Payload)
 findTagN n t

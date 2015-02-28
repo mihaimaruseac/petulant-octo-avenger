@@ -100,7 +100,7 @@ parseKills = do
   return $ NPCList p
   where
     extractTexts = map fromTagText . filter (~== (TagText "" :: Tag Payload))
-    pairs (x:y:xys) = (x, readLongNumber y) : pairs xys
+    pairs (x:y:xys) = (C.init x, readLongNumber y) : pairs xys
     pairs _ = [] -- squeeze in the case of odd elements, ignoring the last
     build (n, Just (c, _)) = return (n, c)
     build _ = throwError $ CannotParseTagContent "<no info>"

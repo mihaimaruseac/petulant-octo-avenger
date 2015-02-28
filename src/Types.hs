@@ -32,6 +32,8 @@ type FactionLevel = Payload -- TODO: change to Int
 type FactionPercentage = Int
 type KDCount = Int
 type Medals = Int
+type NPCKill = Int
+type NPCName = Payload
 type PlayersOnline = Int
 type RepA = Int
 type RepE = Int
@@ -52,6 +54,7 @@ data DBCommand
   | KillBounties Bounties
   | MM [Tag Payload]
   | NPCKill KDCount
+  | NPCList [(NPCName, NPCKill)]
   | POnline PlayersOnline
   | PilotDeath KDCount
   | PilotKill KDCount

@@ -97,7 +97,7 @@ parseKills :: StatsPSM DBCommand
 parseKills = do
   s <- getUntilTag (TagOpen "td" [("valign", "top"), ("align", "center")])
   p <- mapM build . pairs . extractTexts $ s
-  debug $ p
+  return $ NPCList p
   where
     extractTexts = map fromTagText . filter (~== (TagText "" :: Tag Payload))
     pairs (x:y:xys) = (x, readLongNumber y) : pairs xys

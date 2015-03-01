@@ -39,19 +39,29 @@ type RepA = Int
 type RepE = Int
 type RepF = Int
 type RepU = Int
+type Skill = Double
 type XP = Int
 
 data DBCommand
   = AP AP
+  | AM Skill Skill
   | ASP ASP
   | ATP ATP
   | Bounties Bounties
+  | CLK Skill Skill
   | Competency CompetencyLevel CompetencyPercentage
   | Credits Credits
   | Debug Payload
   | DestroyBounties Bounties
+  | EC Skill Skill
+  | ENG Skill Skill
+  | FC Skill Skill
   | Faction FactionLevel FactionPercentage
+  | GC Skill Skill
+  | HA Skill Skill
+  | HACK Skill Skill
   | KillBounties Bounties
+  | MAN Skill Skill
   | MM [Tag Payload]
   | NPCKill KDCount
   | NPCList [(NPCName, NPCKill)]
@@ -60,7 +70,9 @@ data DBCommand
   | PilotKill KDCount
   | Rep RepF RepE RepU RepA
   | Ribbons Medals
+  | Tac Skill Skill
   | Turnover Credits
+  | WEAP Skill Skill
   | WarMedals Medals
   | XP XP
   deriving Show

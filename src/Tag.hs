@@ -69,6 +69,7 @@ parseOverviewStats = sequence
   , parseLabelInfo "Total NPCs killed:" readLongNumber NPCKill
   , parseLabelInfo "Combat Ribbons earned:" C.readInt Ribbons
   , parseKills
+  , parseSkill
   ]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
@@ -104,6 +105,16 @@ parseKills = do
     pairs _ = [] -- squeeze in the case of odd elements, ignoring the last
     build (n, Just (c, _)) = return (n, c)
     build _ = throwError $ CannotParseTagContent "<no info>"
+
+parseSkill :: StatsPSM DBCommand
+parseSkill = do
+  _ <- findTag $ TagOpen "label" [] -- needs to be ignored
+  bv <- readTag 3 -- jump over label, directly to base value
+  av <- readTag 1 -- actual value
+  debug (bv, av)
+  where
+    readTag c = findTagN c (TagText "") >>= (lift . parse)
+    parse t = extractTagText t >>= readAtStartIgnore readPardusDouble
 
 debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show

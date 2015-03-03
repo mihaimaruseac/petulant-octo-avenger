@@ -69,17 +69,17 @@ parseOverviewStats = sequence
   , parseLabelInfo "Total NPCs killed:" readLongNumber NPCKill
   , parseLabelInfo "Combat Ribbons earned:" C.readInt Ribbons
   , parseKills
-  , parseSkill AM
-  , parseSkill EC
-  , parseSkill GC
-  , parseSkill FC
-  , parseSkill TAC
-  , parseSkill HA
-  , parseSkill MAN
-  , parseSkill WEAP
-  , parseSkill ENG
-  , parseSkill CLK
-  , parseSkill HACK
+  , parseSkill "asteroid" AM
+  , parseSkill "energy" EC
+  , parseSkill "gas" GC
+  , parseSkill "fuel" FC
+  , parseSkill "tactics" TAC
+  , parseSkill "hit" HA
+  , parseSkill "maneuver" MAN
+  , parseSkill "weaponry" WEAP
+  , parseSkill "engineering" ENG
+  , parseSkill "cloaking" CLK
+  , parseSkill "hacking" HACK
   ]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand
@@ -116,15 +116,13 @@ parseKills = do
     build (n, Just (c, _)) = return (n, c)
     build _ = throwError $ CannotParseTagContent "<no info>"
 
-parseSkill :: (Skill -> Skill -> DBCommand) -> StatsPSM DBCommand
-parseSkill cmdB = do
-  _ <- findTag $ TagOpen "label" [] -- needs to be ignored
-  bv <- readTag 3 -- jump over label, directly to base value
-  av <- readTag 1 -- actual value
+parseSkill :: Payload -> (Skill -> Skill -> DBCommand) -> StatsPSM DBCommand
+parseSkill title cmdB = do
+  bv:av:_ <- mapM rd ["base", "actual"]
   return $ cmdB bv av
   where
-    readTag c = findTagN c (TagText "") >>= (lift . parse)
-    parse t = extractTagText t >>= readAtStartIgnore readPardusDouble
+    rd x = readTagThenTextStart (buildT x) readPardusDouble
+    buildT typ = TagOpen "td" [("id", C.concat [title, "_", typ])]
 
 debug :: (Monad m, Show a) => a -> m DBCommand
 debug = return . Debug . C.pack . show

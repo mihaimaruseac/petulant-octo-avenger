@@ -70,7 +70,7 @@ data DBCommand
   | PilotKill KDCount
   | Rep RepF RepE RepU RepA
   | Ribbons Medals
-  | Tac Skill Skill
+  | TAC Skill Skill
   | Turnover Credits
   | WEAP Skill Skill
   | WarMedals Medals

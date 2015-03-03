@@ -70,6 +70,16 @@ parseOverviewStats = sequence
   , parseLabelInfo "Combat Ribbons earned:" C.readInt Ribbons
   , parseKills
   , parseSkill AM
+  , parseSkill EC
+  , parseSkill GC
+  , parseSkill FC
+  , parseSkill TAC
+  , parseSkill HA
+  , parseSkill MAN
+  , parseSkill WEAP
+  , parseSkill ENG
+  , parseSkill CLK
+  , parseSkill HACK
   ]
 
 parseRank :: Payload -> (Payload -> Maybe (a, Payload)) -> (a -> Int -> DBCommand) -> StatsPSM DBCommand

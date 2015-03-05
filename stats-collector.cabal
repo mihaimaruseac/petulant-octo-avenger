@@ -47,3 +47,12 @@ executable stats-collector
     tagsoup >= 0.13,
     transformers >= 0.3,
     zlib >= 0.5
+
+executable drawer
+  default-language:  Haskell2010
+  ghc-options:       -Wall -O2
+  main-is:           Main.hs
+  hs-source-dirs:    src-draw
+
+  build-depends:
+    base >= 4.6

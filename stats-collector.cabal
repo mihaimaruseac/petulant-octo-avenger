@@ -55,4 +55,6 @@ executable drawer
   hs-source-dirs:    src-draw
 
   build-depends:
-    base >= 4.6
+    base >= 4.6,
+    diagrams >= 1.2,
+    diagrams-rasterific >= 0.1

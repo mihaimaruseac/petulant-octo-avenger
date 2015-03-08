@@ -6,10 +6,12 @@ import Diagrams.Prelude
 import System.Environment
 
 main :: IO ()
-main = do
+main = firstDemo
+{-do
   args <- getArgs
   case args of
-    ["1"] -> firstDemo
+    "1":_ -> firstDemo
     _ -> print args
+    -}
 
-firstDemo = undefined
+firstDemo = mainWith (circle 1 :: Diagram B R2)

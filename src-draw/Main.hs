@@ -1,7 +1,7 @@
 -- {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Diagrams.Backend.SVG.CmdLine
+import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude
 import System.Environment
 

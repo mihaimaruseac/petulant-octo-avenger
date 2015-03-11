@@ -1,4 +1,3 @@
--- {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import System.Environment

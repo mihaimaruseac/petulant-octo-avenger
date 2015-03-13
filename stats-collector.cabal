@@ -58,4 +58,5 @@ executable drawer
     base >= 4.6,
     diagrams >= 1.2,
     diagrams-lib >= 1.2,
-    diagrams-rasterific >= 0.1
+    diagrams-rasterific >= 0.1,
+    optparse-applicative >= 0.11

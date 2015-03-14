@@ -48,10 +48,12 @@ main :: IO ()
 main = mainWith selectDemo
 
 selectDemo :: Demo -> Diagram B R2
-selectDemo 1 = firstDemo
-selectDemo 2 = secondDemo
-selectDemo 3 = thirdDemo
-selectDemo _ = error "Demo not defined"
+selectDemo n
+  | and [0 < n, n <= length demos] = demos !! (n - 1)
+  | otherwise = error "Demo not defined"
+
+demos :: [Diagram B R2]
+demos = [firstDemo, secondDemo, thirdDemo]
 
 firstDemo :: Diagram B R2
 firstDemo = circle 1

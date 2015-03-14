@@ -14,13 +14,14 @@ selectDemo n
   | otherwise = error "Demo not defined"
 
 demos :: [Diagram B R2]
-demos = [firstDemo, secondDemo, thirdDemo]
-
-firstDemo :: Diagram B R2
-firstDemo = circle 1
-
-secondDemo :: Diagram B R2
-secondDemo = circle 1 # fc blue # lw veryThick # lc purple # dashingG [0.2, 0.05] 0
-
-thirdDemo :: Diagram B R2
-thirdDemo = circle 1 # fc red # lw none ||| circle 1 # fc green # lw none
+demos =
+  [ demoCircle
+  , demoCircleStyled
+  , demoTwoCircles
+  , demoAtop
+  ]
+  where
+    demoCircle = circle 1
+    demoCircleStyled = circle 1 # fc blue # lw veryThick # lc purple # dashingG [0.2, 0.05] 0
+    demoTwoCircles = circle 1 # fc red # lw none ||| circle 1 # fc green # lw none
+    demoAtop = square 1 # fc aqua `atop` circle 1

@@ -38,12 +38,25 @@ genSelection = undefined
 switch :: Selection -> Diagram B R2
 switch FirstDemo = firstDemo
 -}
-
-firstDemo :: Diagram B R2
-firstDemo = circle 1 -- :: Diagram B R2)
-
 d = firstDemo
 -}
 
+
+type Demo = Int
+
 main :: IO ()
-main = mainWith (circle 1 :: Diagram B R2)
+main = mainWith selectDemo
+
+selectDemo :: Demo -> Diagram B R2
+selectDemo 1 = firstDemo
+selectDemo 2 = secondDemo
+selectDemo _ = error "Demo not defined"
+
+firstDemo :: Diagram B R2
+firstDemo = circle 1
+
+secondDemo :: Diagram B R2
+secondDemo = circle 1 # fc blue
+                      # lw veryThick
+                      # lc purple
+                      # dashingG [0.2, 0.05] 0

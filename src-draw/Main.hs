@@ -23,6 +23,12 @@ demos =
   , demoOrigin2
   , demoSide
   , demoSideOrigin
+  , demoBeside
+  , demoHcat
+  , demoEllipse
+  , demoSnug
+  , demoRotate
+  , demoAlign
   ]
   where
     demoCircle = circle 1
@@ -37,3 +43,19 @@ demos =
     demoSide = circle 1 === square 2
     -- origin is origin of first element
     demoSideOrigin = demoSide # showOrigin
+    -- beside uses vector displacements (r2)
+    demoBeside = beside (r2 (1,1)) (circle 1) (square 2)
+    -- horizontal concat (hcat is concat with |||) and strutX for spaces
+    demoHcat = hcat [hcat [demoBeside, demoBeside], strutX 1, demoBeside ||| demoBeside]
+    -- ellipses. Since positioning is based on a separation line perp to the
+    -- center lines there is a gap in between
+    demoEllipse = let ell = circle 1 # scaleX 0.5 # rotateBy (1/6) in ell ||| ell
+    -- solve the above gap issue
+    demoSnug = let ell = circle 1 # scaleX 0.5 # rotateBy (1/6) in ell # snugR <> ell # snugL
+    -- demo rotate by fraction of circle: rotate by 2pi/3 (120 degrees)
+    demoRotate = square 1 # rotateBy (1/3)
+    -- demo align
+    demoAlign = hrule (2 * sum sizes) === circles # centerX
+      where circles = hcat . map alignB . zipWith scale sizes
+                    $ repeat (circle 1)
+            sizes   = [2,5,4,7,1,3]

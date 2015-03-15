@@ -30,8 +30,10 @@ main =
 
 selectDemo :: Demo -> Diagram B R2
 selectDemo n
-  | and [0 < n, n <= length demos] = demos !! (n - 1)
-  | otherwise = error "Demo not defined"
+  | and [0 < n, n <= l] = demos !! (n - 1)
+  | otherwise = error $ concat ["Demo not defined (not in {1, 2.. ", show l, "})"]
+  where
+    l = length demos
 
 demos :: [Diagram B R2]
 demos =

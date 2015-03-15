@@ -29,6 +29,8 @@ demos =
   , demoSnug
   , demoRotate
   , demoAlign
+  , demoTournament -- TODO: move outside
+  -- TODO: move to own file
   ]
   where
     demoCircle = circle 1
@@ -59,3 +61,21 @@ demos =
       where circles = hcat . map alignB . zipWith scale sizes
                     $ repeat (circle 1)
             sizes   = [2,5,4,7,1,3]
+
+demoTournament :: Diagram B R2
+demoTournament
+  = tournament 16
+
+tournament :: Int -> Diagram B R2
+tournament n
+  =  applyAll [connectOutside' arrowOpts j k | j <- [1 .. n-1], k <- [j+1 .. n]]
+  $ decorateTrail (regPoly n 1) (map (node n) [1..])
+  where
+    arrowOpts = with & gaps       .~ small
+                     & headLength .~ Global 0.2
+
+-- remember that <> is `atop`
+node :: Int -> Int -> Diagram B R2
+node m n
+   = text (show n) # fontSizeN (0.5 / fromIntegral m) # fc white # translate (r2 (-0.01, -0.18))
+  <> circle 0.2 # fc green # named n

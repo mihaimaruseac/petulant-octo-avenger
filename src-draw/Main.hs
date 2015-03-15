@@ -7,28 +7,16 @@ import System.Environment
 
 import qualified Options.Applicative as O
 
-{-
--- for introduction demo examples
-newtype Demo = Demo Int deriving Show
-
--- mode for not drawing anything
-newtype NoDiagram = NoDiagram Int deriving Show
--}
-
 -- All modes together
 data Commands
   = Demo Int
   | NoDiagram Int
-{-= Commands
-  { demo :: Demo
-  , nodia :: NoDiagram
-  }-} deriving Show
+  deriving Show
 
 -- parser for all modes
 parseModes :: O.Parser Commands
-parseModes =
-        O.subparser (O.command "demo" parseDemo)
-  O.<|> O.subparser (O.command "nodia" parseNoDiagram)
+parseModes = O.subparser (O.command "demo" parseDemo)
+       O.<|> O.subparser (O.command "nodia" parseNoDiagram)
 
 -- individual parsers
 parseDemo :: O.ParserInfo Commands

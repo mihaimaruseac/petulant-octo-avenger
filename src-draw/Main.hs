@@ -10,7 +10,7 @@ import qualified Options.Applicative as O
 -- All modes together
 data Commands
   = Demo Int
-  | NoDiagram Int
+  | NoDiagram
   deriving Show
 
 -- parser for all modes
@@ -34,21 +34,7 @@ parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
     mod = O.fullDesc O.<> O.header "Draw demo diagram from tutorial" O.<> O.footer "by MM"
 
 parseNoDiagram :: O.ParserInfo Commands
-parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ NoDiagram
-  O.<$> O.option O.auto
-      (    O.short 'n'
-      O.<> O.long "number"
-      O.<> O.help "Demo number"
-      O.<> O.metavar "<INT>"
-      O.<> O.value 15
-      O.<> O.showDefault
-      -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented
-      )
-      {-
-      (    O.value ()
-      O.<> O.hidden
-      )
-      -}
+parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ pure NoDiagram
   where
     mod = O.fullDesc O.<> O.header "Don't draw anything" O.<> O.footer "by MM"
 

@@ -7,6 +7,51 @@ import System.Environment
 
 import qualified Options.Applicative as O
 
+-- for introduction demo examples
+newtype Demo = Demo Int deriving Show
+
+-- mode for not drawing anything
+newtype NoDiagram = NoDiagram () deriving Show
+
+-- All modes together
+data Commands = Commands
+  { demo :: Demo
+  , nodia :: NoDiagram
+  } deriving Show
+
+-- parser for all modes
+parseModes :: O.ParserInfo Commands
+parseModes = O.info (O.helper O.<*> parsers) mod
+  where
+    mod = O.fullDesc O.<> O.footer "by MM"
+    parsers = Commands
+           O.<$> O.subparser (O.command "demo" parseDemo)
+           O.<*> O.subparser (O.command "nodia" parseNoDiagram)
+
+-- individual parsers
+parseDemo :: O.ParserInfo Demo
+parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
+  O.<$> O.option O.auto
+      (    O.short 'n'
+      O.<> O.long "number"
+      O.<> O.help "Demo number"
+      O.<> O.metavar "<INT>"
+      O.<> O.value 15
+      O.<> O.showDefault
+      -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented
+      )
+  where
+    mod = O.fullDesc O.<> O.footer "by MM"
+
+parseNoDiagram :: O.ParserInfo NoDiagram
+parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ NoDiagram
+  O.<$> O.option O.auto
+      (    O.value ()
+      O.<> O.hidden
+      )
+  where
+    mod = O.fullDesc O.<> O.footer "by MM"
+
 --type Demo = Int
 {-
 data DiaArgs
@@ -19,9 +64,18 @@ instance Parseable DiaArgs where
         -}
 
 main :: IO ()
-main =
+main = do
+  args <- O.execParser parseModes
+  print "OK"
+  print args
+  putStrLn "mm"
+  {-
+  case args of
+    Demo n -> selectDemo n
+    _ -> print args
+    --}
   --mainWith (\(Flip f) -> (if f then reflectX else id) $selectDemo 15)
-  mainWith selectDemo
+  --mainWith selectDemo
   {-
   do
   i:_ <- getArgs

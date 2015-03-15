@@ -67,9 +67,8 @@ demoTournament
   = tournament 16
 
 tournament :: Int -> Diagram B R2
-tournament n
-  =  applyAll [connectOutside' arrowOpts j k | j <- [1 .. n-1], k <- [j+1 .. n]]
-  $ decorateTrail (regPoly n 1) (map (node n) [1..])
+tournament n = decorateTrail (regPoly n 1) (map (node n) [1..]) #
+  applyAll [connectOutside' arrowOpts j k | j <- [1 .. n-1], k <- [j+1 .. n]]
   where
     arrowOpts = with & gaps       .~ small
                      & headLength .~ Global 0.2

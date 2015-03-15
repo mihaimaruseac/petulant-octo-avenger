@@ -15,8 +15,8 @@ data Commands
 
 -- parser for all modes
 parseModes :: O.Parser Commands
-parseModes = O.subparser (O.command "demo" parseDemo)
-       O.<|> O.subparser (O.command "nodia" parseNoDiagram)
+parseModes = O.subparser (O.command "demo" parseDemo O.<> O.metavar "demo")
+       O.<|> O.subparser (O.command "nodia" parseNoDiagram O.<> O.metavar "nodia")
 
 -- individual parsers
 parseDemo :: O.ParserInfo Commands

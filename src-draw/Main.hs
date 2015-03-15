@@ -4,19 +4,30 @@ import Diagrams.Backend.CmdLine
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude hiding ((<>))
 import Options.Applicative hiding ((<>))
+import System.Environment
 
 import qualified Diagrams.Prelude as D
 import qualified Options.Applicative as O
 
 type Demo = Int
 
-data FlipOpts = FlipOpts Bool
+data DiaArgs
+  = Flip Bool
+  | Demo Bool
 
-instance Parseable FlipOpts where
-  parser = FlipOpts <$> switch (long "flipped" O.<> help "Flip the diagram L-R")
+instance Parseable DiaArgs where
+  parser =  Flip <$> switch (long "flipped" O.<> help "Flip the diagram L-R")
+        <|> Demo <$> switch (long "demo" O.<> help "Select tutorial demo")
 
 main :: IO ()
-main = mainWith (\(FlipOpts f) -> (if f then reflectX else id) $selectDemo 15) --mainWith selectDemo
+main = 
+  --mainWith (\(Flip f) -> (if f then reflectX else id) $selectDemo 15)
+  mainWith selectDemo
+  {-
+  do
+  i:_ <- getArgs
+  mainWith $ selectDemo (read i)
+  --}
 
 selectDemo :: Demo -> Diagram B R2
 selectDemo n

@@ -7,7 +7,7 @@ import System.Environment
 
 import qualified Options.Applicative as O
 
-type Demo = Int
+--type Demo = Int
 {-
 data DiaArgs
   = Flip Bool
@@ -28,7 +28,7 @@ main =
   mainWith $ selectDemo (read i)
   --}
 
-selectDemo :: Demo -> Diagram B R2
+selectDemo :: Int -> Diagram B R2
 selectDemo n
   | and [0 < n, n <= l] = demos !! (n - 1)
   | otherwise = error $ concat ["Demo not defined (not in {1, 2.. ", show l, "})"]

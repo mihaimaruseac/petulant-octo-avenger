@@ -20,13 +20,10 @@ data Commands = Commands
   } deriving Show
 
 -- parser for all modes
-parseModes :: O.ParserInfo Commands
-parseModes = O.info (O.helper O.<*> parsers) mod
-  where
-    mod = O.fullDesc O.<> O.footer "by MM"
-    parsers = Commands
-           O.<$> O.subparser (O.command "demo" parseDemo)
-           O.<*> O.subparser (O.command "nodia" parseNoDiagram)
+parseModes :: O.Parser Commands
+parseModes = Commands
+  O.<$> O.subparser (O.command "demo" parseDemo)
+  O.<*> O.subparser (O.command "nodia" parseNoDiagram)
 
 -- individual parsers
 parseDemo :: O.ParserInfo Demo
@@ -75,7 +72,12 @@ instance Parseable DiaArgs where
 
 main :: IO ()
 main = do
-  args <- O.execParser parseModes
+  args <- O.execParser $ O.info (O.helper O.<*> parseModes) $ mconcat
+    [ O.fullDesc
+    , O.header "Generic diagram drawer"
+    , O.footer "by MM"
+    , O.progDesc "Draw diagrams"
+    ]
   print "OK"
   print args
   putStrLn "mm"

@@ -71,12 +71,14 @@ main = do
     , O.footer "by MM"
     , O.progDesc "Draw diagrams"
     ]
+    --{-
   print "OK"
   print args
   putStrLn "mm"
+  --}
   {-
   case args of
-    Demo n -> selectDemo n
+    Demo n -> mainWith $ selectDemo n
     _ -> print args
     --}
   --mainWith (\(Flip f) -> (if f then reflectX else id) $selectDemo 15)

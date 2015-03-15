@@ -31,7 +31,7 @@ parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
       -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented
       )
   where
-    mod = O.fullDesc O.<> O.footer "by MM"
+    mod = O.fullDesc O.<> O.header "Draw demo diagram from tutorial" O.<> O.footer "by MM"
 
 parseNoDiagram :: O.ParserInfo Commands
 parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ NoDiagram
@@ -50,7 +50,7 @@ parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ NoDiagram
       )
       -}
   where
-    mod = O.fullDesc O.<> O.footer "by MM"
+    mod = O.fullDesc O.<> O.header "Don't draw anything" O.<> O.footer "by MM"
 
 --type Demo = Int
 {-

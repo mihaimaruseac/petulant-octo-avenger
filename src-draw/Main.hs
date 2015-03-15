@@ -2,15 +2,13 @@
 
 import Diagrams.Backend.CmdLine
 import Diagrams.Backend.Rasterific.CmdLine
-import Diagrams.Prelude hiding ((<>))
-import Options.Applicative hiding ((<>))
+import Diagrams.Prelude
 import System.Environment
 
-import qualified Diagrams.Prelude as D
 import qualified Options.Applicative as O
 
 type Demo = Int
-
+{-
 data DiaArgs
   = Flip Bool
   | Demo Bool
@@ -18,6 +16,7 @@ data DiaArgs
 instance Parseable DiaArgs where
   parser =  Flip <$> switch (long "flipped" O.<> help "Flip the diagram L-R")
         <|> Demo <$> switch (long "demo" O.<> help "Select tutorial demo")
+        -}
 
 main :: IO ()
 main = 
@@ -74,7 +73,7 @@ demos =
     -- center lines there is a gap in between
     demoEllipse = let ell = circle 1 # scaleX 0.5 # rotateBy (1/6) in ell ||| ell
     -- solve the above gap issue
-    demoSnug = let ell = circle 1 # scaleX 0.5 # rotateBy (1/6) in ell # snugR D.<> ell # snugL
+    demoSnug = let ell = circle 1 # scaleX 0.5 # rotateBy (1/6) in ell # snugR <> ell # snugL
     -- demo rotate by fraction of circle: rotate by 2pi/3 (120 degrees)
     demoRotate = square 1 # rotateBy (1/3)
     -- demo align
@@ -94,8 +93,8 @@ tournament n = decorateTrail (regPoly n 1) (map (node n) [1..]) #
     arrowOpts = with & gaps       .~ small
                      & headLength .~ Global 0.2
 
--- remember that D.<> is `atop`
+-- remember that <> is `atop`
 node :: Int -> Int -> Diagram B R2
 node m n
    = text (show n) # fontSizeN (0.5 / fromIntegral m) # fc white # translate (r2 (-0.01, -0.18))
-  D.<> circle 0.2 # fc green # named n
+  <> circle 0.2 # fc green # named n

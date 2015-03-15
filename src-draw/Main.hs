@@ -19,7 +19,7 @@ instance Parseable DiaArgs where
         -}
 
 main :: IO ()
-main = 
+main =
   --mainWith (\(Flip f) -> (if f then reflectX else id) $selectDemo 15)
   mainWith selectDemo
   {-

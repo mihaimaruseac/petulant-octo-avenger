@@ -11,7 +11,7 @@ import qualified Options.Applicative as O
 newtype Demo = Demo Int deriving Show
 
 -- mode for not drawing anything
-newtype NoDiagram = NoDiagram () deriving Show
+newtype NoDiagram = NoDiagram Int deriving Show
 
 -- All modes together
 data Commands = Commands
@@ -46,9 +46,19 @@ parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
 parseNoDiagram :: O.ParserInfo NoDiagram
 parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ NoDiagram
   O.<$> O.option O.auto
+      (    O.short 'n'
+      O.<> O.long "number"
+      O.<> O.help "Demo number"
+      O.<> O.metavar "<INT>"
+      O.<> O.value 15
+      O.<> O.showDefault
+      -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented
+      )
+      {-
       (    O.value ()
       O.<> O.hidden
       )
+      -}
   where
     mod = O.fullDesc O.<> O.footer "by MM"
 

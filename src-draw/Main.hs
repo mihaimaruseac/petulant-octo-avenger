@@ -11,10 +11,10 @@ import qualified Options.Applicative as O
 data Commands
   = Demo Int (DiagramOpts, DiagramLoopOpts)
   | NoDiagram
-  deriving Show
 
-instance Show DiagramLoopOpts where
-  show d = "<loop options>"
+instance Show Commands where
+  show (Demo n (d, dl)) = mconcat ["Demo ", show n, " ", show d]
+  show NoDiagram = show "NoDiagram"
 
 -- parser for all modes
 parseModes :: O.Parser Commands

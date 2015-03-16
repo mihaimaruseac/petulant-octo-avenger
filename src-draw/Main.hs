@@ -28,7 +28,7 @@ parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
       (    O.short 'n'
       O.<> O.long "number"
       O.<> O.help "Demo number"
-      O.<> O.metavar "<INT>"
+      O.<> O.metavar "INT"
       O.<> O.value 15
       O.<> O.showDefault
       -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented

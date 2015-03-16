@@ -42,17 +42,6 @@ parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ pure NoDiagram
   where
     mod = O.fullDesc O.<> O.header "Don't draw anything" O.<> O.footer "by MM"
 
---type Demo = Int
-{-
-data DiaArgs
-  = Flip Bool
-  | Demo Bool
-
-instance Parseable DiaArgs where
-  parser =  Flip <$> switch (long "flipped" O.<> help "Flip the diagram L-R")
-        <|> Demo <$> switch (long "demo" O.<> help "Select tutorial demo")
-        -}
-
 main :: IO ()
 main = do
   args <- O.execParser $ O.info (O.helper O.<*> parseModes) $ mconcat
@@ -61,23 +50,9 @@ main = do
     , O.footer "by MM"
     , O.progDesc "Draw diagrams"
     ]
-    {-
-  print "OK"
-  print args
-  putStrLn "mm"
-  --}
-  --{-
   case args of
-    Demo n o -> mainRender o $ selectDemo n --mainWith $ selectDemo n
+    Demo n o -> mainRender o $ selectDemo n
     _ -> print args
-    --}
-  --mainWith (\(Flip f) -> (if f then reflectX else id) $selectDemo 15)
-  --mainWith selectDemo
-  {-
-  do
-  i:_ <- getArgs
-  mainWith $ selectDemo (read i)
-  --}
 
 selectDemo :: Int -> Diagram B R2
 selectDemo n

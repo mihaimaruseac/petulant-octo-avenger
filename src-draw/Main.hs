@@ -9,9 +9,12 @@ import qualified Options.Applicative as O
 
 -- All modes together
 data Commands
-  = Demo Int
+  = Demo Int (DiagramOpts, DiagramLoopOpts)
   | NoDiagram
   deriving Show
+
+instance Show DiagramLoopOpts where
+  show d = "<loop options>"
 
 -- parser for all modes
 parseModes :: O.Parser Commands
@@ -30,6 +33,7 @@ parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
       O.<> O.showDefault
       -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented
       )
+  O.<*> parser
   where
     mod = O.fullDesc O.<> O.header "Draw demo diagram from tutorial" O.<> O.footer "by MM"
 
@@ -57,14 +61,14 @@ main = do
     , O.footer "by MM"
     , O.progDesc "Draw diagrams"
     ]
-    --{-
+    {-
   print "OK"
   print args
   putStrLn "mm"
   --}
-  {-
+  --{-
   case args of
-    Demo n -> mainWith $ selectDemo n
+    Demo n o -> mainRender o $ selectDemo n --mainWith $ selectDemo n
     _ -> print args
     --}
   --mainWith (\(Flip f) -> (if f then reflectX else id) $selectDemo 15)

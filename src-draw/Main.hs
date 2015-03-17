@@ -7,18 +7,22 @@ import System.Environment
 
 import qualified Options.Applicative as O
 
--- All modes together
+type DO = (DiagramOpts, DiagramLoopOpts)
+
 data Commands
-  = Demo Int (DiagramOpts, DiagramLoopOpts)
+  = Demo Int DO
+  | Tournament DO
   | NoDiagram
 
 instance Show Commands where
-  show (Demo n (d, dl)) = mconcat ["Demo ", show n, " ", show d]
+  show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]
+  show (Tournament (d, _)) = mconcat ["Tournament ", show d]
   show NoDiagram = show "NoDiagram"
 
 -- parser for all modes
 parseModes :: O.Parser Commands
 parseModes = O.subparser (O.command "demo" parseDemo O.<> O.metavar "demo")
+       O.<|> O.subparser (O.command "tournament" parseTournament O.<> O.metavar "tournament")
        O.<|> O.subparser (O.command "nodia" parseNoDiagram O.<> O.metavar "nodia")
 
 -- individual parsers
@@ -29,13 +33,18 @@ parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
       O.<> O.long "number"
       O.<> O.help "Demo number"
       O.<> O.metavar "INT"
-      O.<> O.value 15
+      O.<> O.value 14
       O.<> O.showDefault
       -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented
       )
   O.<*> parser
   where
     mod = O.fullDesc O.<> O.header "Draw demo diagram from tutorial" O.<> O.footer "by MM"
+
+parseTournament :: O.ParserInfo Commands
+parseTournament = flip O.info mod . (O.helper O.<*>) $ Tournament O.<$> parser
+  where
+    mod = O.fullDesc O.<> O.header "Draw demo tournament diagram from tutorial" O.<> O.footer "by MM"
 
 parseNoDiagram :: O.ParserInfo Commands
 parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ pure NoDiagram
@@ -52,6 +61,7 @@ main = do
     ]
   case args of
     Demo n o -> mainRender o $ selectDemo n
+    Tournament o -> mainRender o $ demoTournament
     _ -> print args
 
 selectDemo :: Int -> Diagram B R2
@@ -77,7 +87,6 @@ demos =
   , demoSnug
   , demoRotate
   , demoAlign
-  , demoTournament -- TODO: move outside
   -- TODO: move to own file
   ]
   where
@@ -111,8 +120,7 @@ demos =
             sizes   = [2,5,4,7,1,3]
 
 demoTournament :: Diagram B R2
-demoTournament
-  = tournament 16
+demoTournament = tournament 16
 
 tournament :: Int -> Diagram B R2
 tournament n = decorateTrail (regPoly n 1) (map (node n) [1..]) #

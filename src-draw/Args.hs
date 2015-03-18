@@ -19,47 +19,37 @@ instance Show Commands where
 
 parseArgs :: IO Commands
 parseArgs = execParser $ info (helper <*> parseModes) $
-  buildMod "Generic diagram drawer" "Draw diagrams"
+  buildMod "Draw diagrams"
 
-buildMod :: String -> String -> InfoMod a
-buildMod h d = mconcat
+parseModes :: Parser Commands
+parseModes = build "demo" (parseDemo "Draw demo diagram from tutorial")
+         <|> build "tournament" (parseTournament "Draw demo tournament diagram from tutorial")
+         <|> build "nodia" (parseNoDiagram "Don't draw anything")
+  where
+    build c f = subparser (command c f <> metavar c)
+
+buildMod :: String -> InfoMod a
+buildMod d = mconcat
   [ fullDesc
-  , header h
+  , header "Generic diagram drawer"
   , footer "© 2015 Mihai Maruseac"
   , progDesc d
   ]
 
--- parser for all modes
-parseModes :: Parser Commands
-parseModes = build "demo" parseDemo
-         <|> build "tournament" parseTournament
-         <|> build "nodia" parseNoDiagram
-  where
-    build c f = subparser (command c f <> metavar c)
-
--- individual parsers
-parseDemo :: ParserInfo Commands
-parseDemo = flip info mdf . (helper <*>) $ Demo
+parseDemo :: String -> ParserInfo Commands
+parseDemo d = flip info (buildMod d) . (helper <*>) $ Demo
   <$> option auto
-      (    short 'n'
-      <> long "number"
-      <> help "Demo number"
-      <> metavar "INT"
-      <> value 14
-      <> showDefault
-      -- <> completer (bashCompleter "smth") -- disabled because of not being implemented
-      )
+    ( short 'n'
+   <> long "number"
+   <> help "Demo number"
+   <> metavar "INT"
+   <> value 14
+   <> showDefault
+    )
   <*> parser
-  where
-    mdf = fullDesc <> header "Draw demo diagram from tutorial" <> footer "by MM"
 
-parseTournament :: ParserInfo Commands
-parseTournament = flip info mdf . (helper <*>) $ Tournament <$> parser
-  where
-    mdf = fullDesc <> header "Draw demo tournament diagram from tutorial" <> footer "by MM"
+parseTournament :: String -> ParserInfo Commands
+parseTournament d = flip info (buildMod d) . (helper <*>) $ Tournament <$> parser
 
-parseNoDiagram :: ParserInfo Commands
-parseNoDiagram = flip info mdf . (helper <*>) $ pure NoDiagram
-  where
-    mdf = fullDesc <> header "Don't draw anything" <> footer "by MM"
-
+parseNoDiagram :: String -> ParserInfo Commands
+parseNoDiagram d = flip info (buildMod d) . (helper <*>) $ pure NoDiagram

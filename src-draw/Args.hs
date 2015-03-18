@@ -18,18 +18,24 @@ instance Show Commands where
   show NoDiagram = show "NoDiagram"
 
 parseArgs :: IO Commands
-parseArgs = execParser $ info (helper <*> parseModes) $ mconcat
-    [ fullDesc
-    , header "Generic diagram drawer"
-    , footer "by MM"
-    , progDesc "Draw diagrams"
-    ]
+parseArgs = execParser $ info (helper <*> parseModes) $
+  buildMod "Generic diagram drawer" "Draw diagrams"
+
+buildMod :: String -> String -> InfoMod a
+buildMod h d = mconcat
+  [ fullDesc
+  , header h
+  , footer "© 2015 Mihai Maruseac"
+  , progDesc d
+  ]
 
 -- parser for all modes
 parseModes :: Parser Commands
-parseModes = subparser (command "demo" parseDemo <> metavar "demo")
-       <|> subparser (command "tournament" parseTournament <> metavar "tournament")
-       <|> subparser (command "nodia" parseNoDiagram <> metavar "nodia")
+parseModes = build "demo" parseDemo
+         <|> build "tournament" parseTournament
+         <|> build "nodia" parseNoDiagram
+  where
+    build c f = subparser (command c f <> metavar c)
 
 -- individual parsers
 parseDemo :: ParserInfo Commands

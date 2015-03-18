@@ -3,7 +3,6 @@
 import Diagrams.Backend.CmdLine
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude
-import System.Environment
 
 import qualified Options.Applicative as O
 

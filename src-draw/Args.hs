@@ -1,9 +1,7 @@
 module Args where
 
 import Diagrams.Backend.CmdLine
-import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude
-import System.Environment
 
 import qualified Options.Applicative as O
 
@@ -27,7 +25,7 @@ parseModes = O.subparser (O.command "demo" parseDemo O.<> O.metavar "demo")
 
 -- individual parsers
 parseDemo :: O.ParserInfo Commands
-parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
+parseDemo = flip O.info mdf . (O.helper O.<*>) $ Demo
   O.<$> O.option O.auto
       (    O.short 'n'
       O.<> O.long "number"
@@ -39,15 +37,15 @@ parseDemo = flip O.info mod . (O.helper O.<*>) $ Demo
       )
   O.<*> parser
   where
-    mod = O.fullDesc O.<> O.header "Draw demo diagram from tutorial" O.<> O.footer "by MM"
+    mdf = O.fullDesc O.<> O.header "Draw demo diagram from tutorial" O.<> O.footer "by MM"
 
 parseTournament :: O.ParserInfo Commands
-parseTournament = flip O.info mod . (O.helper O.<*>) $ Tournament O.<$> parser
+parseTournament = flip O.info mdf . (O.helper O.<*>) $ Tournament O.<$> parser
   where
-    mod = O.fullDesc O.<> O.header "Draw demo tournament diagram from tutorial" O.<> O.footer "by MM"
+    mdf = O.fullDesc O.<> O.header "Draw demo tournament diagram from tutorial" O.<> O.footer "by MM"
 
 parseNoDiagram :: O.ParserInfo Commands
-parseNoDiagram = flip O.info mod . (O.helper O.<*>) $ pure NoDiagram
+parseNoDiagram = flip O.info mdf . (O.helper O.<*>) $ pure NoDiagram
   where
-    mod = O.fullDesc O.<> O.header "Don't draw anything" O.<> O.footer "by MM"
+    mdf = O.fullDesc O.<> O.header "Don't draw anything" O.<> O.footer "by MM"
 

@@ -1,9 +1,9 @@
-module Args where
+module Args (parseArgs, Commands(..)) where
 
 import Diagrams.Backend.CmdLine
-import Diagrams.Prelude
+import Options.Applicative
 
-import qualified Options.Applicative as O
+import Data.Monoid (mconcat)
 
 type DO = (DiagramOpts, DiagramLoopOpts)
 
@@ -13,47 +13,47 @@ data Commands
   | NoDiagram
 
 instance Show Commands where
-  show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]
-  show (Tournament (d, _)) = mconcat ["Tournament ", show d]
+  show (Demo n (d, _)) = concat ["Demo ", show n, " ", show d]
+  show (Tournament (d, _)) = concat ["Tournament ", show d]
   show NoDiagram = show "NoDiagram"
 
 parseArgs :: IO Commands
-parseArgs = O.execParser $ O.info (O.helper O.<*> parseModes) $ mconcat
-    [ O.fullDesc
-    , O.header "Generic diagram drawer"
-    , O.footer "by MM"
-    , O.progDesc "Draw diagrams"
+parseArgs = execParser $ info (helper <*> parseModes) $ mconcat
+    [ fullDesc
+    , header "Generic diagram drawer"
+    , footer "by MM"
+    , progDesc "Draw diagrams"
     ]
 
 -- parser for all modes
-parseModes :: O.Parser Commands
-parseModes = O.subparser (O.command "demo" parseDemo O.<> O.metavar "demo")
-       O.<|> O.subparser (O.command "tournament" parseTournament O.<> O.metavar "tournament")
-       O.<|> O.subparser (O.command "nodia" parseNoDiagram O.<> O.metavar "nodia")
+parseModes :: Parser Commands
+parseModes = subparser (command "demo" parseDemo <> metavar "demo")
+       <|> subparser (command "tournament" parseTournament <> metavar "tournament")
+       <|> subparser (command "nodia" parseNoDiagram <> metavar "nodia")
 
 -- individual parsers
-parseDemo :: O.ParserInfo Commands
-parseDemo = flip O.info mdf . (O.helper O.<*>) $ Demo
-  O.<$> O.option O.auto
-      (    O.short 'n'
-      O.<> O.long "number"
-      O.<> O.help "Demo number"
-      O.<> O.metavar "INT"
-      O.<> O.value 14
-      O.<> O.showDefault
-      -- O.<> completer (bashCompleter "smth") -- disabled because of not being implemented
+parseDemo :: ParserInfo Commands
+parseDemo = flip info mdf . (helper <*>) $ Demo
+  <$> option auto
+      (    short 'n'
+      <> long "number"
+      <> help "Demo number"
+      <> metavar "INT"
+      <> value 14
+      <> showDefault
+      -- <> completer (bashCompleter "smth") -- disabled because of not being implemented
       )
-  O.<*> parser
+  <*> parser
   where
-    mdf = O.fullDesc O.<> O.header "Draw demo diagram from tutorial" O.<> O.footer "by MM"
+    mdf = fullDesc <> header "Draw demo diagram from tutorial" <> footer "by MM"
 
-parseTournament :: O.ParserInfo Commands
-parseTournament = flip O.info mdf . (O.helper O.<*>) $ Tournament O.<$> parser
+parseTournament :: ParserInfo Commands
+parseTournament = flip info mdf . (helper <*>) $ Tournament <$> parser
   where
-    mdf = O.fullDesc O.<> O.header "Draw demo tournament diagram from tutorial" O.<> O.footer "by MM"
+    mdf = fullDesc <> header "Draw demo tournament diagram from tutorial" <> footer "by MM"
 
-parseNoDiagram :: O.ParserInfo Commands
-parseNoDiagram = flip O.info mdf . (O.helper O.<*>) $ pure NoDiagram
+parseNoDiagram :: ParserInfo Commands
+parseNoDiagram = flip info mdf . (helper <*>) $ pure NoDiagram
   where
-    mdf = O.fullDesc O.<> O.header "Don't draw anything" O.<> O.footer "by MM"
+    mdf = fullDesc <> header "Don't draw anything" <> footer "by MM"
 

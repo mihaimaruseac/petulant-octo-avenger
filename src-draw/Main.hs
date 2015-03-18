@@ -4,18 +4,11 @@ import Diagrams.Backend.CmdLine
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude
 
-import qualified Options.Applicative as O
-
 import Args
 
 main :: IO ()
 main = do
-  args <- O.execParser $ O.info (O.helper O.<*> parseModes) $ mconcat
-    [ O.fullDesc
-    , O.header "Generic diagram drawer"
-    , O.footer "by MM"
-    , O.progDesc "Draw diagrams"
-    ]
+  args <- parseArgs
   case args of
     Demo n o -> mainRender o $ selectDemo n
     Tournament o -> mainRender o $ demoTournament

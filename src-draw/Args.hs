@@ -17,6 +17,14 @@ instance Show Commands where
   show (Tournament (d, _)) = mconcat ["Tournament ", show d]
   show NoDiagram = show "NoDiagram"
 
+parseArgs :: IO Commands
+parseArgs = O.execParser $ O.info (O.helper O.<*> parseModes) $ mconcat
+    [ O.fullDesc
+    , O.header "Generic diagram drawer"
+    , O.footer "by MM"
+    , O.progDesc "Draw diagrams"
+    ]
+
 -- parser for all modes
 parseModes :: O.Parser Commands
 parseModes = O.subparser (O.command "demo" parseDemo O.<> O.metavar "demo")

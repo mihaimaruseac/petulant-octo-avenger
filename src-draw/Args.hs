@@ -22,11 +22,11 @@ parseArgs = execParser $ info (helper <*> parseModes) $
   buildMod "Draw diagrams"
 
 parseModes :: Parser Commands
-parseModes = build "demo" (parseDemo "Draw demo diagram from tutorial")
-         <|> build "tournament" (parseTournament "Draw demo tournament diagram from tutorial")
-         <|> build "nodia" (parseNoDiagram "Don't draw anything")
+parseModes = build parseDemo "Draw demo diagram from tutorial" "demo"
+         <|> build parseTournament "Draw demo tournament diagram" "tournament"
+         <|> build parseNoDiagram "Don't draw anything" "nodia"
   where
-    build c f = subparser (command c f <> metavar c)
+    build p d c = subparser (command c (p d) <> metavar c)
 
 buildMod :: String -> InfoMod a
 buildMod d = mconcat

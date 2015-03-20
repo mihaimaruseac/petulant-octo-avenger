@@ -43,7 +43,7 @@ parseDemo d = flip info (buildMod d) . (helper <*>) $ Demo
    <> long "number"
    <> help "Demo number"
    <> metavar "INT"
-   <> value 14
+   <> value 0
    <> showDefault
     )
   <*> parser

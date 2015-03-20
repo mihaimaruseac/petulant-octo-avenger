@@ -1,4 +1,4 @@
-module Demos where
+module Demos (selectDemo, demoTournament) where
 
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude
@@ -26,7 +26,6 @@ demos =
   , demoSnug
   , demoRotate
   , demoAlign
-  -- TODO: move to own file
   ]
   where
     demoCircle = circle 1

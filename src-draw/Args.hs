@@ -39,14 +39,14 @@ buildMod d = mconcat
   , progDesc d
   ]
 
-parseDemo :: String -> ParserInfo Commands
-parseDemo d = flip info (buildMod d) . (helper <*>) $ Demo
+parseDemo :: (Int -> DO -> Commands) -> String -> ParserInfo Commands
+parseDemo ct d = flip info (buildMod d) . (helper <*>) $ ct
   <$> option auto
     ( short 'n'
    <> long "number"
    <> help "Demo number"
    <> metavar "INT"
-   <> value 0
+   <> value 1
    <> showDefault
     )
   <*> parser

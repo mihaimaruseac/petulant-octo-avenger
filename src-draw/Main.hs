@@ -1,5 +1,3 @@
-{-# LANGUAGE NoMonomorphismRestriction #-}
-
 import Diagrams.Backend.CmdLine (mainRender)
 
 import Args

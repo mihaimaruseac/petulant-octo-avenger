@@ -1,3 +1,5 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
+
 module Demos (Demo(..), selectDemo, demoTournament) where
 
 import Diagrams.Backend.Rasterific.CmdLine

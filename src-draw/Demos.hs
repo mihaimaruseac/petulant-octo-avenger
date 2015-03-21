@@ -5,16 +5,28 @@ import Diagrams.Prelude
 
 data Demo
   = Tutorial Int
+  | Vector Int
 
 selectDemo :: Demo -> Diagram B R2
-selectDemo (Tutorial n) = selectTutorialDemo n
+selectDemo (Tutorial n) = doSelectDemo demos n
+selectDemo (Vector n) = doSelectDemo vectorDemos n
 
-selectTutorialDemo :: Int -> Diagram B R2
-selectTutorialDemo n
-  | and [0 < n, n <= l] = demos !! (n - 1)
+doSelectDemo :: [Diagram B R2] -> Int -> Diagram B R2
+doSelectDemo ds n
+  | and [0 < n, n <= l] = ds !! (n - 1)
   | otherwise = error $ concat ["Demo not defined (not in {1, 2.. ", show l, "})"]
   where
-    l = length demos
+    l = length ds
+
+vectorDemos :: [Diagram B R2]
+vectorDemos =
+  [ demoAtop
+  , demoCircleStyled
+  ]
+  where
+    demoCircle = circle 1
+    demoCircleStyled = circle 1 # fc blue # lw veryThick # lc purple # dashingG [0.2, 0.05] 0
+    demoAtop = square 1 # fc aqua `atop` circle 1
 
 demos :: [Diagram B R2]
 demos =

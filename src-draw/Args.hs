@@ -9,11 +9,13 @@ type DO = (DiagramOpts, DiagramLoopOpts)
 
 data Commands
   = Demo Int DO
+  | VDemo Int DO
   | Tournament DO
   | NoDiagram
 
 instance Show Commands where
   show (Demo n (d, _)) = concat ["Demo ", show n, " ", show d]
+  show (VDemo n (d, _)) = concat ["Vector ", show n, " ", show d]
   show (Tournament (d, _)) = concat ["Tournament ", show d]
   show NoDiagram = show "NoDiagram"
 
@@ -22,7 +24,8 @@ parseArgs = execParser $ info (helper <*> parseModes) $
   buildMod "Draw diagrams"
 
 parseModes :: Parser Commands
-parseModes = build parseDemo "Draw demo diagram from tutorial" "demo"
+parseModes = build (parseDemo Demo) "Draw tutorial demo diagram" "demo"
+         <|> build (parseDemo VDemo) "Draw vector demo diagram" "vector"
          <|> build parseTournament "Draw demo tournament diagram" "tournament"
          <|> build parseNoDiagram "Don't draw anything" "nodia"
   where

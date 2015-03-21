@@ -21,12 +21,6 @@ doSelectDemo ds n
   where
     l = length ds
 
-vectorDemos :: [Diagram B R2]
-vectorDemos =
-  [ demoAtop
-  , demoCircleStyled
-  ]
-
 demos :: [Diagram B R2]
 demos =
   [ demoCircle
@@ -113,3 +107,15 @@ node :: Int -> Int -> Diagram B R2
 node m n
    = text (show n) # fontSizeN (0.5 / fromIntegral m) # fc white # translate (r2 (-0.01, -0.18))
   <> circle 0.2 # fc green # named n
+
+vectorDemos :: [Diagram B R2]
+vectorDemos =
+  [ demoChainSaw
+  ]
+
+-- fromOffsets takes a list of vectors to draw
+-- r2 construct vectors from pairs
+demoChainSaw :: Diagram B R2
+demoChainSaw = fromOffsets . map r2 . zip (repeat 1) . map s $ [(1::Int)..10]
+  where
+    s x = if odd x then 1 else -1

@@ -1,10 +1,16 @@
-module Demos (selectDemo, demoTournament) where
+module Demos (Demo(..), selectDemo, demoTournament) where
 
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude
 
-selectDemo :: Int -> Diagram B R2
-selectDemo n
+data Demo
+  = Tutorial Int
+
+selectDemo :: Demo -> Diagram B R2
+selectDemo (Tutorial n) = selectTutorialDemo n
+
+selectTutorialDemo :: Int -> Diagram B R2
+selectTutorialDemo n
   | and [0 < n, n <= l] = demos !! (n - 1)
   | otherwise = error $ concat ["Demo not defined (not in {1, 2.. ", show l, "})"]
   where

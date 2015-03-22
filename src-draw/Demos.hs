@@ -111,6 +111,7 @@ node m n
 vectorDemos :: [Diagram B R2]
 vectorDemos =
   [ demoChainSaw
+  , demoSemicircle
   ]
 
 -- fromOffsets takes a list of vectors to draw
@@ -119,3 +120,12 @@ demoChainSaw :: Diagram B R2
 demoChainSaw = fromOffsets . map r2 . zip (repeat 1) . map s $ [(1::Int)..10]
   where
     s x = if odd x then 1 else -1
+
+-- fromDirection builds a vector on a direction (rad, turn or deg, use (@@) to
+-- specify)
+-- Also showcase fromDirection and scalar-vector multiplication
+demoSemicircle :: Diagram B R2
+demoSemicircle = mconcat . map build $ [-3, -2.. 3]
+  where
+    build = flip translate c . (5 *^) . fromDirection . (@@ deg) . (* 30)
+    c = circle 1 # fc blue

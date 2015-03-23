@@ -112,6 +112,7 @@ vectorDemos :: [Diagram B R2]
 vectorDemos =
   [ demoChainSaw
   , demoSemicircle
+  , demoSpokes
   ]
 
 -- fromOffsets takes a list of vectors to draw
@@ -129,3 +130,12 @@ demoSemicircle = mconcat . map build $ [-3, -2.. 3]
   where
     build = flip translate c . (5 *^) . fromDirection . (@@ deg) . (* 30)
     c = circle 1 # fc blue
+
+-- list of lists: inner for spikes, outer for diagrams
+demoSpokes :: Diagram B R2
+demoSpokes = mconcat $ map buildOne [1..3]
+  where
+    s = 10
+    buildOne x = rotate (x/3 @@ turn) $ buildStar x
+    buildStar x = mconcat . map (f x) $ [1..s]
+    f x y = fromOffsets [x *^ fromDirection (y/s @@ turn)]

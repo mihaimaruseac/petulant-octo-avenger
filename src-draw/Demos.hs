@@ -113,6 +113,8 @@ vectorDemos =
   [ demoChainSaw
   , demoSemicircle
   , demoSpokes
+  , vTriangle (unitX # rotateBy (3/7)) (unitX # rotateBy (1/8))
+  , vAddRule (unitX # rotateBy (3/7)) (unitX # rotateBy (1/8))
   ]
 
 -- fromOffsets takes a list of vectors to draw
@@ -139,3 +141,20 @@ demoSpokes = mconcat $ map buildOne [1..3]
     buildOne x = rotate (x/3 @@ turn) $ buildStar x
     buildStar x = mconcat . map (f x) $ [1..s]
     f x y = fromOffsets [x *^ fromDirection (y/s @@ turn)]
+
+-- vTriangle builds a triangle given two sides
+vTriangle :: R2 -> R2 -> Diagram B R2
+vTriangle a b = fromOffsets [a, b - a, -b]
+
+-- vAddRule shows the vector addition rule
+vAddRule :: R2 -> R2 -> Diagram B R2
+vAddRule a b = mconcat
+  [ fromOffsets [a + b] # vSum
+  , mconcat $ build a b
+  , mconcat $ build b a
+  ]
+  where
+    build x y = [fromOffsets [x] # v, translate y $ fromOffsets [x] # vHlp]
+    v         = lc blue
+    vSum      = lc red
+    vHlp      = lc purple # dashingG [0.2, 0.05] 0

@@ -115,6 +115,7 @@ vectorDemos =
   , demoSpokes
   , vTriangle (unitX # rotateBy (3/7)) (unitX # rotateBy (1/8))
   , vAddRule (unitX # rotateBy (3/7)) (unitX # rotateBy (1/8))
+  , demoPoints
   ]
 
 -- fromOffsets takes a list of vectors to draw
@@ -158,3 +159,11 @@ vAddRule a b = mconcat
     v         = lc blue
     vSum      = lc red
     vHlp      = lc purple # dashingG [0.2, 0.05] 0
+
+demoPoints :: Diagram B R2
+demoPoints = position [(p, c p) | x <- l, y <- l, let p = (x ^& y)]
+  where
+    s = 31
+    d = s ** 2
+    l = [-s, -s+2..s]
+    c p = circle 1 # fc (if distanceSq p origin < d then yellow else purple)

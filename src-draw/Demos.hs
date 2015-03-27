@@ -5,10 +5,12 @@ import Diagrams.Prelude
 
 data Demo
   = Tutorial Int
+  | Trails Int
   | Vector Int
 
 selectDemo :: Demo -> Diagram B R2
 selectDemo (Tutorial n) = doSelectDemo demos n
+selectDemo (Trails n) = doSelectDemo trailsDemos n
 selectDemo (Vector n) = doSelectDemo vectorDemos n
 
 demoTournament :: Diagram B R2
@@ -160,6 +162,7 @@ vAddRule a b = mconcat
     vSum      = lc red
     vHlp      = lc purple # dashingG [0.2, 0.05] 0
 
+-- use ^& but could also use p2
 demoPoints :: Diagram B R2
 demoPoints = position [(p, c p) | x <- l, y <- l, let p = (x ^& y)]
   where
@@ -167,3 +170,8 @@ demoPoints = position [(p, c p) | x <- l, y <- l, let p = (x ^& y)]
     d = s ** 2
     l = [-s, -s+2..s]
     c p = circle 1 # fc (if distanceSq p origin < d then yellow else purple)
+
+trailsDemos :: [Diagram B R2]
+trailsDemos =
+  [ demoChainSaw
+  ]

@@ -173,5 +173,21 @@ demoPoints = position [(p, c p) | x <- l, y <- l, let p = (x ^& y)]
 
 trailsDemos :: [Diagram B R2]
 trailsDemos =
-  [ demoChainSaw
+  [ demoBasicTrailFromOffsets
+  , demoFromVertices
+  , demoOnLineSegments
   ]
+
+-- or map v2
+demoBasicTrailFromOffsets :: Diagram B R2
+demoBasicTrailFromOffsets = fromOffsets [(1 ^& 0), (0 ^& 2), (2 ^& 0)]
+
+-- or map p2
+demoFromVertices :: Diagram B R2
+demoFromVertices = mconcat . map (flip translateX b) $ [1..4]
+  where
+    b = fromVertices [(0 ^& 0), (0 ^& 1), (1 ^& 0)]
+
+-- strokeLine to convert a trail to diagram
+demoOnLineSegments :: Diagram B R2
+demoOnLineSegments = strokeLine . onLineSegments (drop 1) $ pentagon 1

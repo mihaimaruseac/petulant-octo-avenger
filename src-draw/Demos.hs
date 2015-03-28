@@ -178,6 +178,7 @@ trailsDemos =
   , demoOnLineSegments
   , demoOnLineSegments2
   , demoKoch5_1
+  , demoKoch5_2
   ]
 
 -- or map v2
@@ -204,5 +205,20 @@ demoKoch5_1 = strokeLine . mconcat . iterateN s (f s) $ auxDemoTrailsLine
     s = 7
     f x = rotate (1/(fromIntegral x) @@ turn)
 
+demoKoch5_2 :: Diagram B R2
+demoKoch5_2 = strokeLine $ koch2 5
+
 auxDemoTrailsLine :: Trail' Line R2
 auxDemoTrailsLine = onLineSegments (take 4) $ pentagon 1
+
+koch2 :: Int -> Trail' Line R2
+koch2 0 = mempty
+koch2 n = mconcat
+  [ l # rotateBy (-1/3) # reverseLine
+  , fromOffsets [unitX] # rotateBy (1/6)
+  , l
+  , fromOffsets [unitX] # rotateBy (-1/6)
+  , l # rotateBy (1/3) # reverseLine
+  ]
+  where
+    l = koch2 $ n - 1

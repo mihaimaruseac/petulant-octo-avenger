@@ -182,6 +182,8 @@ trailsDemos =
   , demoKoch5_3
   , demoBlob
   , demoGrass
+  , demoExplode
+  , demoSquare
   ]
 
 -- or map v2
@@ -257,3 +259,18 @@ grass n = mconcat [fromOffsets [unitY], gl, fromOffsets [unit_Y]]
   where
     gl = mconcat  . replicate n . fromOffsets $ [(1 ^& h), (1 ^& (-h))]
     h = 3
+
+-- explode trail
+-- observe pad, strokeLocTrail and mapLoc
+demoExplode :: Diagram B R2
+demoExplode = heptagon 1 # explodeTrail # map f # mconcat # pad 1.1
+  where
+    f = strokeLocTrail . mapLoc (rotateBy (1/20))
+
+-- at, centerXY
+demoSquare :: Diagram B R2
+demoSquare = squareTrail # explodeTrail # zipWith lc (cycle [red, blue]) #
+  mconcat # centerXY # pad 1.1
+  where
+    squareTrail = iterateN 4 (rotateBy (1/4)) (fromOffsets $
+      replicate 4 unitX) # mconcat # wrapLine # (`at` origin)

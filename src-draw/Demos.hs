@@ -181,6 +181,7 @@ trailsDemos =
   , demoKoch5_2
   , demoKoch5_3
   , demoBlob
+  , demoGrass
   ]
 
 -- or map v2
@@ -247,3 +248,12 @@ andThen t1 t2 = t1 <> t2 # rotate (d1 ^-^ d2)
   where
     d1 = direction (tangentAtEnd t1)
     d2 = direction (tangentAtStart t2)
+
+demoGrass :: Diagram B R2
+demoGrass = grass 31 # closeLine # strokeLoop # fc green
+
+grass :: Int -> Trail' Line R2
+grass n = mconcat [fromOffsets [unitY], gl, fromOffsets [unit_Y]]
+  where
+    gl = mconcat  . replicate n . fromOffsets $ [(1 ^& h), (1 ^& (-h))]
+    h = 3

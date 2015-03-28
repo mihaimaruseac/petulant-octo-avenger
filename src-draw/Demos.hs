@@ -179,6 +179,8 @@ trailsDemos =
   , demoOnLineSegments2
   , demoKoch5_1
   , demoKoch5_2
+  , demoKoch5_3
+  , demoBlob
   ]
 
 -- or map v2
@@ -200,16 +202,22 @@ demoOnLineSegments2 :: Diagram B R2
 demoOnLineSegments2 = strokeLine $ auxDemoTrailsLine <> auxDemoTrailsLine
 
 demoKoch5_1 :: Diagram B R2
-demoKoch5_1 = strokeLine . mconcat . iterateN s (f s) $ auxDemoTrailsLine
-  where
-    s = 7
-    f x = rotate (1/(fromIntegral x) @@ turn)
+demoKoch5_1 = koch1 7 # strokeLine
 
 demoKoch5_2 :: Diagram B R2
 demoKoch5_2 = strokeLine $ koch2 5
 
+-- compare with demoKoch5_1
+demoKoch5_3 :: Diagram B R2
+demoKoch5_3 = koch1 7 # glueLine # strokeLoop # fc green
+
 auxDemoTrailsLine :: Trail' Line R2
 auxDemoTrailsLine = onLineSegments (take 4) $ pentagon 1
+
+koch1 :: Int -> Trail' Line R2
+koch1 s = mconcat . iterateN s f $ auxDemoTrailsLine
+  where
+    f = rotate (1/(fromIntegral s) @@ turn)
 
 koch2 :: Int -> Trail' Line R2
 koch2 0 = mempty
@@ -222,3 +230,20 @@ koch2 n = mconcat
   ]
   where
     l = koch2 $ n - 1
+
+demoBlob :: Diagram B R2
+demoBlob = blob 19 # glueLine # strokeLoop # fc blue
+
+blob :: Int -> Trail' Line R2
+blob n = foldl andThen mempty $ replicate n arm
+  where
+    arm = seg `andThen` cap `andThen` seg `andThen` cup
+    cap = arc (0 @@ turn) (1/2 @@ turn)
+    cup = arc (0 @@ turn) ((fromIntegral n-2)/(2* fromIntegral n) @@ turn) # reflectX
+    seg = fromOffsets [unitX]
+
+andThen :: Trail' Line R2 -> Trail' Line R2 -> Trail' Line R2
+andThen t1 t2 = t1 <> t2 # rotate (d1 ^-^ d2)
+  where
+    d1 = direction (tangentAtEnd t1)
+    d2 = direction (tangentAtStart t2)

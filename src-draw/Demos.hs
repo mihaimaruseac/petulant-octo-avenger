@@ -127,7 +127,7 @@ vectorDemos =
 -- fromOffsets takes a list of vectors to draw
 -- r2 construct vectors from pairs
 demoChainSaw :: Diagram B R2
-demoChainSaw = fromOffsets . map r2 . zip (repeat 1) . map s $ [(1::Int)..10]
+demoChainSaw = fromOffsets . zipWith (curry r2) (repeat 1) . map s $ [(1::Int)..10]
   where
     s x = if odd x then 1 else -1
 

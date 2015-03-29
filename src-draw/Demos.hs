@@ -176,6 +176,8 @@ trailsDemos =
   [ demoBasicTrailFromOffsets
   , demoFromVertices
   , demoOnLineSegments
+  , demoOnLineSegments2
+  , demoKoch5_1
   ]
 
 -- or map v2
@@ -190,4 +192,17 @@ demoFromVertices = mconcat . map (flip translateX b) $ [1..4]
 
 -- strokeLine to convert a trail to diagram
 demoOnLineSegments :: Diagram B R2
-demoOnLineSegments = strokeLine . onLineSegments (drop 1) $ pentagon 1
+demoOnLineSegments = strokeLine auxDemoTrailsLine
+
+-- no need to translate to match, mappend (<>) starts from where it stopped
+demoOnLineSegments2 :: Diagram B R2
+demoOnLineSegments2 = strokeLine $ auxDemoTrailsLine <> auxDemoTrailsLine
+
+demoKoch5_1 :: Diagram B R2
+demoKoch5_1 = strokeLine . mconcat . iterateN s (f s) $ auxDemoTrailsLine
+  where
+    s = 7
+    f x = rotate (1/(fromIntegral x) @@ turn)
+
+auxDemoTrailsLine :: Trail' Line R2
+auxDemoTrailsLine = onLineSegments (take 4) $ pentagon 1

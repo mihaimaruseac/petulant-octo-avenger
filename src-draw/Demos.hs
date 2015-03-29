@@ -359,6 +359,7 @@ demoArrow = connect'        arrow1 "1" "2"
 arrowsDemos :: [Diagram B R2]
 arrowsDemos =
   [ demoCircularArrow
+  , demoSquareArrowShafts
   ]
 
 demoCircularArrow :: Diagram B R2
@@ -371,3 +372,17 @@ demoCircularArrow = mconcat
     pA = p2 (1, 0) # rotateBy (1/8)
     pB = p2 (-1, 0)
     spot = circle 0.02 # lw none # fc blue
+
+-- observe reverseTrail to flip arrow's curvature
+demoSquareArrowShafts :: Diagram B R2
+demoSquareArrowShafts = mconcat
+  [ square 4
+  , arrowBetween' (with & arrowTail .~ spike' & arrowHead .~ noHead) pA pB
+  , arrowBetween' (a sDown) pA pB
+  , arrowBetween' (a sUp) pA pB
+  ] # frame 0.2
+  where
+    [pA, pB] = zipWith (^&) [1, 3] [1, 3]
+    a s = with & arrowTail .~ tri' & arrowHead .~ tri & arrowShaft .~ s
+    sDown = arc (0 @@ turn) ((1/8) @@ turn)
+    sUp = sDown # reverseTrail

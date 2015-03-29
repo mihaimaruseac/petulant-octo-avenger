@@ -10,6 +10,7 @@ main = do
     Demo n o     -> mainRender o $ selectDemo (Tutorial n)
     TDemo n o    -> mainRender o $ selectDemo (Trails n)
     VDemo n o    -> mainRender o $ selectDemo (Vector n)
+    ADemo n o    -> mainRender o $ selectDemo (Arrow' n)
     Tournament o -> mainRender o $ demoTournament
     Arrow o      -> mainRender o $ demoArrow
     _            -> print args

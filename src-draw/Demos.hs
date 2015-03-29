@@ -9,11 +9,13 @@ data Demo
   = Tutorial Int
   | Trails Int
   | Vector Int
+  | Arrow' Int
 
 selectDemo :: Demo -> Diagram B R2
 selectDemo (Tutorial n) = doSelectDemo demos n
 selectDemo (Trails n) = doSelectDemo trailsDemos n
 selectDemo (Vector n) = doSelectDemo vectorDemos n
+selectDemo (Arrow' n) = doSelectDemo arrowsDemos n
 
 demoTournament :: Diagram B R2
 demoTournament = tournament 16
@@ -353,3 +355,19 @@ demoArrow = connect'        arrow1 "1" "2"
     shaft0 = trailFromSegments [parab, seg, parab', seg, parab]
     shaft1 = cubicSpline False (trailVertices (shaft0 `at` origin))
     shaft2 = cubicSpline False (map p2 [(0,0), (1,0), (0.8, 0.2),(2, 0.2)])
+
+arrowsDemos :: [Diagram B R2]
+arrowsDemos =
+  [ demoCircularArrow
+  ]
+
+demoCircularArrow :: Diagram B R2
+demoCircularArrow = mconcat
+  [ circle 1
+  , position . zip [pA, pB] $ repeat spot
+  , arrowBetween pA pB
+  ]
+  where
+    pA = p2 (1, 0) # rotateBy (1/8)
+    pB = p2 (-1, 0)
+    spot = circle 0.02 # lw none # fc blue

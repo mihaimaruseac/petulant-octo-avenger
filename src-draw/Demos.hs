@@ -1,3 +1,5 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
+
 module Demos (Demo(..), selectDemo, demoTournament, demoArrow) where
 
 import Data.List.Split (chunksOf)
@@ -360,6 +362,7 @@ arrowsDemos :: [Diagram B R2]
 arrowsDemos =
   [ demoCircularArrow
   , demoSquareArrowShafts
+  , demoVectorField
   ]
 
 demoCircularArrow :: Diagram B R2
@@ -386,3 +389,20 @@ demoSquareArrowShafts = mconcat
     a s = with & arrowTail .~ tri' & arrowHead .~ tri & arrowShaft .~ s
     sDown = arc (0 @@ turn) ((1/8) @@ turn)
     sUp = sDown # reverseTrail
+
+-- arrowAt
+demoVectorField :: Diagram B R2
+demoVectorField = position . map (\p -> (p2 p, arrowAtPoint p)) $ locs
+  where
+    vectorField (x, y) = r2 (sin (y - 1), sin (x + 1))
+    locs = let xs = [-3, -2.7 .. 3] in [(x, y) | x <- xs, y <- xs]
+    arrowAtPoint p = arrowAt' opts (p2 p) (sL *^ vf) # alignTL
+      where
+        vf   = vectorField p
+        m    = magnitude p
+        -- Head size is a function of the length of the vector
+        -- as are tail size and shaft length.
+        hs   = 0.04 * m
+        sW   = 0.015 * m
+        sL   = 0.01 + 0.1 * m
+        opts = (with & arrowHead .~ tri & headLength .~ Global hs & shaftStyle %~ lwG sW)

@@ -8,22 +8,28 @@ import Data.Monoid (mconcat)
 type DO = (DiagramOpts, DiagramLoopOpts)
 
 data Commands
+  -- demos first
   = Demo Int DO
   | ADemo Int DO
   | TDemo Int DO
   | VDemo Int DO
+  -- special demos
   | Arrow DO
   | Tournament DO
+  -- demo for no diagram
   | NoDiagram
+  -- TSS mess
+  | TSSMess
 
 instance Show Commands where
-  show (Demo n (d, _)) = concat ["Demo ", show n, " ", show d]
-  show (ADemo n (d, _)) = concat ["Arrows ", show n, " ", show d]
-  show (TDemo n (d, _)) = concat ["Trail ", show n, " ", show d]
-  show (VDemo n (d, _)) = concat ["Vector ", show n, " ", show d]
-  show (Arrow (d, _)) = concat ["Arrow ", show d]
-  show (Tournament (d, _)) = concat ["Tournament ", show d]
+  show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]
+  show (ADemo n (d, _)) = mconcat ["Arrows ", show n, " ", show d]
+  show (TDemo n (d, _)) = mconcat ["Trail ", show n, " ", show d]
+  show (VDemo n (d, _)) = mconcat ["Vector ", show n, " ", show d]
+  show (Arrow (d, _)) = mconcat ["Arrow ", show d]
+  show (Tournament (d, _)) = mconcat ["Tournament ", show d]
   show NoDiagram = show "NoDiagram"
+  show TSSMess = show "TSSMess"
 
 parseArgs :: IO Commands
 parseArgs = execParser $ info (helper <*> parseModes) $
@@ -37,6 +43,7 @@ parseModes = build (parseDemo Demo) "Draw tutorial demo diagram" "demo"
          <|> build (parseSingle Arrow) "Draw demo arrow diagram" "arrow"
          <|> build (parseSingle Tournament) "Draw demo tournament diagram" "tournament"
          <|> build parseNoDiagram "Don't draw anything" "nodia"
+         <|> build parseTSSMess "Pardus TSSMess diagrams" "tssmess"
   where
     build p d c = subparser (command c (p d) <> metavar c)
 
@@ -65,3 +72,6 @@ parseSingle f d = flip info (buildMod d) . (helper <*>) $ f <$> parser
 
 parseNoDiagram :: String -> ParserInfo Commands
 parseNoDiagram d = flip info (buildMod d) . (helper <*>) $ pure NoDiagram
+
+parseTSSMess :: String -> ParserInfo Commands
+parseTSSMess d = flip info (buildMod d) . (helper <*>) $ pure TSSMess

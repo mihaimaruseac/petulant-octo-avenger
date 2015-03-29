@@ -129,7 +129,7 @@ vectorDemos =
 -- fromOffsets takes a list of vectors to draw
 -- r2 construct vectors from pairs
 demoChainSaw :: Diagram B R2
-demoChainSaw = fromOffsets . zipWith (curry r2) (repeat 1) . map s $ [(1::Int)..10]
+demoChainSaw = fromOffsets . map (curry r2 1) . map s $ [(1::Int)..10]
   where
     s x = if odd x then 1 else -1
 
@@ -170,7 +170,7 @@ vAddRule a b = mconcat
 
 -- use ^& but could also use p2
 demoPoints :: Diagram B R2
-demoPoints = position [(p, c p) | x <- l, y <- l, let p = (x ^& y)]
+demoPoints = position [(p, c p) | x <- l, y <- l, let p = x ^& y]
   where
     s = 31
     d = s ** 2
@@ -196,13 +196,13 @@ trailsDemos =
 
 -- or map v2
 demoBasicTrailFromOffsets :: Diagram B R2
-demoBasicTrailFromOffsets = fromOffsets [(1 ^& 0), (0 ^& 2), (2 ^& 0)]
+demoBasicTrailFromOffsets = fromOffsets [1 ^& 0, 0 ^& 2, 2 ^& 0]
 
 -- or map p2
 demoFromVertices :: Diagram B R2
-demoFromVertices = mconcat . map (flip translateX b) $ [1..4]
+demoFromVertices = mconcat . map (`translateX` b) $ [1..4]
   where
-    b = fromVertices [(0 ^& 0), (0 ^& 1), (1 ^& 0)]
+    b = fromVertices [0 ^& 0, 0 ^& 1, 1 ^& 0]
 
 -- strokeLine to convert a trail to diagram
 demoOnLineSegments :: Diagram B R2
@@ -228,7 +228,7 @@ auxDemoTrailsLine = onLineSegments (take 4) $ pentagon 1
 koch1 :: Int -> Trail' Line R2
 koch1 s = mconcat . iterateN s f $ auxDemoTrailsLine
   where
-    f = rotate (1/(fromIntegral s) @@ turn)
+    f = rotate ((1/fromIntegral s) @@ turn)
 
 koch2 :: Int -> Trail' Line R2
 koch2 0 = mempty
@@ -265,7 +265,7 @@ demoGrass = grass 31 # closeLine # strokeLoop # fc green
 grass :: Int -> Trail' Line R2
 grass n = mconcat [fromOffsets [unitY], gl, fromOffsets [unit_Y]]
   where
-    gl = mconcat  . replicate n . fromOffsets $ [(1 ^& h), (1 ^& (-h))]
+    gl = mconcat  . replicate n . fromOffsets $ [1 ^& h, 1 ^& (-h)]
     h = 3
 
 -- explode trail
@@ -406,7 +406,7 @@ demoVectorField = position . map (\p -> (p2 p, arrowAtPoint p)) $ locs
         hs   = 0.04 * m
         sW   = 0.015 * m
         sL   = 0.01 + 0.1 * m
-        opts = (with & arrowHead .~ tri & headLength .~ Global hs & shaftStyle %~ lwG sW)
+        opts = with & arrowHead .~ tri & headLength .~ Global hs & shaftStyle %~ lwG sW
 
 demoTorusConnectPerimeter :: Diagram B R2
 demoTorusConnectPerimeter = foldr f circles [0..12]

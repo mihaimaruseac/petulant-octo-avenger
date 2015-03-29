@@ -8,10 +8,10 @@ import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude
 
 data Demo
-  = Tutorial Int
+  = Arrow' Int
   | Trails Int
+  | Tutorial Int
   | Vector Int
-  | Arrow' Int
 
 selectDemo :: Demo -> Diagram B R2
 selectDemo (Tutorial n) = doSelectDemo demos n

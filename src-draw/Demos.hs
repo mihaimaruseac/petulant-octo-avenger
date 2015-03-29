@@ -363,6 +363,7 @@ arrowsDemos =
   [ demoCircularArrow
   , demoSquareArrowShafts
   , demoVectorField
+  , demoTorusConnectPerimeter
   ]
 
 demoCircularArrow :: Diagram B R2
@@ -406,3 +407,12 @@ demoVectorField = position . map (\p -> (p2 p, arrowAtPoint p)) $ locs
         sW   = 0.015 * m
         sL   = 0.01 + 0.1 * m
         opts = (with & arrowHead .~ tri & headLength .~ Global hs & shaftStyle %~ lwG sW)
+
+demoTorusConnectPerimeter :: Diagram B R2
+demoTorusConnectPerimeter = foldr f circles [0..12]
+  where
+    f x = connectPerim "in" "out" ((x/12) @@ turn) ((x/12) @@ turn)
+    circles = mconcat
+      [ circle 1 # fc orange # named "in"
+      , circle 5 # fc yellow # named "out"
+      ]

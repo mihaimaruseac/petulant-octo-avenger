@@ -89,53 +89,53 @@ instance Eq Game where
   g1 == g2 = g1 ^. announcementDate == g2 ^. announcementDate
 
 {- players -}
-pXolarix = P "Xolarix"
-pHamsterAlien = P "Hamster Alien"
-pRedKomodo = P "Red Komodo"
-pDiablo = P "Diablo"
-pTheCloneRanger = P "The Clone Ranger"
-pMarcus = P "Marcus"
-pWesR = P "Wes R"
-pProle = P "Prole"
-pMilkyway = P "Milkyway"
-pSolarGeo = P "Solar Geo"
 pBeep = P "Beep"
-pNolt = P "Nolt"
-pVegas = P "Vegas"
-pGarkosTheDevourer = P "Garkos the Devourer"
-pThePwnlyCollective = P "The Pwnly Collective"
-pCommandaguy = P "Commandaguy"
-pNanuq = P "Nanuq"
-pTheSheep = P "The Sheep"
 pBomb = P "Bomb"
-pKillforfood = P "Killforfood"
+pCommandaguy = P "Commandaguy"
+pDiablo = P "Diablo"
+pGarkosTheDevourer = P "Garkos the Devourer"
+pHamsterAlien = P "Hamster Alien"
 pHatelove = P "Hatelove"
+pKillforfood = P "Killforfood"
+pMarcus = P "Marcus"
+pMilkyway = P "Milkyway"
+pNanuq = P "Nanuq"
+pNolt = P "Nolt"
+pProle = P "Prole"
+pRedKomodo = P "Red Komodo"
+pSolarGeo = P "Solar Geo"
+pTheCloneRanger = P "The Clone Ranger"
+pThePwnlyCollective = P "The Pwnly Collective"
+pTheSheep = P "The Sheep"
+pVegas = P "Vegas"
+pWesR = P "Wes R"
+pXolarix = P "Xolarix"
 
 {- games -}
 g1 :: Game
 g1 = G pXolarix (fromGregorian 2011 9 18)
   (fromGregorian 2011 9 22) (fromGregorian 2011 9 30)
   "Stalemate" "You'll nebah tek me alibe"
-  [ (pHamsterAlien, EPS, Lynched)
-  , (pRedKomodo, Federation, Lynched)
-  , (pDiablo, TSS, Lynched)
-  , (pTheCloneRanger, Hacker, TSSed)
-  , (pMarcus, Union, TSSed)
-  , (pWesR, Neutral, Won)
-  , (pProle, TSS, Lynched)
-  , (pMilkyway, Union, Won)
-  , (pSolarGeo, VeteranFighter, TSSed)
-  , (pBeep, TSS, Suicided)
-  , (pNolt, IllegalDealer, Lynched)
-  , (pVegas, Federation, Lynched)
-  , (pGarkosTheDevourer, Doctor, Won)
-  , (pThePwnlyCollective, Neutral, TSSed)
-  , (pCommandaguy, Empire, TSSed)
-  , (pNanuq, TSS, Lynched)
-  , (pTheSheep, Neutral, TSSed)
+  [ (pBeep, TSS, Suicided)
   , (pBomb, MisguidedVigilante, Lynched)
-  , (pKillforfood, Empire, Bombed)
+  , (pCommandaguy, Empire, TSSed)
+  , (pDiablo, TSS, Lynched)
+  , (pGarkosTheDevourer, Doctor, Won)
+  , (pHamsterAlien, EPS, Lynched)
   , (pHatelove, Neutral, TSSed)
+  , (pKillforfood, Empire, Bombed)
+  , (pMarcus, Union, TSSed)
+  , (pMilkyway, Union, Won)
+  , (pNanuq, TSS, Lynched)
+  , (pNolt, IllegalDealer, Lynched)
+  , (pProle, TSS, Lynched)
+  , (pRedKomodo, Federation, Lynched)
+  , (pSolarGeo, VeteranFighter, TSSed)
+  , (pTheCloneRanger, Hacker, TSSed)
+  , (pThePwnlyCollective, Neutral, TSSed)
+  , (pTheSheep, Neutral, TSSed)
+  , (pVegas, Federation, Lynched)
+  , (pWesR, Neutral, Won)
   ]
   [ (TSS, KillAtNight WConsensus $ PerDay 1)
   , (TSS, Communication WithinGroup)

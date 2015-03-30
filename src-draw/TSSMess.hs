@@ -1,5 +1,218 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
+
 module TSSMess (tssMess) where
 
+import Control.Lens
+import Data.Text
 import Data.Time
 
 tssMess = undefined
+
+{- types -}
+
+newtype Player = P Text deriving Show
+
+data Role
+  = TSS
+  | Federation
+  | Empire
+  | Union
+  | Neutral
+  | Hacker
+  | IllegalDealer
+  | VeteranFighter
+  | EPS
+  | Doctor
+  | MisguidedVigilante
+  | Wildcard Role
+  -- wildcard specific roles
+  deriving (Show, Eq)
+
+data Status
+  = Suicided -- inactivity
+  | Lynched
+  | TSSed
+  | Bombed
+  -- the following are end-game conditions
+  | DiedAtEndOfGame
+  | Survived
+  | Won
+  deriving (Show, Eq)
+
+data Vote = Public | Private deriving (Show, Eq)
+data Consensus = WConsensus | WOConsensus deriving (Show, Eq)
+data Comm = Freely | WithinGroup | DeadLetterDrop deriving (Show, Eq)
+data Identified = CompletelyAnonymous | HackerID | OwnID deriving (Show, Eq)
+data RetryOrUsed = Retry | Used deriving (Show, Eq)
+data Count = PerGame RetryOrUsed Int | PerDay Int deriving (Show, Eq)
+data Self = SelfAllowed | SelfDenied deriving (Show, Eq)
+
+data Mechanic
+  = Kill Role
+  | KillOr [Role]
+  -- particular mechanics
+  | KillAtNight Consensus Count
+  | Communication Comm
+  | AnonymousMessage Identified Count
+  | Bomb Int Count -- must match exactly those Int to blow
+  | HackID
+  | Lobby
+  | DiesWhenKills Role
+  | NightImmunity
+  | ProtectAtNight Self
+  deriving (Show, Eq)
+
+data SpecialMechanic
+  = Votes Vote
+  | BloodlustOnTiedVotes
+  | Suicide Int
+  deriving (Show, Eq)
+
+{-
+ -}
+
+data Game = G
+  { _dm :: Player
+  , _announcementDate :: Day
+  , _startDate :: Day
+  , _endDate :: Day
+  , _title :: Text
+  , _quote :: Text
+  , _players :: [(Player, Role, Status)]
+  , _mechanics :: [(Role, Mechanic)]
+  , _specialMechanics :: [SpecialMechanic]
+  } deriving (Show)
+makeLenses ''Game
+
+instance Eq Game where
+  g1 == g2 = g1 ^. announcementDate == g2 ^. announcementDate
+
+{- players -}
+pXolarix = P "Xolarix"
+pHamsterAlien = P "Hamster Alien"
+pRedKomodo = P "Red Komodo"
+pDiablo = P "Diablo"
+pTheCloneRanger = P "The Clone Ranger"
+pMarcus = P "Marcus"
+pWesR = P "Wes R"
+pProle = P "Prole"
+pMilkyway = P "Milkyway"
+pSolarGeo = P "Solar Geo"
+pBeep = P "Beep"
+pNolt = P "Nolt"
+pVegas = P "Vegas"
+pGarkosTheDevourer = P "Garkos the Devourer"
+pThePwnlyCollective = P "The Pwnly Collective"
+pCommandaguy = P "Commandaguy"
+pNanuq = P "Nanuq"
+pTheSheep = P "The Sheep"
+pBomb = P "Bomb"
+pKillforfood = P "Killforfood"
+pHatelove = P "Hatelove"
+
+{- games -}
+g1 :: Game
+g1 = G pXolarix (fromGregorian 2011 9 18)
+  (fromGregorian 2011 9 22) (fromGregorian 2011 9 30)
+  "Stalemate" "You'll nebah tek me alibe"
+  [ (pHamsterAlien, EPS, Lynched)
+  , (pRedKomodo, Federation, Lynched)
+  , (pDiablo, TSS, Lynched)
+  , (pTheCloneRanger, Hacker, TSSed)
+  , (pMarcus, Union, TSSed)
+  , (pWesR, Neutral, Won)
+  , (pProle, TSS, Lynched)
+  , (pMilkyway, Union, Won)
+  , (pSolarGeo, VeteranFighter, TSSed)
+  , (pBeep, TSS, Suicided)
+  , (pNolt, IllegalDealer, Lynched)
+  , (pVegas, Federation, Lynched)
+  , (pGarkosTheDevourer, Doctor, Won)
+  , (pThePwnlyCollective, Neutral, TSSed)
+  , (pCommandaguy, Empire, TSSed)
+  , (pNanuq, TSS, Lynched)
+  , (pTheSheep, Neutral, TSSed)
+  , (pBomb, MisguidedVigilante, Lynched)
+  , (pKillforfood, Empire, Bombed)
+  , (pHatelove, Neutral, TSSed)
+  ]
+  [ (TSS, KillAtNight WConsensus $ PerDay 1)
+  , (TSS, Communication WithinGroup)
+  , (TSS, AnonymousMessage OwnID $ PerDay 1)
+  , (TSS, Kill Federation)
+  , (TSS, Kill Empire)
+  , (TSS, Kill Union)
+  , (TSS, Kill Neutral)
+  , (TSS, Kill Hacker)
+  , (TSS, Kill IllegalDealer)
+  , (TSS, Kill VeteranFighter)
+  , (TSS, Kill EPS)
+  , (TSS, Kill Doctor)
+  , (TSS, Kill MisguidedVigilante)
+  , (Federation, Communication WithinGroup)
+  , (Empire, Communication WithinGroup)
+  , (Union, Communication WithinGroup)
+  , (Federation, Kill TSS)
+  , (Federation, Kill Empire)
+  , (Federation, Kill Union)
+  , (Empire, Kill TSS)
+  , (Empire, Kill Federation)
+  , (Empire, Kill Union)
+  , (Union, Kill TSS)
+  , (Union, Kill Federation)
+  , (Union, Kill Empire)
+  , (Federation, Bomb 2 $ PerGame Retry 2)
+  , (Empire, Bomb 2 $ PerGame Retry 2)
+  , (Union, Bomb 2 $ PerGame Retry 2)
+  , (Neutral, Communication DeadLetterDrop)
+  , (Neutral, Kill TSS)
+  , (Neutral, Kill MisguidedVigilante)
+  , (Hacker, HackID)
+  , (Hacker, AnonymousMessage OwnID $ PerDay 1)
+  , (IllegalDealer, Lobby)
+  , (IllegalDealer, Kill TSS)
+  , (IllegalDealer, Kill EPS)
+  , (VeteranFighter, KillAtNight WOConsensus $ PerGame Used 1)
+  , (VeteranFighter, DiesWhenKills Neutral)
+  , (VeteranFighter, Kill TSS)
+  , (EPS, NightImmunity)
+  , (EPS, Kill TSS)
+  , (EPS, KillOr [Hacker, IllegalDealer])
+  , (Doctor, ProtectAtNight SelfAllowed)
+  , (Doctor, Kill TSS)
+  , (MisguidedVigilante, KillAtNight WOConsensus $ PerGame Used 4)
+  , (MisguidedVigilante, Kill Neutral)
+  , (MisguidedVigilante, Kill TSS)
+  ]
+  [Votes Public, BloodlustOnTiedVotes, Suicide 2]
+
+--
+
+{-
+ - Games:
+ - http://forum.pardus.at/archive/index.php?showtopic=55254&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=55372&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=55622&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=55850&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=56043&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=60311&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=60552&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=60684&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=60837&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=62666&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=62795&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=62905&st=0
+ - http://forum.pardus.at/archive/index.php?showtopic=65885&st=0
+ -
+ - Notes:
+ - http://forum.pardus.at/archive/index.php?showtopic=55254&st=15&#entry1112281 This is not a combat game
+ - http://forum.pardus.at/archive/index.php?showtopic=55372&st=105&#entry1118753 We have maps
+ - http://forum.pardus.at/archive/index.php?showtopic=55372&st=360&#entry1121896 Some numbers
+ - http://forum.pardus.at/archive/index.php?showtopic=55622&st=60&#entry1123559 Poetry
+ - http://forum.pardus.at/archive/index.php?showtopic=55622&st=135&#entry1125240 Security seal or too much geekery?
+ - http://forum.pardus.at/archive/index.php?showtopic=55850&st=120&#entry1129702 Survival? No, we have hormones
+ - http://forum.pardus.at/archive/index.php?showtopic=60552&st=105&#entry1225650 Bloody kills
+ - http://forum.pardus.at/archive/index.php?showtopic=60552&st=210&#entry1227035 Getting screwed and screwdrivers..
+ - http://forum.pardus.at/archive/index.php?showtopic=60684&st=120&#entry1229656 ..or wrenches
+ -}

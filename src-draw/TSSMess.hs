@@ -38,6 +38,7 @@ data Status
   | Doctored
   | MisguidedVigilanted
   | Gunned
+  | RNGed
   -- the following are end-game conditions
   | DiedAtEndOfGame
   | Survived
@@ -92,13 +93,17 @@ data SpecialMechanic
   | BloodlustOnTiedVotes
   | Suicide Int
   | ListOfTargettedPilots [Role] Int
-  | DocGunKill
-  | DocGunTSSRandomTSSKill
+  | DocGunKill -- kill protected target if Doc has gun
+  | DocGunKillSelf -- kill doc if protected target has gun
+  | DocGunTSSRandomTSSKill -- kill TSS if protected target is attacked by tss and has gun
+  | DocIDBotHDie -- doc and ID both die if doc protects ID
   | WildcardNotTargetted
   | DropBoxes
   | GroupLeaders
   | AllWildcards
   | RPCharacterStory
+  | RNGKills
+  | TurnTSS
   deriving (Show, Eq)
 
 {-
@@ -122,6 +127,7 @@ instance Eq Game where
 
 {- players -}
 pAgile = P "Agile"
+pArose = P "Arose"
 pBarackAlIssteg = P "Barack Al Issteg"
 pBeep = P "Beep"
 pBlah = P "Blah"
@@ -131,6 +137,7 @@ pCaledor = P "Caledor"
 pCommandaguy = P "Commandaguy"
 pCrackpot = P "Crackpot"
 pDarsia = P "Darsia"
+pDdaz = P "Ddaz"
 pDiablo = P "Diablo"
 pElMalo = P "El Malo"
 pEsmereldaWeatherwax = P "Esmerelda Weatherwax"
@@ -166,6 +173,7 @@ pTarraEclipse = P "Tarra Eclipse"
 pTheCloneRanger = P "The Clone Ranger"
 pThePwnlyCollective = P "The Pwnly Collective"
 pTheSheep = P "The Sheep"
+pTradeMachine = P "Trade Machine"
 pTudytudysavaki = P "Tudytudysavaki"
 pTyMercer = P "Ty Mercer"
 pVegas = P "Vegas"
@@ -296,7 +304,6 @@ g2 = G pXolarix (fromGregorian 2011 9 28)
   , (IllegalDealer, Gun $ Cooldown 2)
   , (IllegalDealer, WinWhenDead [TSS, EPS, Doctor])
   , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 2)
-  , (VeteranFighter, DiesWhenKills Neutral)
   , (VeteranFighter, WinWhenDead [TSS, Hacker])
   , (EPS, NightImmunity)
   , (EPS, ConfiscateGun)
@@ -312,7 +319,7 @@ g2 = G pXolarix (fromGregorian 2011 9 28)
   ]
   [Votes Public, BloodlustOnTiedVotes, Suicide 2
   , ListOfTargettedPilots [Doctor, IllegalDealer] 5
-  , DocGunKill, DocGunTSSRandomTSSKill, WildcardNotTargetted
+  , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
   ]
 
 g3 :: Game
@@ -372,9 +379,8 @@ g3 = G pMikillThomas (fromGregorian 2011 10 16)
   , (IllegalDealer, Gun $ Cooldown 2)
   , (IllegalDealer, WinWhenDead [TSS, EPS, Doctor])
   , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 2)
-  , (VeteranFighter, DiesWhenKills Neutral)
   , (VeteranFighter, WinWhenDead [TSS, Hacker])
-  , (VeteranFighter, Know [RandomRole 1 $ Replace [(TSS, [Doctor, IllegalDealer,
+  , (VeteranFighter, Know [RandomRole 2 $ Replace [(TSS, [Doctor, IllegalDealer,
       MisguidedVigilante, Neutral])]])
   , (EPS, NightImmunity)
   , (EPS, ConfiscateGun)
@@ -392,7 +398,7 @@ g3 = G pMikillThomas (fromGregorian 2011 10 16)
   ]
   [DropBoxes, AllWildcards, RPCharacterStory, Suicide 2, GroupLeaders
   , Votes Public, BloodlustOnTiedVotes, Suicide 2
-  , DocGunKill, DocGunTSSRandomTSSKill, WildcardNotTargetted
+  , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
   ]
 
 g4 :: Game
@@ -448,9 +454,8 @@ g4 = G pFenrir (fromGregorian 2011 10 29)
   , (IllegalDealer, Gun $ Cooldown 2)
   , (IllegalDealer, WinWhenDead [Federation, Empire, Union, EPS, Doctor])
   , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 2)
-  , (VeteranFighter, DiesWhenKills Neutral)
   , (VeteranFighter, WinWhenDead [TSS, Hacker])
-  , (VeteranFighter, Know [RandomRole 1 $ Replace [(TSS, [Doctor, IllegalDealer,
+  , (VeteranFighter, Know [RandomRole 2 $ Replace [(TSS, [Doctor, IllegalDealer,
       MisguidedVigilante, Neutral])]])
   , (EPS, NightImmunity)
   , (EPS, ConfiscateGun)
@@ -468,7 +473,80 @@ g4 = G pFenrir (fromGregorian 2011 10 29)
   ]
   [DropBoxes, AllWildcards, RPCharacterStory, Suicide 2, GroupLeaders
   , Votes Private, BloodlustOnTiedVotes
-  , DocGunKill, DocGunTSSRandomTSSKill, WildcardNotTargetted
+  , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
+  ]
+
+g5 :: Game
+g5 = G pMarcus (fromGregorian 2011 11 11)
+  (fromGregorian 2012 1 17) (fromGregorian 2012 1 27)
+  "Hidden Operative - Codenames" "You wet your pants but are still alive. For now."
+  [ (pArose, Union, Bombed)
+  , (pBarackAlIssteg, Wildcard Doctor, RNGed)
+  , (pBlah, Neutral, RNGed)
+  , (pDdaz, MisguidedVigilante, Lynched)
+  , (pEsmereldaWeatherwax, EPS, Lynched)
+  , (pFUrquhart, Empire, VeteranFightered)
+  , (pFenrir, Hacker, VeteranFightered)
+  , (pFlink, IllegalDealer, RNGed)
+  , (pIrk, Union, Lynched)
+  , (pMikillThomas, Neutral, RNGed)
+  , (pMilkyway, Doctor, Lynched)
+  , (pRedKomodo, VeteranFighter, Lynched)
+  , (pShine, Wildcard Hacker, Won)
+  , (pSolarGeo, Empire, Bombed)
+  , (pThePwnlyCollective, Federation, Bombed)
+  , (pTradeMachine, Federation, RNGed)
+  ]
+  [ (TSS, KillAtNight [] WConsensus $ PerDay $ I 1)
+  , (TSS, Communication DeadLetterDrop)
+  , (TSS, AnonymousMessage CompletelyAnonymous $ PerDay $ I 1)
+  , (TSS, WinWhenDead [Federation, Empire, Union, Hacker,
+      IllegalDealer, VeteranFighter, EPS, Doctor, MisguidedVigilante])
+  , (Federation, Communication DeadLetterDrop)
+  , (Empire, Communication DeadLetterDrop)
+  , (Union, Communication DeadLetterDrop)
+  , (Federation, WinWhenDead [TSS, Empire, Union])
+  , (Empire, WinWhenDead [TSS, Federation, Union])
+  , (Union, WinWhenDead [TSS, Federation, Empire])
+  , (Federation, Bomb NumberOfMatches $ PerGame Retry $ I 2)
+  , (Empire, Bomb NumberOfMatches $ PerGame Retry $ I 2)
+  , (Union, Bomb NumberOfMatches $ PerGame Retry $ I 2)
+  , (Neutral, Communication DeadLetterDrop)
+  , (Neutral, WinWhenDead [TSS, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Federation, Empire, Union, Hacker,
+      IllegalDealer, VeteranFighter, EPS, Doctor, MisguidedVigilante])
+  , (Neutral, Know [Role Neutral 2, RandomRole 1 $ Replace [(TSS, [Doctor,
+      Hacker, IllegalDealer, MisguidedVigilante, VeteranFighter])]])
+  , (Neutral, Lobby WConsensus $ PerDay $ I 1)
+  , (Hacker, HackID)
+  , (Hacker, AnonymousMessage CompletelyAnonymous $ PerDay $ I 1)
+  , (Hacker, WinWhenDead [TSS, EPS, VeteranFighter])
+  , (Hacker, ReadDropboxes)
+  , (Hacker, Know [RandomRole 2 $ NotFrom [EPS, VeteranFighter]])
+  , (IllegalDealer, Gun $ Cooldown 2)
+  , (IllegalDealer, WinWhenDead [Federation, Empire, Union, EPS, Doctor])
+  , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 2)
+  , (VeteranFighter, WinWhenDead [TSS, Hacker])
+  , (VeteranFighter, Know [RandomRole 2 $ Replace [(TSS, [Doctor, IllegalDealer,
+      MisguidedVigilante, Neutral])]])
+  , (EPS, NightImmunity)
+  , (EPS, ConfiscateGun)
+  , (EPS, WinWhenDead [TSS, Hacker, IllegalDealer])
+  , (EPS, Know [RandomRole 2 $ NotFrom [TSS]])
+  , (Doctor, ProtectAtNight SelfDenied)
+  , (Doctor, WinWhenDead [TSS, IllegalDealer])
+  , (Doctor, Compromise [Hacker, VeteranFighter])
+  , (Doctor, Doctors IllegalDealer)
+  , (Doctor, AttackerIdOnProtection [TSS, MisguidedVigilante])
+  , (Doctor, Know [RandomRole 2 $ NotFrom [Hacker, Doctor]])
+  , (MisguidedVigilante, KillAtNight [Neutral] WOConsensus $ PerGame Retry $ EqRole [Neutral])
+  , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
+  , (MisguidedVigilante, Know [RandomRole 2 $ NotFrom [MisguidedVigilante, Neutral]])
+  ]
+  [DropBoxes, AllWildcards, RPCharacterStory, Suicide 2, GroupLeaders
+  , Votes Private, BloodlustOnTiedVotes
+  , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
+  , RNGKills, DocIDBotHDie, TurnTSS
   ]
 
 --

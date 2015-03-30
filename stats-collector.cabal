@@ -59,6 +59,7 @@ executable drawer
     diagrams >= 1.2,
     diagrams-lib >= 1.2,
     diagrams-rasterific >= 0.1,
+    lens >= 4.7,
     optparse-applicative >= 0.11,
     split >= 0.2,
     time >= 1.4

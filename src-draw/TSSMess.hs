@@ -86,6 +86,7 @@ data Mechanic
   | AttackerIdOnProtection [Role]
   | Know [RoleInfo]
   | ReadDropboxes
+  | TrophyPoints
   deriving (Show, Eq)
 
 data SpecialMechanic
@@ -135,10 +136,15 @@ pBomb = P "Bomb"
 pBstr = P "Bstr"
 pCaledor = P "Caledor"
 pCommandaguy = P "Commandaguy"
+pCovington = P "Covington"
 pCrackpot = P "Crackpot"
+pDanteLongshadow = P "Dante Longshadow"
 pDarsia = P "Darsia"
 pDdaz = P "Ddaz"
 pDiablo = P "Diablo"
+pDinonumber = P "Dinonumber"
+pEddieRikes = P "Eddie Rikes"
+pElGringoBandito = P "El Gringo Bandito"
 pElMalo = P "El Malo"
 pEsmereldaWeatherwax = P "Esmerelda Weatherwax"
 pFUrquhart = P "F Urquhart"
@@ -146,11 +152,13 @@ pFehera = P "Fehera"
 pFenrir = P "Fenrir"
 pFlink = P "Flink"
 pGarkosTheDevourer = P "Garkos the Devourer"
+pGarkostheButcher = P "Garkos the Butcher"
 pHamsterAlien = P "Hamster Alien"
 pHatelove = P "Hatelove"
 pHellequin = P "Hellequin"
 pHolidayKoval = P "Holiday Koval"
 pHorizon = P "Horizon"
+pHuckleberry = P "Huckleberry"
 pIrk = P "Irk"
 pKennyYoobaStard = P "Kenny Yooba Stard"
 pKillforfood = P "Killforfood"
@@ -163,21 +171,30 @@ pNanuq = P "Nanuq"
 pNashSteelfist = P "Nash Steelfist"
 pNeight = P "Neight"
 pNolt = P "Nolt"
+pPelor = P "Pelor"
 pProle = P "Prole"
 pRedKomodo = P "Red Komodo"
+pReez = P "Reez"
+pRichert = P "Richert"
 pShine = P "Shine"
 pSkyCrossbones  = P "Sky Crossbones"
 pSolarGeo = P "Solar Geo"
 pSonofWarson = P "Son of Warson"
+pSream = P "Sream"
+pTacoguy = P "Tacoguy"
 pTarraEclipse = P "Tarra Eclipse"
 pTheCloneRanger = P "The Clone Ranger"
+pTheInsaneOne = P "The Insane One"
 pThePwnlyCollective = P "The Pwnly Collective"
 pTheSheep = P "The Sheep"
 pTradeMachine = P "Trade Machine"
+pTro = P "Tro"
 pTudytudysavaki = P "Tudytudysavaki"
 pTyMercer = P "Ty Mercer"
+pUristMclovin = P "Urist Mclovin"
 pVegas = P "Vegas"
 pWesR = P "Wes R"
+pWildGina = P "Wild Gina"
 pXolarix = P "Xolarix"
 pXorism = P "Xorism"
 
@@ -471,7 +488,7 @@ g4 = G pFenrir (fromGregorian 2011 10 29)
   , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
   , (MisguidedVigilante, Know [RandomRole 2 $ NotFrom [MisguidedVigilante, Neutral]])
   ]
-  [DropBoxes, AllWildcards, RPCharacterStory, Suicide 2, GroupLeaders
+  [DropBoxes, RPCharacterStory, Suicide 2, GroupLeaders
   , Votes Private, BloodlustOnTiedVotes
   , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
   ]
@@ -543,10 +560,76 @@ g5 = G pMarcus (fromGregorian 2011 11 11)
   , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
   , (MisguidedVigilante, Know [RandomRole 2 $ NotFrom [MisguidedVigilante, Neutral]])
   ]
-  [DropBoxes, AllWildcards, RPCharacterStory, Suicide 2, GroupLeaders
+  [DropBoxes, RPCharacterStory, Suicide 2, GroupLeaders
   , Votes Private, BloodlustOnTiedVotes
   , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
   , RNGKills, DocIDBotHDie, TurnTSS
+  ]
+
+g6 :: Game
+g6 = G pXolarix (fromGregorian 2012 10 27)
+  (fromGregorian 2012 11 14) (fromGregorian 2012 11 21)
+  "Save Gina" "Wonder why he died? He ran into space with no suit."
+  [ (pCovington, EPS, Lynched)
+  , (pDanteLongshadow, Neutral, TSSed)
+  , (pDinonumber, TSS, Lynched)
+  , (pEddieRikes, Neutral, MisguidedVigilanted)
+  , (pElGringoBandito, VeteranFighter, DiedAtEndOfGame)
+  , (pFUrquhart, IllegalDealer, TSSed)
+  , (pGarkostheButcher, TSS, Lynched)
+  , (pHuckleberry, Union, DiedAtEndOfGame)
+  , (pMarcus, Wildcard MisguidedVigilante, Won)
+  , (pPelor, MisguidedVigilante, Won)
+  , (pReez, Empire, DiedAtEndOfGame)
+  , (pRichert, Neutral, Lynched)
+  , (pSream, TSS, Lynched)
+  , (pTacoguy, Federation, DiedAtEndOfGame)
+  , (pTarraEclipse, Empire, DiedAtEndOfGame)
+  , (pTheCloneRanger, Federation, TSSed)
+  , (pTheInsaneOne, Union, TSSed)
+  , (pTro, Doctor, DiedAtEndOfGame)
+  , (pUristMclovin, Hacker, Won)
+  , (pVegas, Neutral, MisguidedVigilanted)
+  , (pWildGina, TSS, Lynched)
+  ]
+  [ (TSS, KillAtNight [] WConsensus $ PerDay $ I 1)
+  , (TSS, Communication WithinGroup)
+  , (TSS, AnonymousMessage CompletelyAnonymous $ PerDay $ I 1)
+  , (TSS, WinWhenDead [Federation, Empire, Union, Hacker,
+      IllegalDealer, VeteranFighter, EPS, Doctor, MisguidedVigilante])
+  , (TSS, TrophyPoints)
+  , (Federation, Communication WithinGroup)
+  , (Empire, Communication WithinGroup)
+  , (Union, Communication WithinGroup)
+  , (Federation, WinWhenDead [TSS, Empire, Union])
+  , (Empire, WinWhenDead [TSS, Federation, Union])
+  , (Union, WinWhenDead [TSS, Federation, Empire])
+  , (Federation, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Empire, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Union, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Neutral, Communication DeadLetterDrop)
+  , (Neutral, WinWhenDead [Federation, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Empire, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Union, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Hacker, HackID)
+  , (Hacker, AnonymousMessage CompletelyAnonymous $ PerDay $ I 1)
+  , (Hacker, WinWhenDead [TSS, EPS])
+  , (IllegalDealer, Gun $ Cooldown 1)
+  , (IllegalDealer, WinWhenDead [TSS, EPS])
+  , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 1)
+  , (VeteranFighter, DiesWhenKills Neutral)
+  , (VeteranFighter, WinWhenDead [TSS, MisguidedVigilante])
+  , (VeteranFighter, WinWhenDead [TSS, Doctor])
+  , (EPS, NightImmunity)
+  , (EPS, WinWhenDead [TSS, Hacker])
+  , (EPS, WinWhenDead [TSS, IllegalDealer])
+  , (Doctor, ProtectAtNight SelfDenied)
+  , (Doctor, WinWhenDead [TSS, VeteranFighter])
+  , (MisguidedVigilante, KillAtNight [Neutral] WOConsensus $ PerGame Used $ EqRole [Neutral])
+  , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
+  ]
+  [RPCharacterStory, Suicide 2, Votes Public, BloodlustOnTiedVotes
+  , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
   ]
 
 --

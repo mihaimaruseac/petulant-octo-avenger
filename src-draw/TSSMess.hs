@@ -81,6 +81,7 @@ data TropyAction
   = Bloodlust
   | Impersonation
   | Firewall Cooldown
+  | Execution
   deriving (Show, Eq)
 
 data Mechanic
@@ -92,6 +93,7 @@ data Mechanic
   | Bomb BombPuzzle Count -- must match exactly those Int to blow
   | HackID
   | HackIDTwice Cooldown -- 50% of being locked down Cooldown
+  | RevealWildcardMechanic
   | Lobby Consensus Count
   | Lobby2 Consensus Int Cooldown
   | Gun Cooldown
@@ -167,6 +169,8 @@ pBrenettoftheRills = P "Brenett of the Rills"
 pBstr = P "Bstr"
 pCaledor = P "Caledor"
 pCalimond = P "Calimond"
+pCarimo = P "Carimo"
+pChadDeoxy = P "Chad Deoxy"
 pCommandaguy = P "Commandaguy"
 pCovington = P "Covington"
 pCrackpot = P "Crackpot"
@@ -178,6 +182,7 @@ pDemonswrath = P "Demonswrath"
 pDiablo = P "Diablo"
 pDinonumber = P "Dinonumber"
 pDodge = P "Dodge"
+pEddieBLanner = P "Eddie B Lanner"
 pEddieRikes = P "Eddie Rikes"
 pElGringoBandito = P "El Gringo Bandito"
 pElMalo = P "El Malo"
@@ -185,6 +190,7 @@ pEsmereldaWeatherwax = P "Esmerelda Weatherwax"
 pFUrquhart = P "F Urquhart"
 pFehera = P "Fehera"
 pFenrir = P "Fenrir"
+pFera = P "Fera"
 pFlink = P "Flink"
 pGamerguy = P "Gamerguy"
 pGarkosTheDevourer = P "Garkos the Devourer"
@@ -194,6 +200,7 @@ pGrafEisen = P "Graf Eisen"
 pHamsterAlien = P "Hamster Alien"
 pHatelove = P "Hatelove"
 pHellequin = P "Hellequin"
+pHerneTheHunter = P "Herne The Hunter"
 pHolidayKoval = P "Holiday Koval"
 pHorizon = P "Horizon"
 pHuckleberry = P "Huckleberry"
@@ -208,14 +215,20 @@ pKurrai = P "Kurrai"
 pKylie = P "Kylie"
 pLauraDumitrescu = P "Laura Dumitrescu"
 pLauraTheLovedOne = P "Laura The Loved One"
+pLauratheLovedOne = P "Laura the Loved One"
 pLornanRoche = P "Lornan Roche"
 pLoyalty = P "Loyalty"
 pMarcus = P "Marcus"
+pMattGray = P "Matt Gray"
 pMephistoles = P "Mephistoles"
 pMicase = P "Micase"
 pMikillThomas = P "Mikill Thomas"
+pMikkas = P "Mikkas"
 pMilkyway = P "Milkyway"
 pMiloStark = P "Milo Stark"
+pMissSmokey = P "Miss Smokey"
+pMistyMoonlight = P "Misty Moonlight"
+pMith = P "Mith"
 pNanuq = P "Nanuq"
 pNashSteelfist = P "Nash Steelfist"
 pNeight = P "Neight"
@@ -232,13 +245,17 @@ pSalveCrossbones = P "Salve Crossbones"
 pSarthker = P "Sarthker"
 pSaturnine = P "Saturnine"
 pSeneka = P "Seneka"
+pSenty = P "Senty"
+pSeverin = P "Severin"
 pSextusPompeius = P "Sextus Pompeius"
 pShine = P "Shine"
+pSirius = P "Sirius"
 pSkyCrossbones  = P "Sky Crossbones"
 pSmedley = P "Smedley"
 pSolarGeo = P "Solar Geo"
 pSonofWarson = P "Son of Warson"
 pSream = P "Sream"
+pStarflight = P "Starflight"
 pSupercooli = P "Supercooli"
 pSysice = P "Sysice"
 pTEldor = P "T Eldor"
@@ -1052,11 +1069,64 @@ g11 = G pDinonumber (fromGregorian 2013 6 29)
   , (MisguidedVigilante, KillAtNight [Neutral] WOConsensus $ PerGame Retry $ EqRole [Neutral])
   , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
   ]
-  [Suicide 2, Votes Public, BloodlustOnTiedVotes
+  [Suicide 2, Votes Private, BloodlustOnTiedVotes
   , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill
   , RedShirts [pInvictio, pFUrquhart, pLauraTheLovedOne, pSysice, pWildGina,
     pXolarix, pYarok, pGarkostheButcher, pSarthker, pDemonswrath, pThanu,
     pGeePig, pMicase]
+  ]
+
+g12 :: Game
+g12 = G pDinonumber (fromGregorian 2014 8 26)
+  (fromGregorian 2014 9 13) (fromGregorian 2013 9 19)
+  "Flares of Polaris" "I expect to be severin' his bones soon"
+  [ (pAnger, Federation, TSSed)
+  ]
+  [ (TSS, KillAtNight [] WConsensus $ PerDay $ I 1)
+  , (TSS, Communication WithinGroup)
+  , (TSS, AnonymousMessage OwnID $ PerDay $ I 1)
+  , (TSS, WinWhenDead [Federation, Empire, Union, Hacker,
+      IllegalDealer, VeteranFighter, EPS, Doctor, MisguidedVigilante])
+  , (TSS, TrophyPoints [Bloodlust, Execution])
+  , (Federation, Communication WithinGroup)
+  , (Empire, Communication WithinGroup)
+  , (Union, Communication WithinGroup)
+  , (Federation, WinWhenDead [TSS, Empire, Union])
+  , (Empire, WinWhenDead [TSS, Federation, Union])
+  , (Union, WinWhenDead [TSS, Federation, Empire])
+  , (Federation, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Empire, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Union, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Neutral, Communication DeadLetterDrop)
+  , (Neutral, Lobby2 WConsensus 2 $ Cooldown 2)
+  , (Neutral, WinWhenDead [Federation, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Empire, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Union, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, NoTSSKillWhenWon)
+  , (Hacker, HackID)
+  , (Hacker, RevealWildcardMechanic)
+  , (Hacker, AnonymousMessage OwnID $ PerDay $ I 1)
+  , (Hacker, WinWhenDead [Neutral, TSS, EPS])
+  , (IllegalDealer, Gun $ Cooldown 0)
+  , (IllegalDealer, WinWhenDead [Federation, EPS, Doctor])
+  , (IllegalDealer, WinWhenDead [Empire, EPS, Doctor])
+  , (IllegalDealer, WinWhenDead [Union, EPS, Doctor])
+  , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 1)
+  , (VeteranFighter, Wound Immune $ Cooldown 2)
+  , (VeteranFighter, WinWhenDead [TSS, MisguidedVigilante])
+  , (VeteranFighter, WinWhenDead [TSS, Doctor])
+  , (EPS, NightImmunity)
+  , (EPS, WinWhenDead [TSS, Hacker])
+  , (EPS, WinWhenDead [TSS, IllegalDealer])
+  , (Doctor, ProtectAtNight SelfDenied)
+  , (Doctor, CompromiseWounded)
+  , (Doctor, WinWhenDead [TSS, VeteranFighter])
+  , (Doctor, WinWhenDead [TSS, IllegalDealer])
+  , (MisguidedVigilante, KillAtNight [Neutral] WOConsensus $ PerGame Retry $ EqRole [Neutral])
+  , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
+  ]
+  [Suicide 2, Votes Private, BloodlustOnTiedVotes
+  , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill
   ]
 
 --

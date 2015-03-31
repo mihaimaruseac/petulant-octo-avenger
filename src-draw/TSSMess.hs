@@ -7,8 +7,6 @@ import Control.Lens
 import Data.Text
 import Data.Time
 
-tssMess = undefined
-
 {- types -}
 
 newtype Player = P Text deriving (Show, Eq)
@@ -215,7 +213,6 @@ pKurrai = P "Kurrai"
 pKylie = P "Kylie"
 pLauraDumitrescu = P "Laura Dumitrescu"
 pLauraTheLovedOne = P "Laura The Loved One"
-pLauratheLovedOne = P "Laura the Loved One"
 pLornanRoche = P "Lornan Roche"
 pLoyalty = P "Loyalty"
 pMarcus = P "Marcus"
@@ -1080,7 +1077,27 @@ g12 :: Game
 g12 = G pDinonumber (fromGregorian 2014 8 26)
   (fromGregorian 2014 9 13) (fromGregorian 2013 9 19)
   "Flares of Polaris" "I expect to be severin' his bones soon"
-  [ (pAnger, Federation, TSSed)
+  [ (pCarimo, EPS, Won)
+  , (pChadDeoxy, Neutral, Survived)
+  , (pEddieBLanner, Federation, Suicided)
+  , (pFera, MisguidedVigilante, Survived)
+  , (pHerneTheHunter, Neutral, MisguidedVigilanted)
+  , (pLauraTheLovedOne, VeteranFighter, TSSed)
+  , (pMattGray, Neutral, MisguidedVigilanted)
+  , (pMikillThomas, IllegalDealer, Suicided)
+  , (pMikkas, Neutral, Suicided)
+  , (pMissSmokey, Federation, Bombed)
+  , (pMistyMoonlight, TSS, Suicided)
+  , (pMith, Empire, TSSed)
+  , (pPelor, Wildcard EPSCrussaded, TSSed)
+  , (pSenty, Union, TSSed)
+  , (pSeverin, Union, Lynched)
+  , (pSirius, TSS, Lynched)
+  , (pStarflight, TSS, Lynched)
+  , (pTheInsaneOne, Doctor, Won)
+  , (pTro, Empire, Lynched)
+  , (pVegas, Hacker, Suicided)
+  , (pXolarix, TSS, Lynched)
   ]
   [ (TSS, KillAtNight [] WConsensus $ PerDay $ I 1)
   , (TSS, Communication WithinGroup)
@@ -1129,6 +1146,9 @@ g12 = G pDinonumber (fromGregorian 2014 8 26)
   , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill
   ]
 
+artemisGames = [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12]
+
+tssMess = print artemisGames
 --
 
 {-

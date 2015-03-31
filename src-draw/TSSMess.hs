@@ -54,6 +54,8 @@ data CountVal = I Int | EqRole [Role] deriving (Show, Eq)
 data Count = PerGame RetryOrUsed CountVal | PerDay CountVal deriving (Show, Eq)
 data Self = SelfAllowed | SelfDenied deriving (Show, Eq)
 data BombPuzzle = ExactMatch | NumberOfMatches deriving (Show, Eq)
+data Immune = Immune | NoImmune deriving (Show, Eq)
+data Overdose = Overdose | NoOverdose deriving (Show, Eq)
 
 newtype Cooldown = Cooldown Int deriving (Show, Eq)
 
@@ -75,10 +77,11 @@ data Mechanic
   | AnonymousMessage Identified Count
   | Bomb BombPuzzle Count -- must match exactly those Int to blow
   | HackID
+  | HackIDTwice Cooldown -- 50% of being locked down Cooldown
   | Lobby Consensus Count
   | Gun Cooldown
   | ConfiscateGun
-  | DiesWhenKills Role
+  | DiesWhenKills [Role]
   | NightImmunity
   | ProtectAtNight Self
   | Doctors Role
@@ -87,7 +90,8 @@ data Mechanic
   | Know [RoleInfo]
   | ReadDropboxes
   | TrophyPoints
-  | Paralyze Count
+  | Paralyze Immune Overdose Count
+  | Arrest
   deriving (Show, Eq)
 
 data SpecialMechanic
@@ -129,10 +133,12 @@ instance Eq Game where
 
 {- players -}
 pAgile = P "Agile"
+pAquilaSicarius = P "Aquila Sicarius"
 pArose = P "Arose"
 pAsriel = P "Asriel"
 pBarackAlIssteg = P "Barack Al Issteg"
 pBeep = P "Beep"
+pBlackChocolate = P "Black Chocolate"
 pBlah = P "Blah"
 pBomb = P "Bomb"
 pBstr = P "Bstr"
@@ -193,6 +199,7 @@ pTheCloneRanger = P "The Clone Ranger"
 pTheInsaneOne = P "The Insane One"
 pThePwnlyCollective = P "The Pwnly Collective"
 pTheSheep = P "The Sheep"
+pThraxis = P "Thraxis"
 pTradeMachine = P "Trade Machine"
 pTro = P "Tro"
 pTudytudysavaki = P "Tudytudysavaki"
@@ -252,7 +259,7 @@ g1 = G pXolarix (fromGregorian 2011 9 18)
   , (IllegalDealer, Lobby WConsensus $ PerDay $ I 1)
   , (IllegalDealer, WinWhenDead [TSS, EPS])
   , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 1)
-  , (VeteranFighter, DiesWhenKills Neutral)
+  , (VeteranFighter, DiesWhenKills [Neutral])
   , (VeteranFighter, WinWhenDead [TSS])
   , (EPS, NightImmunity)
   , (EPS, WinWhenDead [TSS, Hacker])
@@ -623,7 +630,7 @@ g6 = G pXolarix (fromGregorian 2012 10 27)
   , (IllegalDealer, Gun $ Cooldown 1)
   , (IllegalDealer, WinWhenDead [TSS, EPS])
   , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 1)
-  , (VeteranFighter, DiesWhenKills Neutral)
+  , (VeteranFighter, DiesWhenKills [Neutral])
   , (VeteranFighter, WinWhenDead [TSS, MisguidedVigilante])
   , (VeteranFighter, WinWhenDead [TSS, Doctor])
   , (EPS, NightImmunity)
@@ -691,19 +698,92 @@ g7 = G pMarcus (fromGregorian 2012 11 21)
   , (IllegalDealer, Gun $ Cooldown 1)
   , (IllegalDealer, WinWhenDead [TSS, EPS, Doctor])
   , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 1)
-  , (VeteranFighter, DiesWhenKills Neutral)
+  , (VeteranFighter, DiesWhenKills [Neutral])
   , (VeteranFighter, WinWhenDead [TSS, MisguidedVigilante])
   , (VeteranFighter, WinWhenDead [TSS, Doctor])
   , (EPS, NightImmunity)
   , (EPS, WinWhenDead [TSS, Hacker])
   , (EPS, WinWhenDead [TSS, IllegalDealer])
   , (Doctor, ProtectAtNight SelfDenied)
-  , (Doctor, Paralyze $ PerGame Used $ I 4)
+  , (Doctor, Paralyze NoImmune NoOverdose $ PerGame Used $ I 4)
   , (Doctor, WinWhenDead [TSS, VeteranFighter, MisguidedVigilante])
   , (MisguidedVigilante, KillAtNight [Neutral] WOConsensus $ PerGame Used $ EqRole [Neutral])
   , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
   ]
   [Suicide 2, Votes Public, BloodlustOnTiedVotes
+  , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
+  ]
+
+g8 :: Game
+g8 = G pDinonumber (fromGregorian 2012 12 3)
+  (fromGregorian 2012 12 12) (fromGregorian 2012 12 18)
+  "EPS Fiasco" "If you start praying in Latin again I'll make your death the worst I can think of"
+  [ (pAquilaSicarius, TSS, Suicided)
+  , (pBlackChocolate, VeteranFighter, VeteranFightered)
+  , (pDanteLongshadow, Neutral, Suicided)
+  , (pFUrquhart, Wildcard Neutral, TSSed)
+  , (pLauraDumitrescu, Union, TSSed)
+  , (pMarcus, Empire, Bombed)
+  , (pMephistoles, Empire, Survived)
+  , (pMilkyway, MisguidedVigilante, TSSed)
+  , (pPelor, Federation, Survived)
+  , (pRedKomodo, Doctor, TSSed)
+  , (pSalathr, Neutral, Survived)
+  , (pSolarGeo, Neutral, Suicided)
+  , (pSream, IllegalDealer, TSSed)
+  , (pTheCloneRanger, Neutral, VeteranFightered)
+  , (pTheInsaneOne, Hacker, Won)
+  , (pThePwnlyCollective, Federation, Bombed)
+  , (pThraxis, TSS, Lynched)
+  , (pTro, EPS, Lynched)
+  , (pVegas, Union, Lynched)
+  , (pWildGina, TSS, Suicided)
+  , (pXolarix, TSS, Lynched)
+  ]
+  [ (TSS, KillAtNight [] WConsensus $ PerDay $ I 1)
+  , (TSS, Communication WithinGroup)
+  , (TSS, AnonymousMessage CompletelyAnonymous $ PerDay $ I 1)
+  , (TSS, WinWhenDead [Federation, Empire, Union, Hacker,
+      IllegalDealer, VeteranFighter, EPS, Doctor, MisguidedVigilante])
+  , (TSS, TrophyPoints)
+  , (Federation, Communication WithinGroup)
+  , (Empire, Communication WithinGroup)
+  , (Union, Communication WithinGroup)
+  , (Federation, WinWhenDead [TSS, Empire, Union])
+  , (Empire, WinWhenDead [TSS, Federation, Union])
+  , (Union, WinWhenDead [TSS, Federation, Empire])
+  , (Federation, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Empire, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Union, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Neutral, Communication DeadLetterDrop)
+  , (Neutral, WinWhenDead [Federation, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Empire, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Union, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, Lobby WOConsensus $ PerGame Used $ I 1)
+  , (Hacker, HackID)
+  , (Hacker, HackIDTwice $ Cooldown 2)
+  , (Hacker, AnonymousMessage CompletelyAnonymous $ PerDay $ I 1)
+  , (Hacker, WinWhenDead [Federation, TSS, EPS, VeteranFighter])
+  , (Hacker, WinWhenDead [Empire, TSS, EPS, VeteranFighter])
+  , (Hacker, WinWhenDead [Union, TSS, EPS, VeteranFighter])
+  , (IllegalDealer, Gun $ Cooldown 1)
+  , (IllegalDealer, WinWhenDead [TSS, EPS, Doctor])
+  , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 1)
+  , (VeteranFighter, DiesWhenKills [Neutral])
+  , (VeteranFighter, WinWhenDead [TSS, MisguidedVigilante])
+  , (VeteranFighter, WinWhenDead [TSS, Doctor])
+  , (EPS, NightImmunity)
+  , (EPS, Arrest)
+  , (EPS, WinWhenDead [TSS, Hacker])
+  , (EPS, WinWhenDead [TSS, IllegalDealer])
+  , (Doctor, ProtectAtNight SelfDenied)
+  , (Doctor, Paralyze Immune Overdose $ PerGame Used $ I 3)
+  , (Doctor, DiesWhenKills [EPS, Neutral])
+  , (Doctor, WinWhenDead [TSS, VeteranFighter, MisguidedVigilante])
+  , (MisguidedVigilante, KillAtNight [Neutral] WOConsensus $ PerGame Used $ EqRole [Neutral])
+  , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
+  ]
+  [Suicide 2, Votes Private, BloodlustOnTiedVotes
   , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill, WildcardNotTargetted
   ]
 

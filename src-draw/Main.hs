@@ -19,4 +19,5 @@ main = do
     Tournament o -> mainRender o $ demoTournament
     -- other
     TSSMess      -> tssMess
+    Wars         -> wars
     _            -> print args

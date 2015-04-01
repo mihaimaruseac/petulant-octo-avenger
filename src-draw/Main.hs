@@ -3,6 +3,7 @@ import Diagrams.Backend.CmdLine (mainRender)
 import Args
 import Demos
 import TSSMess
+import Wars
 
 main :: IO ()
 main = do

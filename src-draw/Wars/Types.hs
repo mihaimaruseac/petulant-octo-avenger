@@ -1,5 +1,8 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Wars.Types where
 
+import Control.Lens
 import Data.Time
 
 data Event = E
@@ -12,3 +15,5 @@ data EventType
   = Peace
   | War -- TODO: add details here or as an extra field above?
   | AllianceConflict
+
+makeLenses ''Event

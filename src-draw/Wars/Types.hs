@@ -9,14 +9,12 @@ data Event = E
   { _startDate :: Day
   , _endDate :: Day
   , _type :: EventType
-  }
+  } deriving (Show)
 
 data EventType
   = Peace
   | War -- TODO: add details here or as an extra field above?
   | AllianceConflict
-
-instance Show Event
-instance Show EventType
+  deriving (Show)
 
 makeLenses ''Event

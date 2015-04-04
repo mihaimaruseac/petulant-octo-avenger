@@ -16,4 +16,7 @@ data EventType
   | War -- TODO: add details here or as an extra field above?
   | AllianceConflict
 
+instance Show Event
+instance Show EventType
+
 makeLenses ''Event

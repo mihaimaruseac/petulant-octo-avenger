@@ -1,5 +1,6 @@
 module Wars (wars) where
 
+import Control.Lens
 import Data.Time
 
 import Wars.Types

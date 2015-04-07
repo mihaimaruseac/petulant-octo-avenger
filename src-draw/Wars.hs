@@ -10,7 +10,7 @@ wars = print events
 events :: [Event]
 events =
   [ mkPeace artemisOpened vendettaStart
-  , War   (Duration vendettaStart $ Just vendettaEnd) undefined undefined
+  , mkWar vendettaStart vendettaEnd (Federation, Empire) Empire undefined
   ]
   where
     artemisOpened = fromGregorian 2007 6 10

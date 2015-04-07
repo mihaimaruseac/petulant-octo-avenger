@@ -9,6 +9,7 @@ data Event
   = Peace { _d :: Duration }
   | War { _d :: Duration
         , _factions :: (Faction, Faction)
+        , _winner :: Faction
         , _details :: (WarDetails, WarDetails)
         }
   | LocalConflict { _d :: Duration}
@@ -45,8 +46,8 @@ mkPeace st en = Peace $ Duration st $ Just en
 mkPeace' :: Day -> Event
 mkPeace' st = Peace $ Duration st Nothing
 
-mkWar :: Day -> Day -> (Faction, Faction) -> WarDetails -> Event
-mkWar st en fcts det = War (Duration st $ Just en) fcts det
+mkWar :: Day -> Day -> (Faction, Faction) -> Faction -> (WarDetails, WarDetails) -> Event
+mkWar st en = War (Duration st $ Just en)
 
-mkWar' :: Day -> (Faction, Faction) -> WarDetails -> Event
-mkWar' st fcts det = War (Duration st Nothing) fcts det
+mkWar' :: Day -> (Faction, Faction) -> Faction -> (WarDetails, WarDetails) -> Event
+mkWar' st = War (Duration st Nothing)

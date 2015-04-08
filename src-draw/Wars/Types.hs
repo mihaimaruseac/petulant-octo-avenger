@@ -3,22 +3,24 @@
 module Wars.Types where
 
 import Control.Lens
+import Data.Default
 import Data.Time
 
-data Event
-  = Peace { _d :: Duration }
-  | War { _d :: Duration
-        , _factions :: (Faction, Faction)
-        , _winner :: Faction
-        , _details :: (WarDetails, WarDetails)
-        }
-  | LocalConflict { _d :: Duration}
-  deriving (Show)
-
-data Duration = Duration
-  { _startDate :: Day
+data Event = Event
+  { _name :: Maybe String
+  , _startDate :: Day
   , _endDate :: Maybe Day
+  , _details :: EventDetails
   } deriving (Show)
+
+data EventDetails
+  = Peace
+  | War { _factions :: (Faction, Faction)
+        , _winner :: Faction
+        , _war_details :: (WarDetails, WarDetails)
+        }
+  | LocalConflict
+  deriving (Show)
 
 data WarDetails = Details
   { _points :: Int
@@ -36,18 +38,24 @@ data Faction
   | Union
   deriving Show
 
-makeLenses ''Duration
 makeLenses ''Event
+makeLenses ''EventDetails
 makeLenses ''WarDetails
 
+instance Default Event where
+  def = Event Nothing (fromGregorian 0 0 0) Nothing Peace
+
+peace :: Event
+peace = def
+
 mkPeace :: Day -> Day -> Event
-mkPeace st en = Peace $ Duration st $ Just en
+mkPeace st en = undefined --Peace $ Duration st $ Just en
 
 mkPeace' :: Day -> Event
-mkPeace' st = Peace $ Duration st Nothing
+mkPeace' st = undefined --Peace $ Duration st Nothing
 
 mkWar :: Day -> Day -> (Faction, Faction) -> Faction -> (WarDetails, WarDetails) -> Event
-mkWar st en = War (Duration st $ Just en)
+mkWar st en = undefined --War (Duration st $ Just en)
 
 mkWar' :: Day -> (Faction, Faction) -> Faction -> (WarDetails, WarDetails) -> Event
-mkWar' st = War (Duration st Nothing)
+mkWar' st = undefined --War (Duration st Nothing)

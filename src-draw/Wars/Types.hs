@@ -15,8 +15,8 @@ data Event = Event
 
 data EventDetails
   = Peace
-  | War { _factions :: (Faction, Faction)
-        , _winner :: Faction
+  | War { _winner :: Faction
+        , _loser :: Faction
         , _war_details :: (WarDetails, WarDetails)
         }
   | LocalConflict
@@ -45,8 +45,20 @@ makeLenses ''WarDetails
 instance Default Event where
   def = Event Nothing (fromGregorian 0 0 0) Nothing Peace
 
+{-
+instance Default EventDetails where
+  def = 
+  -}
+
 peace :: Event
 peace = def
+
+localConflict :: Event
+localConflict = def & details .~ LocalConflict
+-- TODO: add alliances involved?
+
+war :: Event
+war = def
 
 mkPeace :: Day -> Day -> Event
 mkPeace st en = undefined --Peace $ Duration st $ Just en

@@ -20,6 +20,7 @@ data EventDetails
         , _war_details :: (WarDetails, WarDetails)
         }
   | LocalConflict
+  | MajorEvent
   deriving (Show)
 
 data WarDetails = Details
@@ -60,14 +61,5 @@ localConflict = def & details .~ LocalConflict
 war :: Event
 war = def
 
-mkPeace :: Day -> Day -> Event
-mkPeace st en = undefined --Peace $ Duration st $ Just en
-
-mkPeace' :: Day -> Event
-mkPeace' st = undefined --Peace $ Duration st Nothing
-
-mkWar :: Day -> Day -> (Faction, Faction) -> Faction -> (WarDetails, WarDetails) -> Event
-mkWar st en = undefined --War (Duration st $ Just en)
-
-mkWar' :: Day -> (Faction, Faction) -> Faction -> (WarDetails, WarDetails) -> Event
-mkWar' st = undefined --War (Duration st Nothing)
+majorEvent :: Event
+majorEvent = def & details .~ MajorEvent

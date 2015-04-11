@@ -22,7 +22,7 @@ events =
   , war & details .~ prosperity & name ?~ "Prosperity War"
         & startDate .~ prosperityStart & endDate ?~ prosperityEnd
   , peace & startDate .~ prosperityEnd & endDate ?~ lastWarStart & name ?~ "privateer disturbed"
-  , war & details .~ prosperity & name ?~ "The Last War"
+  , war & details .~ lastWar & name ?~ "The Last War"
         & startDate .~ lastWarStart & endDate ?~ lastWarEnd
   , peace & startDate .~ lastWarEnd & endDate ?~ warsonGate & name ?~ "deceitful"
   , majorEvent & startDate .~ warsonGate & name ?~ "Warsongate"

@@ -46,17 +46,11 @@ makeLenses ''WarDetails
 instance Default Event where
   def = Event Nothing (fromGregorian 0 0 0) Nothing Peace
 
-{-
-instance Default EventDetails where
-  def = 
-  -}
-
 peace :: Event
 peace = def
 
 localConflict :: Event
 localConflict = def & details .~ LocalConflict
--- TODO: add alliances involved?
 
 war :: Event
 war = def

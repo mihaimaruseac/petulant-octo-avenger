@@ -15,9 +15,9 @@ main = do
     TDemo n o    -> mainRender o $ selectDemo (Trails n)
     VDemo n o    -> mainRender o $ selectDemo (Vector n)
     -- special demos
-    Arrow o      -> mainRender o $ demoArrow
-    Tournament o -> mainRender o $ demoTournament
+    Arrow o      -> mainRender o demoArrow
+    Tournament o -> mainRender o demoTournament
     -- other
     TSSMess      -> tssMess
-    Wars o       -> wars
+    Wars o       -> mainRender o wars
     _            -> print args

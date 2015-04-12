@@ -2,10 +2,13 @@ module Wars (wars) where
 
 import Control.Lens
 import Data.Time
+import Diagrams.Backend.Rasterific.CmdLine
+import Diagrams.Prelude
 
 import Wars.Types
 
-wars = print events
+wars :: Diagram B R2
+wars = undefined --print events
 
 events :: [Event]
 events =

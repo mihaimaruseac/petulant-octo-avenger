@@ -2,6 +2,7 @@
 
 module Demos (Demo(..), selectDemo, demoTournament, demoArrow) where
 
+import Control.Arrow ((&&&))
 import Data.List.Split (chunksOf)
 
 import Diagrams.Backend.Rasterific.CmdLine
@@ -24,7 +25,7 @@ demoTournament = tournament 16
 
 doSelectDemo :: [Diagram B R2] -> Int -> Diagram B R2
 doSelectDemo ds n
-  | and [0 < n, n <= l] = ds !! (n - 1)
+  | 0 < n && n <= l = ds !! (n - 1)
   | otherwise = error $ concat ["Demo not defined (not in {1, 2.. ", show l, "})"]
   where
     l = length ds
@@ -129,7 +130,7 @@ vectorDemos =
 -- fromOffsets takes a list of vectors to draw
 -- r2 construct vectors from pairs
 demoChainSaw :: Diagram B R2
-demoChainSaw = fromOffsets . map (curry r2 1) . map s $ [(1::Int)..10]
+demoChainSaw = fromOffsets . map (curry r2 1 . s) $ [(1::Int)..10]
   where
     s x = if odd x then 1 else -1
 
@@ -183,9 +184,9 @@ trailsDemos =
   , demoFromVertices
   , demoOnLineSegments
   , demoOnLineSegments2
-  , demoKoch5_1
-  , demoKoch5_2
-  , demoKoch5_3
+  , demoKoch51
+  , demoKoch52
+  , demoKoch53
   , demoBlob
   , demoGrass
   , demoExplode
@@ -212,15 +213,15 @@ demoOnLineSegments = strokeLine auxDemoTrailsLine
 demoOnLineSegments2 :: Diagram B R2
 demoOnLineSegments2 = strokeLine $ auxDemoTrailsLine <> auxDemoTrailsLine
 
-demoKoch5_1 :: Diagram B R2
-demoKoch5_1 = koch1 7 # strokeLine
+demoKoch51 :: Diagram B R2
+demoKoch51 = koch1 7 # strokeLine
 
-demoKoch5_2 :: Diagram B R2
-demoKoch5_2 = strokeLine $ koch2 5
+demoKoch52 :: Diagram B R2
+demoKoch52 = strokeLine $ koch2 5
 
--- compare with demoKoch5_1
-demoKoch5_3 :: Diagram B R2
-demoKoch5_3 = koch1 7 # glueLine # strokeLoop # fc green
+-- compare with demoKoch51
+demoKoch53 :: Diagram B R2
+demoKoch53 = koch1 7 # glueLine # strokeLoop # fc green
 
 auxDemoTrailsLine :: Trail' Line R2
 auxDemoTrailsLine = onLineSegments (take 4) $ pentagon 1
@@ -342,7 +343,7 @@ demoArrow = connect'        arrow1 "1" "2"
     -- Create a 3 x 3 grid of circles named "1" to "9"
     c = circle 1.5 # fc lightgray # lw none # showOrigin
     cs = [c # named (show x) | x <- [1::Int ..9]]
-    cGrid = (vcat' $ with & sep .~ 4)
+    cGrid = vcat' (with & sep .~ 4)
           . map (hcat' $ with & sep .~ 12)
           . chunksOf 3 $ cs
 
@@ -393,7 +394,7 @@ demoSquareArrowShafts = mconcat
 
 -- arrowAt
 demoVectorField :: Diagram B R2
-demoVectorField = position . map (\p -> (p2 p, arrowAtPoint p)) $ locs
+demoVectorField = position . map (p2 &&& arrowAtPoint) $ locs
   where
     vectorField (x, y) = r2 (sin (y - 1), sin (x + 1))
     locs = let xs = [-3, -2.7 .. 3] in [(x, y) | x <- xs, y <- xs]

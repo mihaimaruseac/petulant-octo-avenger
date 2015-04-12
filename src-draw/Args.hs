@@ -28,9 +28,9 @@ instance Show Commands where
   show (ADemo n (d, _)) = mconcat ["Arrows ", show n, " ", show d]
   show (TDemo n (d, _)) = mconcat ["Trail ", show n, " ", show d]
   show (VDemo n (d, _)) = mconcat ["Vector ", show n, " ", show d]
-  show (Arrow (d, _)) = mconcat ["Arrow ", show d]
-  show (Tournament (d, _)) = mconcat ["Tournament ", show d]
-  show (Wars (d, _)) = mconcat ["Wars ", show d]
+  show (Arrow (d, _)) = "Arrow " ++ show d
+  show (Tournament (d, _)) = "Tournament " ++ show d
+  show (Wars (d, _)) = "Wars " ++ show d
   show NoDiagram = show "NoDiagram"
   show TSSMess = show "TSSMess"
 

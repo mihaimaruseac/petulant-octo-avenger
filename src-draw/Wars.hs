@@ -1,5 +1,3 @@
-{-# LANGUAGE ViewPatterns #-}
-
 module Wars (wars) where
 
 import Control.Lens hiding ((#))
@@ -11,20 +9,21 @@ import Diagrams.Prelude hiding (view)
 import Wars.Types
 
 wars :: Day -> Diagram B R2
-wars d = drawEvent d $ events !! 13
+wars d = drawEvent d $ events !! 9
 
--- TODO: would be better to have PatternSynonyms but not in GHC7.6 :(
 drawEvent :: Day -> Event -> Diagram B R2
 drawEvent d e
   | isPeace e         = textBox gray peaceText
   | isLocalConflict e = textBox lightblue evName
                         ===
                         textBox lightblue intervalText
+  | isMajorEvent e    = textBox red $ mconcat [evName, " ", show $ e ^. startDate]
+  | isWar e           = mempty -- TODO
   | otherwise = error $ "Don't know to draw " ++ show e
   where
     st:en:_ = take 2 . catMaybes $ [e ^? startDate, e ^. endDate, Just d]
-    duration = diffDays en st
-    durText = mconcat [show duration, " days of"]
+    eduration = diffDays en st
+    durText = mconcat [show eduration, " days of"]
     intervalText = mconcat ["From ", show st, " to ", show en]
     evName = maybe "" (' ':) $ e ^. name
     peaceText = mconcat [durText, evName, " peace"]

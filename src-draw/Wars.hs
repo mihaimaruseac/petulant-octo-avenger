@@ -3,6 +3,7 @@
 module Wars (wars) where
 
 import Control.Lens hiding ((#))
+import Data.Maybe (catMaybes)
 import Data.Time
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude hiding (view)
@@ -10,29 +11,28 @@ import Diagrams.Prelude hiding (view)
 import Wars.Types
 
 wars :: Day -> Diagram B R2
-wars d = drawEvent d $ events !! 14
+wars d = drawEvent d $ events !! 13
 
 -- TODO: would be better to have PatternSynonyms but not in GHC7.6 :(
 drawEvent :: Day -> Event -> Diagram B R2
 drawEvent d e
-  | isPeace e = text (buildText d e) # fc black
-             <> alignY (-0.6) (rect 25 2 # bg gray # frame 0.2)
+  | isPeace e         = textBox gray peaceText
+  | isLocalConflict e = textBox lightblue evName
+                        ===
+                        textBox lightblue intervalText
   | otherwise = error $ "Don't know to draw " ++ show e
-
-buildText :: Day -> Event -> String
-buildText d e
-  | isPeace e = mconcat [show time, " days of", desc, " peace"]
   where
-    desc = evName e
-    time = evDuration d e
+    st:en:_ = take 2 . catMaybes $ [e ^? startDate, e ^. endDate, Just d]
+    duration = diffDays en st
+    durText = mconcat [show duration, " days of"]
+    intervalText = mconcat ["From ", show st, " to ", show en]
+    evName = maybe "" (' ':) $ e ^. name
+    peaceText = mconcat [durText, evName, " peace"]
 
-evDuration :: Day -> Event -> Integer
-evDuration _ e@(view endDate -> Just ed) = diffDays ed (e ^. startDate)
-evDuration now e = diffDays now (e ^. startDate)
-
-evName :: Event -> String
-evName (view name -> Just n) = ' ':n
-evName _ = ""
+textBox :: Colour Double -> String -> Diagram B R2
+textBox c t = text t # fc black <> frameBox
+  where
+    frameBox = rect 50 4 # bg c # lc c # alignY (-0.6)
 
 events :: [Event]
 events =

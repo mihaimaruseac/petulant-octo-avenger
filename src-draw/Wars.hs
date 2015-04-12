@@ -15,9 +15,8 @@ wars d = drawEvent d $ events !! 14
 -- TODO: would be better to have PatternSynonyms but not in GHC7.6 :(
 drawEvent :: Day -> Event -> Diagram B R2
 drawEvent d e
-  | isPeace e = text (buildText d e) # --fontSizeO 18 #
-                fc black # showOrigin
-             <> alignY (-0.6) (rect 25 2 # bg gray # showOrigin # frame 0.2)
+  | isPeace e = text (buildText d e) # fc black
+             <> alignY (-0.6) (rect 25 2 # bg gray # frame 0.2)
   | otherwise = error $ "Don't know to draw " ++ show e
 
 buildText :: Day -> Event -> String

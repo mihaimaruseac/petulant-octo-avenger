@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Wars.Types where
 
@@ -57,3 +58,19 @@ war = def
 
 majorEvent :: Event
 majorEvent = def & details .~ MajorEvent
+
+isPeace :: Event -> Bool
+isPeace (view details -> Peace) = True
+isPeace _ = False
+
+isWar :: Event -> Bool
+isWar (view details -> War _ _ _) = True
+isWar _ = False
+
+isLocalConflict :: Event -> Bool
+isLocalConflict (view details -> LocalConflict) = True
+isLocalConflict _ = False
+
+isMajorEvent :: Event -> Bool
+isMajorEvent (view details -> MajorEvent) = True
+isMajorEvent _ = False

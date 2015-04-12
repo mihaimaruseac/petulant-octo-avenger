@@ -1,5 +1,7 @@
 import Diagrams.Backend.CmdLine (mainRender)
 
+import Data.Time (getCurrentTime, utctDay)
+
 import Args
 import Demos
 import TSSMess
@@ -19,5 +21,7 @@ main = do
     Tournament o -> mainRender o demoTournament
     -- other
     TSSMess      -> tssMess
-    Wars o       -> mainRender o wars
+    Wars o       -> do
+      today <- fmap utctDay getCurrentTime
+      mainRender o $ wars today
     _            -> print args

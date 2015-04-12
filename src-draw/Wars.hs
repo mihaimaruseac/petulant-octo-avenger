@@ -1,14 +1,39 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Wars (wars) where
 
-import Control.Lens
+import Control.Lens hiding ((#))
 import Data.Time
 import Diagrams.Backend.Rasterific.CmdLine
-import Diagrams.Prelude
+import Diagrams.Prelude hiding (view)
 
 import Wars.Types
 
-wars :: Diagram B R2
-wars = undefined --print events
+wars :: Day -> Diagram B R2
+wars d = drawEvent d $ events !! 14
+
+-- TODO: would be better to have PatternSynonyms but not in GHC7.6 :(
+drawEvent :: Day -> Event -> Diagram B R2
+drawEvent d e
+  | isPeace e = text (buildText d e) # --fontSizeO 18 #
+                fc black # showOrigin
+             <> alignY (-0.6) (rect 25 2 # bg gray # showOrigin # frame 0.2)
+  | otherwise = error $ "Don't know to draw " ++ show e
+
+buildText :: Day -> Event -> String
+buildText d e
+  | isPeace e = mconcat [show time, " days of", desc, " peace"]
+  where
+    desc = evName e
+    time = evDuration d e
+
+evDuration :: Day -> Event -> Integer
+evDuration _ e@(view endDate -> Just ed) = diffDays ed (e ^. startDate)
+evDuration now e = diffDays now (e ^. startDate)
+
+evName :: Event -> String
+evName (view name -> Just n) = ' ':n
+evName _ = ""
 
 events :: [Event]
 events =

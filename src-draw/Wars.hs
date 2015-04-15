@@ -13,7 +13,7 @@ wars d = drawEvent d $ events !! 9
 
 drawEvent :: Day -> Event -> Diagram B R2
 drawEvent d e
-  | isPeace e         = textBox gray peaceText
+  | isPeace e         = textBox lightgreen peaceText
   | isLocalConflict e = textBox lightblue evName
                         ===
                         textBox lightblue intervalText

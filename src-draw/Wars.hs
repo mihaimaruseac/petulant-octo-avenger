@@ -18,7 +18,9 @@ drawEvent d e
                         ===
                         textBox lightblue intervalText
   | isMajorEvent e    = textBox red $ mconcat [evName, " ", show $ e ^. startDate]
-  | isWar e           = mempty -- TODO
+  | isWar e           = textBox lightgray evName
+                        ===
+                        textBox lightgrey evName
   | otherwise = error $ "Don't know to draw " ++ show e
   where
     st:en:_ = take 2 . catMaybes $ [e ^? startDate, e ^. endDate, Just d]

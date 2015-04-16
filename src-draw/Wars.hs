@@ -19,7 +19,9 @@ drawEvent d e
                         textBox lightblue intervalText
   | isMajorEvent e    = textBox red $ mconcat [evName, " ", show $ e ^. startDate]
   | isWar e           = textBox lightgray evName
-                        ===
+                        === -- TODO: build faction boxes
+                        -- TODO: build title boxes
+                        -- TODO: build lower boxes
                         textBox lightgrey evName
   | otherwise = error $ "Don't know to draw " ++ show e
   where

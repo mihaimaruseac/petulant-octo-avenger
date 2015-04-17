@@ -13,11 +13,11 @@ wars d = drawEvent d $ events !! 9
 
 drawEvent :: Day -> Event -> Diagram B R2
 drawEvent d e
-  | isPeace e         = textBox lightgreen lightgreen peaceText
-  | isLocalConflict e = textBox lightblue lightblue evName
+  | isPeace e         = fwSingleBox lightgreen peaceText
+  | isLocalConflict e = fwSingleBox lightblue evName
                         ===
-                        textBox lightblue lightblue intervalText
-  | isMajorEvent e    = textBox red red $ mconcat [evName, " ", show $ e ^. startDate]
+                        fwSingleBox lightblue intervalText
+  | isMajorEvent e    = fwSingleBox red $ mconcat [evName, " ", show $ e ^. startDate]
   | isWar e           = textBox lightgray black evName
                         === -- TODO: build faction boxes
                         -- TODO: build title boxes
@@ -31,6 +31,7 @@ drawEvent d e
     intervalText = mconcat ["From ", show st, " to ", show en]
     evName = maybe "" (' ':) $ e ^. name
     peaceText = mconcat [durText, evName, " peace"]
+    fwSingleBox c t = textBox c c t
 
 textBox :: Colour Double -> Colour Double -> String -> Diagram B R2
 textBox c c' t = text t # fc black <> frameBox

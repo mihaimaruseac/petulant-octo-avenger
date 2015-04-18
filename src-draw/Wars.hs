@@ -46,11 +46,15 @@ buildWarFrame = fix $ vcat
   , hcat $ replicate 8 $ rect 100 100 # style
   , hcat $ replicate 8 $ rect 100 100 # style
   , hcat $ replicate 8 $ rect 100 50 # style
-  , hcat $ map (\x -> rect x 200 # style # translateX 100) [300, 200, 300]
+  , hcat
+    [ rect 300 200 # style
+    , rect 200 200 # style
+    , rect 300 200 # style
+    ] # translateX 100
   ]
   where
     style = bg gray # lc black # lwO 10
-    fix d = d # centerXY <> rect 900 500 # bg gray -- <> (d # centerXY)
+    fix d = d # centerXY <> rect 900 500 # bg gray
 
 events :: [Event]
 events =

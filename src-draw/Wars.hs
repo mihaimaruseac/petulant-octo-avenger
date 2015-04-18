@@ -41,16 +41,13 @@ textBox c c' t = text t # fc black <> frameBox
   where
     frameBox = rect 50 4 # bg c # lc c' # alignY (-0.6)
 
-buildWarFrame = fix $
-  rect 800 50 # style # translateX 350
-  ===
-  (foldl (|||) mempty $ replicate 8 $ rect 100 100 # style)
-  ===
-  (foldl (|||) mempty $ replicate 8 $ rect 100 100 # style)
-  ===
-  (foldl (|||) mempty $ replicate 8 $ rect 100 50 # style)
-  ===
-  (foldl (|||) mempty $ map (\x -> rect x 200 # style # translateX 100) [300, 200, 300])
+buildWarFrame = fix $ vcat
+  [ rect 800 50 # style # translateX 350
+  , hcat $ replicate 8 $ rect 100 100 # style
+  , hcat $ replicate 8 $ rect 100 100 # style
+  , hcat $ replicate 8 $ rect 100 50 # style
+  , hcat $ map (\x -> rect x 200 # style # translateX 100) [300, 200, 300]
+  ]
   where
     style = bg gray # lc black # lwO 10
     fix d = d # centerXY <> rect 900 500 # bg gray -- <> (d # centerXY)

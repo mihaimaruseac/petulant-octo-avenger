@@ -45,7 +45,9 @@ buildWarFrame st en = fix $ vcat
   [ rect 800 50 # style # translateX 350
   , hcat $ replicate 8 $ rect 100 100 # style
   , hcat $ replicate 8 $ rect 100 100 # style
-  , hcat $ replicate 8 $ rect 100 50 # style
+  , hcat $ zipWith (\tx r -> (t 14 tx # translateY (-12))<> r)
+      ["Factions", "Points", "Kills", "Structs", "Mission", "Sector",
+      "Heroes", "Medals"] $ repeat (rect 100 50 # style)
   , hcat
     [ (showTimeslots # translateY 25) <> rect 300 200 # style
     , rect 200 200 # style
@@ -55,13 +57,13 @@ buildWarFrame st en = fix $ vcat
   where
     style = bg gray # lc black # lwO 10
     fix d = d # centerXY <> rect 900 500 # bg gray
-    showTimeslots =  vcat' (with & sep .~ 30) . map t $
+    showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
       [ show st
       , show en
       , ""
       , show (diffDays en st) ++ " days"
       ]
-    t tx = text tx # bold # font "sans" # fontSizeL 18
+    t fs tx = text tx # bold # font "sans" # fontSizeL fs
 
 events :: [Event]
 events =

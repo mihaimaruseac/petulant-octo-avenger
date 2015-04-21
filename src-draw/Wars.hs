@@ -9,7 +9,7 @@ import Diagrams.Prelude hiding (view)
 import Wars.Types
 
 wars :: Day -> Diagram B R2
-wars d = drawEvent d $ events !! 9
+wars d = drawEvent d $ events !! 5
 
 drawEvent :: Day -> Event -> Diagram B R2
 drawEvent d e
@@ -18,14 +18,7 @@ drawEvent d e
                         ===
                         fwSingleBox lightblue intervalText
   | isMajorEvent e    = fwSingleBox red $ mconcat [evName, " ", show $ e ^. startDate]
-  | isWar e           = buildWarFrame st en
-  {-
-                        textBox lightgray black evName
-                        === -- TODO: build faction boxes
-                        -- TODO: build title boxes
-                        -- TODO: build lower boxes
-                        textBox lightgrey black (evName ++ "\n" ++ evName)
-                        -}
+  | isWar e           = buildWarFrame st en evName (e ^. details)
   | otherwise = error $ "Don't know to draw " ++ show e
   where
     st:en:_ = take 2 . catMaybes $ [e ^? startDate, e ^. endDate, Just d]
@@ -41,8 +34,8 @@ textBox c c' t = text t # fc black <> frameBox
   where
     frameBox = rect 50 4 # bg c # lc c' # alignY (-0.6)
 
-buildWarFrame st en = fix $ vcat
-  [ rect 800 50 # style # translateX 350
+buildWarFrame st en n d = fix $ vcat
+  [ t 14 n # translate (r2 (350, -12)) <> rect 800 50 # style # translateX 350
   , hcat $ replicate 8 $ rect 100 100 # style
   , hcat $ replicate 8 $ rect 100 100 # style
   , hcat $ zipWith (\tx r -> (t 14 tx # translateY (-12))<> r)

@@ -37,9 +37,9 @@ buildWarFrame st en n d = fix $ vcat
   [ t 14 n # translate (r2 (350, -12)) <> rect 800 50 # style # translateX 350
   , hcat $ replicate 8 $ rect 100 100 # style
   , hcat $ replicate 8 $ rect 100 100 # style
-  , hcat $ zipWith (\tx r -> (t 14 tx # translateY (-12))<> r)
+  , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> rect 100 50 # style)
       ["Factions", "Points", "Kills", "Structs", "Mission", "Sector",
-      "Heroes", "Medals"] $ repeat (rect 100 50 # style)
+      "Heroes", "Medals"]
   , hcat
     [ (showTimeslots # translateY 25) <> rect 300 200 # style
     , rect 200 200 # style

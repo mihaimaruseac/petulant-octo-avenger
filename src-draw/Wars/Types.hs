@@ -18,7 +18,7 @@ data EventDetails
   = Peace
   | War { _winner :: Faction
         , _loser :: Faction
-        , _war_details :: (WarDetails, WarDetails)
+        , _warDetails :: (WarDetails, WarDetails)
         }
   | LocalConflict
   | MajorEvent
@@ -64,7 +64,7 @@ isPeace (view details -> Peace) = True
 isPeace _ = False
 
 isWar :: Event -> Bool
-isWar (view details -> War _ _ _) = True
+isWar (view details -> War {}) = True
 isWar _ = False
 
 isLocalConflict :: Event -> Bool

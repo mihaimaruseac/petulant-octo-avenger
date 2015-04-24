@@ -48,7 +48,7 @@ buildWarFrame st en n d = fix $ vcat
   ]
   where
     style = bg gray # lc black # lwO 10
-    fix d = d # centerXY <> rect 900 500 # bg gray
+    fix dia = dia # centerXY <> rect 900 500 # bg gray
     showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
       [ show st
       , show en

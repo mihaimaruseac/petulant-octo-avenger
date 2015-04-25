@@ -33,7 +33,7 @@ textBox c t = text t # fc black <> frameBox
   where
     frameBox = rect 50 4 # bg c # lc c # alignY (-0.6)
 
-buildWarFrame st en n d = fix $ vcat
+buildWarFrame st en n d = vcat
   [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
   , hcat [r 100 100, build f1]
   , hcat [r 100 100, build f2]
@@ -45,11 +45,10 @@ buildWarFrame st en n d = fix $ vcat
     , r 200 200
     , r 300 200
     ] # translateX 100
-  ]
+  ] # centerXY <> rect 900 500 # bg gray
   where
     r x y = rect x y # style
     style = bg gray # lc black # lwO 10
-    fix dia = dia # centerXY <> rect 900 500 # bg gray
     showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
       [ show st
       , show en

@@ -38,7 +38,13 @@ data Faction
   = Federation
   | Empire
   | Union
-  deriving Show
+  deriving (Show, Eq)
+
+instance Ord Faction where
+  Federation <= Empire = True
+  Empire <= Union = True
+  Union <= Federation = True
+  x <= y = x == y
 
 makeLenses ''Event
 makeLenses ''EventDetails

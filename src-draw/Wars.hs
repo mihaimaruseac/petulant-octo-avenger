@@ -35,8 +35,8 @@ textBox c t = text t # fc black <> frameBox
 
 buildWarFrame st en n d = fix $ vcat
   [ t 14 n # translate (r2 (350, -12)) <> rect 800 50 # style # translateX 350
-  , hcat $ replicate 8 $ rect 100 100 # style
-  , hcat $ replicate 8 $ rect 100 100 # style
+  , hcat [rect 100 100 # style, build f1]
+  , hcat [rect 100 100 # style, build f2]
   , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> rect 100 50 # style)
       ["Factions", "Points", "Kills", "Structs", "Mission", "Sector",
       "Heroes", "Medals"]
@@ -56,6 +56,14 @@ buildWarFrame st en n d = fix $ vcat
       , show (diffDays en st) ++ " days"
       ]
     t fs tx = text tx # bold # font "sans" # fontSizeL fs
+    wonFaction = d ^?! winner
+    lstFaction = d ^?! loser
+    theDetails = d ^?! warDetails
+    f1 = if wonFaction < lstFaction then theDetails ^._1 else theDetails ^._2
+    f2 = if wonFaction < lstFaction then theDetails ^._2 else theDetails ^._1
+    build f = hcat $ map (\x -> ((f ^. x) # show # t 14 # translateY (-15))
+      <> rect 100 100 # style)
+      [points, kills, structures, mission, sector, heroes, medals]
 
 events :: [Event]
 events =

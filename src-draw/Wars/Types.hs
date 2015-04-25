@@ -40,6 +40,7 @@ data Faction
   | Union
   deriving (Show, Eq)
 
+-- NOTE that this is not transitive!
 instance Ord Faction where
   Federation <= Empire = True
   Empire <= Union = True

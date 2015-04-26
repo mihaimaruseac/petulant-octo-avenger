@@ -35,26 +35,22 @@ textBox c t = text t # fc black <> frameBox
 
 buildWarFrame st en n d = vcat
   [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
-  , hcat [r 100 100, build f1]
-  , hcat [r 100 100, build f2]
+  , hcat [r 100 100 {- TODO: logo -}, build f1]
+  , hcat [r 100 100 {- TODO: logo -}, build f2]
   , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> r 100 50)
       ["Factions", "Points", "Kills", "Structs", "Mission", "Sector",
       "Heroes", "Medals"]
   , hcat
     [ (showTimeslots # translateY 25) <> r 300 200
-    , r 200 200
-    , r 300 200
+    , r 200 200 {- TODO: winner logo -}
+    , r 300 200 {- TODO: score -}
     ] # translateX 100
   ] # centerXY <> rect 900 500 # bg gray
   where
     r x y = rect x y # style
     style = bg gray # lc black # lwO 10
     showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
-      [ show st
-      , show en
-      , ""
-      , show (diffDays en st) ++ " days"
-      ]
+      [ show st, show en, "", show (diffDays en st) ++ " days"]
     t fs tx = text tx # bold # font "sans" # fontSizeL fs
     wonFaction = d ^?! winner
     lstFaction = d ^?! loser
@@ -62,7 +58,7 @@ buildWarFrame st en n d = vcat
     f1 = if wonFaction < lstFaction then theDetails ^._1 else theDetails ^._2
     f2 = if wonFaction < lstFaction then theDetails ^._2 else theDetails ^._1
     build f = hcat $ map (\x -> ((f ^. x) # show # t 14 # translateY (-15))
-      <> r 100 100)
+      <> r 100 100 {- TODO: histogram -})
       [points, kills, structures, mission, sector, heroes, medals]
 
 events :: [Event]

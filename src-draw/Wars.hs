@@ -38,8 +38,8 @@ buildWarFrame st en n d = vcat
   , hcat [r 100 100 {- TODO: logo -}, build f1]
   , hcat [r 100 100 {- TODO: logo -}, build f2]
   , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> r 100 50)
-      ["Factions", "Points", "Kills", "Structs", "Mission", "Sector",
-      "Heroes", "Medals"]
+      ["Factions", "Kills", "Structs", "Mission", "Sector",
+      "Points", "Heroes", "Medals"]
   , hcat
     [ (showTimeslots # translateY 25) <> r 300 200
     , r 200 200 {- TODO: winner logo -}
@@ -59,7 +59,7 @@ buildWarFrame st en n d = vcat
     f2 = if wonFaction < lstFaction then _2 else _1
     build f = hcat $ map (\x -> ((theDetails ^. f.x) # show # t 14 # translateY (-15))
       <> r 100 100 {- TODO: histogram -})
-      [points, kills, structures, mission, sector, heroes, medals]
+      [kills, structures, mission, sector, points, heroes, medals]
 
 events :: [Event]
 events =

@@ -8,8 +8,13 @@ import Diagrams.Prelude hiding (view)
 
 import Wars.Types
 
+import qualified Debug.Trace as D
+
 wars :: Day -> Diagram B R2
-wars d = drawEvent d $ events !! 5
+wars d = D.trace (show maxes) $ drawEvent d $ events !! 5
+  where
+    -- fugly map but missing Monoid instance on EventDetails :(
+    maxes = map _details events ^.. folded . _War . _3 ^. traverse . both
 
 drawEvent :: Day -> Event -> Diagram B R2
 drawEvent d e

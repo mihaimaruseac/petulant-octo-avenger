@@ -57,6 +57,7 @@ instance Monoid WarDetails where
 makeLenses ''Event
 makeLenses ''EventDetails
 makeLenses ''WarDetails
+makePrisms ''EventDetails
 
 instance Default Event where
   def = Event Nothing (fromGregorian 0 0 0) Nothing Peace

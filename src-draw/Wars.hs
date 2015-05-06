@@ -11,18 +11,18 @@ import Wars.Types
 import qualified Debug.Trace as D
 
 wars :: Day -> Diagram B R2
-wars d = D.trace (show maxes) $ drawEvent d $ events !! 5
+wars d = drawEvent maxes d $ events !! 5
   where
     maxes = map _details events ^.. folded . _War . _3 ^. traverse . both
 
-drawEvent :: Day -> Event -> Diagram B R2
-drawEvent d e
+drawEvent :: WarDetails -> Day -> Event -> Diagram B R2
+drawEvent w d e
   | isPeace e         = textBox lightgreen peaceText
   | isLocalConflict e = textBox lightblue evName
                         ===
                         textBox lightblue intervalText
   | isMajorEvent e    = textBox red $ mconcat [evName, " ", show $ e ^. startDate]
-  | isWar e           = buildWarFrame st en evName (e ^. details)
+  | isWar e           = buildWarFrame w st en evName (e ^. details)
   | otherwise = error $ "Don't know to draw " ++ show e
   where
     st:en:_ = take 2 . catMaybes $ [e ^? startDate, e ^. endDate, Just d]
@@ -37,7 +37,8 @@ textBox c t = text t # fc black <> frameBox
   where
     frameBox = rect 50 4 # bg c # lc c # alignY (-0.6)
 
-buildWarFrame st en n d = vcat
+buildWarFrame :: WarDetails -> Day -> Day -> String -> EventDetails -> Diagram B R2
+buildWarFrame w st en n d = vcat
   [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
   , hcat [r 100 100 {- TODO: logo -}, build f1]
   , hcat [r 100 100 {- TODO: logo -}, build f2]

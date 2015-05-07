@@ -8,8 +8,6 @@ import Diagrams.Prelude hiding (view)
 
 import Wars.Types
 
-import qualified Debug.Trace as D
-
 wars :: Day -> Diagram B R2
 wars d = drawEvent maxes d $ events !! 5
   where

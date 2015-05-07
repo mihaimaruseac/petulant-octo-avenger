@@ -51,6 +51,7 @@ buildWarFrame w st en n d = vcat
   ] # centerXY <> rect 900 500 # bg gray
   where
     r x y = rect x y # style
+    r' x y = rect x y # bg red # style
     style = bg gray # lc black # lwO 10
     showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
       [ show st, show en, "", show (diffDays en st) ++ " days"]
@@ -61,7 +62,7 @@ buildWarFrame w st en n d = vcat
     f1 = if wonFaction < lstFaction then _1 else _2
     f2 = if wonFaction < lstFaction then _2 else _1
     build f = hcat $ map (\x -> ((theDetails ^. f.x) # show # t 14 # translateY (-15))
-      <> r 100 100 {- TODO: histogram -})
+      <> r' 100 20 <> r 100 100 {- TODO: histogram -})
       [kills, structures, mission, sector, points, heroes, medals]
 
 events :: [Event]

@@ -51,7 +51,7 @@ buildWarFrame w st en n d = vcat
   ] # centerXY <> rect 900 500 # bg gray
   where
     r x y = rect x y # style
-    r' x y = rect (x - 12) y # bg red # lc red
+    r' x y = rect (x - 12) y # bg red # lc red # translateY (-2 * y + 6)
     style = bg gray # lc black # lwO 10
     showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
       [ show st, show en, "", show (diffDays en st) ++ " days"]

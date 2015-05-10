@@ -64,14 +64,14 @@ buildWarFrame fi w st en n d = vcat
     theDetails = d ^?! warDetails
     cW = colorOf wonFaction
     cL = colorOf lstFaction
-    iW = fi !! (fromEnum wonFaction)
-    iL = fi !! (fromEnum lstFaction)
+    iW = fi !! fromEnum wonFaction
+    iL = fi !! fromEnum lstFaction
     (f1, c1, i1) = if wonFaction < lstFaction then (_1, cW, iW) else (_2, cL, iL)
     (f2, c2, i2) = if wonFaction < lstFaction then (_2, cL, iL) else (_1, cW, iW)
     build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x))
       [kills, structures, mission, sector, points, heroes, medals]
     buildOne c v m = buildText v
-      <> r' c 88 (88 * (fromIntegral v) / (fromIntegral m))
+      <> r' c 88 (88 * fromIntegral v / fromIntegral m)
       <> r 100 100
     buildText v = show v # t 14 # translateY (-15)
 

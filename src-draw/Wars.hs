@@ -47,7 +47,7 @@ buildWarFrame fi w st en n d = vcat
       "Points", "Heroes", "Medals"]
   , hcat
     [ (showTimeslots # translateY 25) <> r 300 200
-    , r 200 200 {- TODO: winner logo -}
+    , scale 2 iW <> r 200 200
     , r 300 200 {- TODO: score -}
     ] # translateX 100
   ] # centerXY <> rect 900 500 # bg cBG

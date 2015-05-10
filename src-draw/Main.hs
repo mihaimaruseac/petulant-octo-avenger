@@ -29,7 +29,7 @@ main = do
 
 doWars :: DO -> IO ()
 doWars o = do
-  fImgs <- mapM_ loadImage
+  fImgs <- mapM loadImage
     [ "src-draw/res/wars/sign_fed_64x64.png"
     , "src-draw/res/wars/sign_emp_64x64.png"
     , "src-draw/res/wars/sign_uni_64x64.png"

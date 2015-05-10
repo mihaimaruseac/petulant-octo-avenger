@@ -61,9 +61,10 @@ buildWarFrame w st en n d = vcat
     theDetails = d ^?! warDetails
     f1 = if wonFaction < lstFaction then _1 else _2
     f2 = if wonFaction < lstFaction then _2 else _1
-    build f = hcat $ map (\x -> ((theDetails ^. f.x) # show # t 14 # translateY (-15))
-      <> r' 100 20 <> r 100 100 {- TODO: histogram -})
+    build f = hcat $ map (\x -> theDetails ^. f.x # buildOne)
       [kills, structures, mission, sector, points, heroes, medals]
+    buildOne v = buildText v <> r' 100 5 <> r 100 100
+    buildText v = show v # t 14 # translateY (-15)
 
 events :: [Event]
 events =

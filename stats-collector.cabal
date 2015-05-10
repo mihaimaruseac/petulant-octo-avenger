@@ -56,6 +56,7 @@ executable drawer
 
   build-depends:
     base >= 4.6,
+    colour >= 2.3,
     data-default >= 0.5,
     diagrams >= 1.2,
     diagrams-lib >= 1.2,

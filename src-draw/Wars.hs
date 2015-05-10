@@ -2,6 +2,7 @@ module Wars (wars) where
 
 import Control.Lens hiding ((#))
 import Data.Maybe (catMaybes)
+import Data.Colour.SRGB.Linear
 import Data.Time
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude hiding (view)
@@ -9,7 +10,7 @@ import Diagrams.Prelude hiding (view)
 import Wars.Types
 
 wars :: Day -> Diagram B R2
-wars d = drawEvent maxes d $ events !! 7
+wars d = drawEvent maxes d $ events !! 3
   where
     maxes = map _details events ^.. folded . _War . _3 ^. traverse . both
 
@@ -38,8 +39,8 @@ textBox c t = text t # fc black <> frameBox
 buildWarFrame :: WarDetails -> Day -> Day -> String -> EventDetails -> Diagram B R2
 buildWarFrame w st en n d = vcat
   [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
-  , hcat [r 100 100 {- TODO: logo -}, build f1]
-  , hcat [r 100 100 {- TODO: logo -}, build f2]
+  , hcat [r 100 100 {- TODO: logo -}, build f1 c1]
+  , hcat [r 100 100 {- TODO: logo -}, build f2 c2]
   , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> r 100 50)
       ["Factions", "Kills", "Structs", "Mission", "Sector",
       "Points", "Heroes", "Medals"]
@@ -48,24 +49,45 @@ buildWarFrame w st en n d = vcat
     , r 200 200 {- TODO: winner logo -}
     , r 300 200 {- TODO: score -}
     ] # translateX 100
-  ] # centerXY <> rect 900 500 # bg gray
+  ] # centerXY <> rect 900 500 # bg cBG
   where
     r x y = rect x y # style
-    r' x y | y > 0 = rect x y # bg red # lc red # translateY (-44 + y / 2)
-    r' _ _ = mempty
-    style = bg gray # lc black # lwO 10
+    r' c x y | y > 0 = rect x y # bg c # lc c # translateY (-44 + y / 2)
+    r' _ _ _ = mempty
+    style = bg cBG # lc black # lwO 10
     showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
       [ show st, show en, "", show (diffDays en st) ++ " days"]
     t fs tx = text tx # bold # font "sans" # fontSizeL fs
     wonFaction = d ^?! winner
     lstFaction = d ^?! loser
     theDetails = d ^?! warDetails
-    f1 = if wonFaction < lstFaction then _1 else _2
-    f2 = if wonFaction < lstFaction then _2 else _1
-    build f = hcat $ map (\x -> buildOne (theDetails ^. f.x) (w ^. x))
+    cW = colorOf wonFaction
+    cL = colorOf lstFaction
+    (f1, c1) = if wonFaction < lstFaction then (_1, cW) else (_2, cL)
+    (f2, c2) = if wonFaction < lstFaction then (_2, cL) else (_1, cW)
+    build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x))
       [kills, structures, mission, sector, points, heroes, medals]
-    buildOne v m = buildText v <> r' 88 (88 * (fromIntegral v) / (fromIntegral m)) <> r 100 100
+    buildOne c v m = buildText v
+      <> r' c 88 (88 * (fromIntegral v) / (fromIntegral m))
+      <> r 100 100
     buildText v = show v # t 14 # translateY (-15)
+
+--- main colors
+colorOf :: Faction -> Colour Double
+colorOf Federation = cFed
+colorOf Empire = cEmp
+colorOf Union = cUni
+
+cBG, cPeace, cFed, cEmp, cUni :: Colour Double
+cBG = rgb 0.25 0.25 0.25
+cPeace = rgb 0.32 0.59 0.28 -- TODO: use
+cSpecial = undefined -- TODO: use
+cLocal = undefined -- TODO: use
+cFed = rgb 0.02 0.23 0.89
+cEmp = rgb 0.95 0.00 0.00
+cUni = rgb 0.85 0.68 0
+
+--- events
 
 events :: [Event]
 events =

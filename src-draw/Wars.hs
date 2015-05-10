@@ -80,7 +80,7 @@ colorOf Federation = cFed
 colorOf Empire = cEmp
 colorOf Union = cUni
 
-cBG, cPeace, cFed, cEmp, cUni :: Colour Double
+cBG, cPeace, cSpecial, cLocal, cFed, cEmp, cUni :: Colour Double
 cBG = rgb 0.25 0.25 0.25
 cPeace = rgb 0.32 0.59 0.28 -- TODO: use
 cSpecial = undefined -- TODO: use

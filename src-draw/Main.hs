@@ -21,7 +21,10 @@ main = do
     Tournament o -> mainRender o demoTournament
     -- other
     TSSMess      -> tssMess
-    Wars o       -> do
-      today <- fmap utctDay getCurrentTime
-      mainRender o $ wars today
+    Wars o       -> doWars o
     _            -> print args
+
+doWars :: DO -> IO ()
+doWars o = do
+  today <- fmap utctDay getCurrentTime
+  mainRender o $ wars today

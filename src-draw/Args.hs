@@ -1,4 +1,4 @@
-module Args (parseArgs, Commands(..)) where
+module Args (parseArgs, DO, Commands(..)) where
 
 import Diagrams.Backend.CmdLine
 import Options.Applicative

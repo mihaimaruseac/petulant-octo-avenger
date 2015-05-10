@@ -1,6 +1,6 @@
-import Diagrams.Backend.CmdLine (mainRender)
-
 import Data.Time (getCurrentTime, utctDay)
+import Diagrams.Backend.CmdLine (mainRender)
+import Diagrams.TwoD.Image (loadImageEmb)
 
 import Args
 import Demos

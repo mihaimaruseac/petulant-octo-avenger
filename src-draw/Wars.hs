@@ -9,12 +9,12 @@ import Diagrams.Prelude hiding (view)
 
 import Wars.Types
 
---wars :: Day -> Diagram B R2
+wars :: [Diagram B R2] -> Day -> Diagram B R2
 wars fi d = drawEvent fi maxes d $ events !! 3
   where
     maxes = map _details events ^.. folded . _War . _3 ^. traverse . both
 
---drawEvent :: WarDetails -> Day -> Event -> Diagram B R2
+drawEvent :: [Diagram B R2] -> WarDetails -> Day -> Event -> Diagram B R2
 drawEvent fi w d e
   | isPeace e         = textBox lightgreen peaceText
   | isLocalConflict e = textBox lightblue evName
@@ -36,7 +36,8 @@ textBox c t = text t # fc black <> frameBox
   where
     frameBox = rect 50 4 # bg c # lc c # alignY (-0.6)
 
---buildWarFrame :: WarDetails -> Day -> Day -> String -> EventDetails -> Diagram B R2
+buildWarFrame :: [Diagram B R2] -> WarDetails -> Day -> Day -> String
+  -> EventDetails -> Diagram B R2
 buildWarFrame fi w st en n d = vcat
   [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
   , hcat [i1 <> r 100 100, build f1 c1]

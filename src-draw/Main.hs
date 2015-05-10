@@ -1,6 +1,9 @@
 import Data.Time (getCurrentTime, utctDay)
+import Data.Monoid (mempty)
 import Diagrams.Backend.CmdLine (mainRender)
-import Diagrams.TwoD.Image (loadImageEmb)
+import Diagrams.Backend.Rasterific.CmdLine (B)
+import Diagrams.Prelude (Diagram, R2)
+import Diagrams.TwoD.Image (loadImageEmb, image)
 
 import Args
 import Demos
@@ -28,3 +31,10 @@ doWars :: DO -> IO ()
 doWars o = do
   today <- fmap utctDay getCurrentTime
   mainRender o $ wars today
+
+loadImage :: FilePath -> IO (Diagram B R2)
+loadImage path = do
+  img <- loadImageEmb path
+  case img of
+    Left _  -> putStrLn ("Invalid image path " ++ path) >> return mempty
+    Right i -> return $ image i

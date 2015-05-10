@@ -29,6 +29,11 @@ main = do
 
 doWars :: DO -> IO ()
 doWars o = do
+  fImgs <- mapM_ loadImage
+    [ "src-draw/res/wars/sign_fed_64x64.png"
+    , "src-draw/res/wars/sign_emp_64x64.png"
+    , "src-draw/res/wars/sign_uni_64x64.png"
+    ]
   today <- fmap utctDay getCurrentTime
   mainRender o $ wars today
 

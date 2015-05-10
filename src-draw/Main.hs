@@ -35,7 +35,7 @@ doWars o = do
     , "src-draw/res/wars/sign_uni_64x64.png"
     ]
   today <- fmap utctDay getCurrentTime
-  mainRender o $ wars today
+  mainRender o $ wars fImgs today
 
 loadImage :: FilePath -> IO (Diagram B R2)
 loadImage path = do

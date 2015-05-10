@@ -39,8 +39,8 @@ textBox c t = text t # fc black <> frameBox
 --buildWarFrame :: WarDetails -> Day -> Day -> String -> EventDetails -> Diagram B R2
 buildWarFrame fi w st en n d = vcat
   [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
-  , hcat [r 100 100 {- TODO: logo -}, build f1 c1]
-  , hcat [r 100 100 {- TODO: logo -}, build f2 c2]
+  , hcat [i1 <> r 100 100, build f1 c1]
+  , hcat [i2 <> r 100 100, build f2 c2]
   , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> r 100 50)
       ["Factions", "Kills", "Structs", "Mission", "Sector",
       "Points", "Heroes", "Medals"]
@@ -63,8 +63,10 @@ buildWarFrame fi w st en n d = vcat
     theDetails = d ^?! warDetails
     cW = colorOf wonFaction
     cL = colorOf lstFaction
-    (f1, c1) = if wonFaction < lstFaction then (_1, cW) else (_2, cL)
-    (f2, c2) = if wonFaction < lstFaction then (_2, cL) else (_1, cW)
+    iW = fi !! (fromEnum wonFaction)
+    iL = fi !! (fromEnum lstFaction)
+    (f1, c1, i1) = if wonFaction < lstFaction then (_1, cW, iW) else (_2, cL, iL)
+    (f2, c2, i2) = if wonFaction < lstFaction then (_2, cL, iL) else (_1, cW, iW)
     build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x))
       [kills, structures, mission, sector, points, heroes, medals]
     buildOne c v m = buildText v

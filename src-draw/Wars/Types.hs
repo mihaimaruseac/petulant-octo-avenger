@@ -39,7 +39,7 @@ data Faction
   = Federation
   | Empire
   | Union
-  deriving (Show, Eq)
+  deriving (Show, Eq, Enum)
 
 -- NOTE that this is not transitive!
 instance Ord Faction where

@@ -44,11 +44,11 @@ buildWarFrame fi w st en n d = vcat
   , hcat [i2 <> r 100 100, build f2 c2]
   , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> r 100 50)
       ["Factions", "Kills", "Structs", "Mission", "Sector",
-      "Points", "Heroes", "Medals"]
+      "Heroes", "Medals", "Points"]
   , hcat
-    [ (showTimeslots # translateY 25) <> r 300 200
+    [ showTimeslots <> r 300 200
     , scale 2 iW <> r 200 200
-    , r 300 200 {- TODO: score -}
+    , showScores <> r 300 200
     ] # translateX 100
   ] # centerXY <> rect 900 500 # bg cBG
   where
@@ -56,9 +56,26 @@ buildWarFrame fi w st en n d = vcat
     r' c x y | y > 0 = rect x y # bg c # lc c # translateY (-44 + y / 2)
     r' _ _ _ = mempty
     style = bg cBG # lc black # lwO 10
-    showTimeslots =  vcat' (with & sep .~ 30) . map (t 18) $
+    showTimeslots =  display4TextVals
       [ show st, show en, "", show (diffDays en st) ++ " days"]
-    t fs tx = text tx # bold # font "sans" # fontSizeL fs
+    showScores = let tab = "        " in display4TextVals
+      [ concat [pd pKills,      'k':tab, pd pHeroes, "H"]
+      , concat [pd pStructures, 's':tab, pd pMedals, "M"]
+      , concat [pd pMissions,   'm':tab, pd pPoints, "P"]
+      , concat [pd pSectors,    'S':tab, pd 0]
+      ]
+      where
+        pKills = getScore kills
+        pStructures = getScore structures
+        pMissions = getScore mission
+        pSectors = getScore sector
+        pHeroes = getScore heroes
+        pMedals = getScore medals
+        pPoints = getScore points
+        getScore f = jaccard (theDetails ^. _1.f) (theDetails ^. _2.f)
+        jaccard x y = fromIntegral (min x y) / fromIntegral (max x y)
+    display4TextVals = translateY 25 . vcat' (with & sep .~ 30) . map (t 18)
+    t fs tx = text tx # bold # fontSizeL fs
     wonFaction = d ^?! winner
     lstFaction = d ^?! loser
     theDetails = d ^?! warDetails
@@ -69,11 +86,20 @@ buildWarFrame fi w st en n d = vcat
     (f1, c1, i1) = if wonFaction < lstFaction then (_1, cW, iW) else (_2, cL, iL)
     (f2, c2, i2) = if wonFaction < lstFaction then (_2, cL, iL) else (_1, cW, iW)
     build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x))
-      [kills, structures, mission, sector, points, heroes, medals]
+      [kills, structures, mission, sector, heroes, medals, points]
     buildOne c v m = buildText v
       <> r' c 88 (88 * fromIntegral v / fromIntegral m)
       <> r 100 100
     buildText v = show v # t 14 # translateY (-15)
+
+pd :: Double -> String
+pd x
+  | t < 10 = concat [show y, ".0", show t]
+  | otherwise = concat [show y, ".", show t]
+  where
+    y = truncate x :: Integer
+    z = fromIntegral y
+    t = abs $ truncate (100 * (x - z)) :: Integer
 
 --- main colors
 colorOf :: Faction -> Colour Double

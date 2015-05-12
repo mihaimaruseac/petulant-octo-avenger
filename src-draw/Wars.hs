@@ -62,18 +62,14 @@ buildWarFrame fi w st en n d = vcat
       [ concat [pd pKills,      'k':tab, pd pHeroes, "H"]
       , concat [pd pStructures, 's':tab, pd pMedals, "M"]
       , concat [pd pMissions,   'm':tab, pd pPoints, "P"]
-      , concat [pd pSectors,    'S':tab, pd 0]
+      , concat [pd pSectors,    'S':tab, pd pAll]
       ]
       where
-        pKills = getScore kills
-        pStructures = getScore structures
-        pMissions = getScore mission
-        pSectors = getScore sector
-        pHeroes = getScore heroes
-        pMedals = getScore medals
-        pPoints = getScore points
+        l@(pKills:pStructures:pMissions:pSectors:pHeroes:pMedals:pPoints:_)
+          = map getScore lenses
         getScore f = jaccard (theDetails ^. _1.f) (theDetails ^. _2.f)
         jaccard x y = fromIntegral (min x y) / fromIntegral (max x y)
+        pAll = sum l / 7
     display4TextVals = translateY 25 . vcat' (with & sep .~ 30) . map (t 18)
     t fs tx = text tx # bold # fontSizeL fs
     wonFaction = d ^?! winner
@@ -85,8 +81,8 @@ buildWarFrame fi w st en n d = vcat
     iL = fi !! fromEnum lstFaction
     (f1, c1, i1) = if wonFaction < lstFaction then (_1, cW, iW) else (_2, cL, iL)
     (f2, c2, i2) = if wonFaction < lstFaction then (_2, cL, iL) else (_1, cW, iW)
-    build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x))
-      [kills, structures, mission, sector, heroes, medals, points]
+    build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x)) lenses
+    lenses = [kills, structures, mission, sector, heroes, medals, points]
     buildOne c v m = buildText v
       <> r' c 88 (88 * fromIntegral v / fromIntegral m)
       <> r 100 100

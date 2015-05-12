@@ -16,10 +16,10 @@ wars fi d = vcat $ map (drawEvent fi maxes d) events
 
 drawEvent :: [Diagram B R2] -> WarDetails -> Day -> Event -> Diagram B R2
 drawEvent fi w d e
-  | isPeace e         = textBox lightgreen peaceText
-  | isLocalConflict e = textBox lightblue evName
+  | isPeace e         = textBox cPeace peaceText
+  | isLocalConflict e = textBox cLocal evName
                         ===
-                        textBox lightblue intervalText
+                        textBox cLocal intervalText
   | isMajorEvent e    = textBox red $ mconcat [evName, " ", show $ e ^. startDate]
   | isWar e           = buildWarFrame fi w st en evName (e ^. details)
   | otherwise = error $ "Don't know to draw " ++ show e
@@ -108,10 +108,10 @@ cBG, cPeace, cSpecial, cLocal, cFed, cEmp, cUni :: Colour Double
 cBG = rgb 0.25 0.25 0.25
 cPeace = rgb 0.32 0.59 0.28 -- TODO: use
 cSpecial = undefined -- TODO: use
-cLocal = undefined -- TODO: use
+cLocal = rgb 0.50 0.52 0.54
 cFed = rgb 0.02 0.23 0.89
 cEmp = rgb 0.95 0.00 0.00
-cUni = rgb 0.85 0.68 0
+cUni = rgb 0.85 0.68 0.00
 
 --- events
 

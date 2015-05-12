@@ -68,6 +68,7 @@ buildWarFrame fi w st en n d = vcat
         l@(pKills:pStructures:pMissions:pSectors:pHeroes:pMedals:pPoints:_)
           = map getScore lenses
         getScore f = jaccard (theDetails ^. _1.f) (theDetails ^. _2.f)
+        jaccard 0 0 = 1
         jaccard x y = fromIntegral (min x y) / fromIntegral (max x y)
         pAll = sum l / 7
     display4TextVals = translateY 25 . vcat' (with & sep .~ 30) . map (t 18)

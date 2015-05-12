@@ -85,7 +85,7 @@ buildWarFrame fi w st en n d = vcat
     build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x)) lenses
     lenses = [kills, structures, mission, sector, heroes, medals, points]
     buildOne c v m = buildText v
-      <> r' c 88 (88 * fromIntegral v / fromIntegral m)
+      <> r' c 87 (87 * fromIntegral v / fromIntegral m)
       <> r 100 100
     buildText v = show v # t 14 # translateY (-15)
 

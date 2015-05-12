@@ -20,7 +20,7 @@ drawEvent fi w d e
   | isLocalConflict e = textBox cLocal evName
                         ===
                         textBox cLocal intervalText
-  | isMajorEvent e    = textBox red $ mconcat [evName, " ", show $ e ^. startDate]
+  | isMajorEvent e    = textBox cSpecial $ mconcat [evName, " ", show $ e ^. startDate]
   | isWar e           = buildWarFrame fi w st en evName (e ^. details)
   | otherwise = error $ "Don't know to draw " ++ show e
   where
@@ -106,8 +106,8 @@ colorOf Union = cUni
 
 cBG, cPeace, cSpecial, cLocal, cFed, cEmp, cUni :: Colour Double
 cBG = rgb 0.25 0.25 0.25
-cPeace = rgb 0.32 0.59 0.28 -- TODO: use
-cSpecial = undefined -- TODO: use
+cPeace = rgb 0.32 0.59 0.28
+cSpecial = rgb 0.80 0.70 0.05
 cLocal = rgb 0.50 0.52 0.54
 cFed = rgb 0.02 0.23 0.89
 cEmp = rgb 0.95 0.00 0.00

@@ -59,10 +59,10 @@ buildWarFrame fi w st en n d = vcat
     showTimeslots =  display4TextVals
       [ show st, show en, "", show (diffDays en st) ++ " days"]
     showScores = let tab = "        " in display4TextVals
-      [ concat [pd pKills,      'k':tab, pd pHeroes, "H"]
-      , concat [pd pStructures, 's':tab, pd pMedals, "M"]
-      , concat [pd pMissions,   'm':tab, pd pPoints, "P"]
-      , concat [pd pSectors,    'S':tab, pd pAll]
+      [ concat [pd pKills,      tab, pd pHeroes]
+      , concat [pd pStructures, tab, pd pMedals]
+      , concat [pd pMissions,   tab, pd pPoints]
+      , concat [pd pSectors,    tab, pd pAll]
       ]
       where
         l@(pKills:pStructures:pMissions:pSectors:pHeroes:pMedals:pPoints:_)

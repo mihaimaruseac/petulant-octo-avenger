@@ -50,12 +50,12 @@ buildWarFrame fi w st en n d = vcat
     , scale 2 iW <> r 200 200
     , showScores <> r 300 200
     ] # translateX 100
-  ] # centerXY <> rect 900 500 # bg cBG
+  ] # centerXY <> rect 900 508 # bg cBG # lc cBG # translateY 3
   where
     r x y = rect x y # style
     r' c x y | y > 0 = rect x y # bg c # lc c # translateY (-44 + y / 2)
     r' _ _ _ = mempty
-    style = bg cBG # lc black # lwO 10
+    style = bg cBG # lc black # lwO 8
     showTimeslots =  display4TextVals
       [ show st, show en, "", show (diffDays en st) ++ " days"]
     showScores = let tab = "        " in display4TextVals
@@ -85,7 +85,7 @@ buildWarFrame fi w st en n d = vcat
     build f c = hcat $ map (\x -> buildOne c (theDetails ^. f.x) (w ^. x)) lenses
     lenses = [kills, structures, mission, sector, heroes, medals, points]
     buildOne c v m = buildText v
-      <> r' c 87 (87 * fromIntegral v / fromIntegral m)
+      <> r' c 86 (86 * fromIntegral v / fromIntegral m)
       <> r 100 100
     buildText v = show v # t 14 # translateY (-15)
 

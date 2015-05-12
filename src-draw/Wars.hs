@@ -10,7 +10,7 @@ import Diagrams.Prelude hiding (view)
 import Wars.Types
 
 wars :: [Diagram B R2] -> Day -> Diagram B R2
-wars fi d = drawEvent fi maxes d $ events !! 3
+wars fi d = vcat $ map (drawEvent fi maxes d) events
   where
     maxes = map _details events ^.. folded . _War . _3 ^. traverse . both
 

@@ -34,7 +34,7 @@ drawEvent fi w d e
 textBox :: Colour Double -> String -> Diagram B R2
 textBox c t = text t # fc black <> frameBox
   where
-    frameBox = rect 50 4 # bg c # lc c # alignY (-0.6)
+    frameBox = rect 900 50 # bg c # lc c # alignY (-0.6)
 
 buildWarFrame :: [Diagram B R2] -> WarDetails -> Day -> Day -> String
   -> EventDetails -> Diagram B R2

@@ -115,8 +115,10 @@ cUni = rgb 0.85 0.68 0.00
 
 --- events
 
-events :: [Event]
-events =
+events, artemis, orion, pegasus :: [Event]
+events = artemis
+
+artemis =
   [ peace & startDate .~ artemisOpened & endDate ?~ vendettaStart
   , war & details .~ vendetta & name ?~ "Vendetta War"
         & startDate .~ vendettaStart & endDate ?~ vendettaEnd
@@ -168,3 +170,10 @@ events =
     prosperityEmp = Details 390711 311371  39740  39600      0 193 368
     lastWarUni    = Details 480084 207297  46187 226600      0 153 356
     lastWarFed    = Details 495682 265319  72163  78200  80000 178 377
+-- end artemis
+
+orion = undefined
+-- end orion
+
+pegasus = undefined
+-- end pegasus

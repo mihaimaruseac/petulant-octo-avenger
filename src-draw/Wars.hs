@@ -175,5 +175,17 @@ artemis =
 orion = undefined
 -- end orion
 
-pegasus = undefined
+pegasus =
+  [ peace & startDate .~ pegasusOpened & endDate ?~ shimokitaStart
+  , war & details .~ shimokita & name ?~ "Shimokita Anomaly"
+        & startDate .~ shimokitaStart & endDate ?~ shimokitaEnd
+  , peace & startDate .~ shimokitaEnd
+  ]
+  where
+    pegasusOpened  = fromGregorian 2007  6 10
+    shimokitaStart = fromGregorian 2015  2 26
+    shimokitaEnd   = fromGregorian 2015  4  7
+    shimokita = War Empire Union (shimokitaEmp, shimokitaFed)
+    shimokitaEmp = Details 399436 31257 19279 308900 40000 30  78
+    shimokitaFed = Details 153982 19985  2397 131600     0 43 160
 -- end pegasus

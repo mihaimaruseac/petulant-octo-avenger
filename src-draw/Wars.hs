@@ -116,7 +116,7 @@ cUni = rgb 0.85 0.68 0.00
 --- events
 
 events, artemis, orion, pegasus :: [Event]
-events = artemis
+events = concat [artemis, orion, pegasus]
 
 artemis =
   [ peace & startDate .~ artemisOpened & endDate ?~ vendettaStart

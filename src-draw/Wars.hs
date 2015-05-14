@@ -116,7 +116,7 @@ cUni = rgb 0.85 0.68 0.00
 --- events
 
 events, artemis, orion, pegasus :: [Event]
-events = concat [artemis, orion, pegasus]
+events = last [artemis, orion, pegasus]
 
 artemis =
   [ peace & startDate .~ artemisOpened & endDate ?~ vendettaStart
@@ -262,6 +262,6 @@ pegasus =
     shimokitaStart = fromGregorian 2015  2 26
     shimokitaEnd   = fromGregorian 2015  4  7
     shimokita = War Empire Union (shimokitaEmp, shimokitaFed)
-    shimokitaEmp = Details 399436 31257 19279 308900 40000 30  78
-    shimokitaFed = Details 153982 19985  2397 131600     0 43 160
+    shimokitaEmp = Details 399436 31257 19279 308900 40000 43 160
+    shimokitaFed = Details 153982 19985  2397 131600     0 30  78
 -- end pegasus

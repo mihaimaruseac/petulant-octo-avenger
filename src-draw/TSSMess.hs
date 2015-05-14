@@ -1167,7 +1167,7 @@ tssMess = print artemisGames
  - http://forum.pardus.at/archive/index.php?showtopic=62905&st=0
  - http://forum.pardus.at/archive/index.php?showtopic=65885&st=0
  -
- - Notes:
+ - Notes (as funny quotes):
  - http://forum.pardus.at/archive/index.php?showtopic=55254&st=15&#entry1112281 This is not a combat game
  - http://forum.pardus.at/archive/index.php?showtopic=55372&st=105&#entry1118753 We have maps
  - http://forum.pardus.at/archive/index.php?showtopic=55372&st=360&#entry1121896 Some numbers

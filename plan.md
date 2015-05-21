@@ -9,8 +9,8 @@
 - [x] get HTTP layers
 - [x] get HTTP main content
 - [x] extract and unzip content
-- [ ] parse content
-  - [ ] Extract HTML info from HTML + HTTP tags.
+- [x] parse content
+  - [x] Extract HTML info from HTML + HTTP tags.
 - [ ] save to db
   - [ ] define db layout
   - [ ] ACID state?
@@ -18,10 +18,10 @@
 
 # Stats to collect
 
-- [ ] personal stats
-- [ ] factions stats
-- [ ] monsters kills stats
-- [ ] pilots kills stats
+- [x] personal stats
+- [x] factions stats
+- [x] monsters kills stats
+- [x] pilots kills stats
 - [ ] alliances stats
 - [ ] top20 stats
 - [ ] respected factions stats

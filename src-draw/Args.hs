@@ -22,6 +22,8 @@ data Commands
   | TSSMess
   -- Wars
   | Wars DO
+  -- Career log
+  | Career
 
 instance Show Commands where
   show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]

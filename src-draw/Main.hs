@@ -25,7 +25,7 @@ main = do
     -- other
     TSSMess      -> tssMess
     Wars o       -> doWars o
-    -- TODO: career log analysis
+    Career       -> undefined
     _            -> print args
 
 doWars :: DO -> IO ()

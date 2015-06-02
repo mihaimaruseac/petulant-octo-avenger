@@ -75,7 +75,7 @@ data RoleInfo
   | RandomRole Int RandomRoleRange
   deriving (Show, Eq)
 
-data TropyAction
+data TrophyAction
   = Bloodlust
   | Impersonation
   | Firewall Cooldown
@@ -105,7 +105,7 @@ data Mechanic
   | AttackerIdOnProtection [Role]
   | Know [RoleInfo]
   | ReadDropboxes
-  | TrophyPoints [TropyAction]
+  | TrophyPoints [TrophyAction]
   | Paralyze Immune Overdose Count
   | Arrest
   | Wound Immune Cooldown

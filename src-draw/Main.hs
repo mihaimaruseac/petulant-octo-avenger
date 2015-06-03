@@ -1,9 +1,4 @@
-import Data.Time (getCurrentTime, utctDay)
-import Data.Monoid (mempty)
 import Diagrams.Backend.CmdLine (mainRender)
-import Diagrams.Backend.Rasterific.CmdLine (B)
-import Diagrams.Prelude (Diagram, R2)
-import Diagrams.TwoD.Image (loadImageEmb, image)
 
 import Args
 import Demos
@@ -24,23 +19,6 @@ main = do
     Tournament o -> mainRender o demoTournament
     -- other
     TSSMess      -> tssMess
-    Wars o       -> doWars o
+    Wars o       -> doWars (mainRender o)
     Career       -> undefined
     _            -> print args
-
-doWars :: DO -> IO ()
-doWars o = do
-  fImgs <- mapM loadImage
-    [ "src-draw/res/wars/sign_fed_64x64.png"
-    , "src-draw/res/wars/sign_emp_64x64.png"
-    , "src-draw/res/wars/sign_uni_64x64.png"
-    ]
-  today <- fmap utctDay getCurrentTime
-  mainRender o $ wars fImgs today
-
-loadImage :: FilePath -> IO (Diagram B R2)
-loadImage path = do
-  img <- loadImageEmb path
-  case img of
-    Left _  -> putStrLn ("Invalid image path " ++ path) >> return mempty
-    Right i -> return $ image i

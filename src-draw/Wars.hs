@@ -1,4 +1,4 @@
-module Wars (wars) where
+module Wars (doWars) where
 
 import Control.Lens hiding ((#))
 import Data.Maybe (catMaybes)
@@ -7,7 +7,19 @@ import Data.Time
 import Diagrams.Backend.Rasterific.CmdLine
 import Diagrams.Prelude hiding (view)
 
+import Utils
+
 import Wars.Types
+
+doWars :: (Diagram B R2 -> IO ()) -> IO ()
+doWars rf = do
+  fImgs <- mapM loadImage
+    [ "src-draw/res/wars/sign_fed_64x64.png"
+    , "src-draw/res/wars/sign_emp_64x64.png"
+    , "src-draw/res/wars/sign_uni_64x64.png"
+    ]
+  today <- fmap utctDay getCurrentTime
+  rf $ wars fImgs today
 
 wars :: [Diagram B R2] -> Day -> Diagram B R2
 wars fi d = vcat $ map (drawEvent fi maxes d) events

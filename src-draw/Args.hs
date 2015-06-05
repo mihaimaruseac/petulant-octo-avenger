@@ -19,11 +19,18 @@ data Commands
   -- demo for no diagram
   | NoDiagram
   -- TSS mess
-  | TSSMess
+  | TSSMess TSSMessCommands
   -- Wars
   | Wars DO
   -- Career log
   | Career
+
+data TSSMessCommands
+  = GameInfo
+  | RoleInfo
+  | PlayerInfo
+  | MechInfo
+  deriving Show
 
 instance Show Commands where
   show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]
@@ -33,8 +40,8 @@ instance Show Commands where
   show (Arrow (d, _)) = "Arrow " ++ show d
   show (Tournament (d, _)) = "Tournament " ++ show d
   show (Wars (d, _)) = "Wars " ++ show d
+  show (TSSMess c) = "TSSMess" ++ show c
   show NoDiagram = show "NoDiagram"
-  show TSSMess = show "TSSMess"
 
 parseArgs :: IO Commands
 parseArgs = execParser $ info (helper <*> parseModes) $

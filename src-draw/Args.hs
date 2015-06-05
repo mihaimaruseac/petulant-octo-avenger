@@ -41,7 +41,7 @@ instance Show Commands where
   show (Tournament (d, _)) = "Tournament " ++ show d
   show (Wars (d, _)) = "Wars " ++ show d
   show (TSSMess c) = "TSSMess" ++ show c
-  show NoDiagram = show "NoDiagram"
+  show NoDiagram = "NoDiagram"
 
 parseArgs :: IO Commands
 parseArgs = execParser $ info (helper <*> parseModes) $

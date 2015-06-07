@@ -54,9 +54,9 @@ parseModes = build (parseDemo Demo) "Draw tutorial demo diagram" "demo"
          <|> build (parseDemo VDemo) "Draw vector demo diagram" "vector"
          <|> build (parseSingle Arrow) "Draw demo arrow diagram" "arrow"
          <|> build (parseSingle Tournament) "Draw demo tournament diagram" "tournament"
+         <|> build (parseSingle Wars) "Pardus Wars diagrams" "wars"
          <|> build parseNoDiagram "Don't draw anything" "nodia"
          <|> build parseTSSMess "Pardus TSSMess diagrams" "tssmess"
-         <|> build (parseSingle Wars) "Pardus Wars diagrams" "wars"
   where
     build p d c = subparser (command c (p d) <> metavar c)
 

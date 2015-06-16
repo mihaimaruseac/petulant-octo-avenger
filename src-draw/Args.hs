@@ -71,8 +71,20 @@ buildMod d = mconcat
   , progDesc d
   ]
 
+buildParserHelper :: String -> Parser a -> ParserInfo a
+buildParserHelper d = flip info (buildMod d) . (helper <*>)
+
+buildSP :: (p -> ParserInfo a) -> p -> String -> Parser a
+buildSP parseFun descr c = subparser (command c (parseFun descr) <> metavar c)
+
+parseSingle :: (Parseable b) => (b -> a) -> String -> ParserInfo a
+parseSingle f d = buildParserHelper d $ f <$> parser
+
+parsePure :: a -> String -> ParserInfo a
+parsePure f d = buildParserHelper d $ pure f
+
 parseDemo :: (Int -> DO -> Commands) -> String -> ParserInfo Commands
-parseDemo ct d = flip info (buildMod d) . (helper <*>) $ ct
+parseDemo ct d = buildParserHelper d $ ct
   <$> option auto
     ( short 'n'
    <> long "number"
@@ -83,17 +95,8 @@ parseDemo ct d = flip info (buildMod d) . (helper <*>) $ ct
     )
   <*> parser
 
-parseSingle :: (Parseable b) => (b -> a) -> String -> ParserInfo a
-parseSingle f d = flip info (buildMod d) . (helper <*>) $ f <$> parser
-
-parsePure :: a -> String -> ParserInfo a
-parsePure f d = flip info (buildMod d) . (helper <*>) $ pure f
-
-buildSP :: (p -> ParserInfo a) -> p -> String -> Parser a
-buildSP parseFun descr c = subparser (command c (parseFun descr) <> metavar c)
-
 parseTSSMess :: String -> ParserInfo Commands
-parseTSSMess d = flip info (buildMod d) . (helper <*>) $ TSSMess <$> subparse <*> parser
+parseTSSMess d = buildParserHelper d $ TSSMess <$> subparse <*> parser
   where
     subparse = buildSP (parsePure GameInfo) "Game info" "g"
            <|> buildSP (parsePure RoleInfo) "Role info" "r"

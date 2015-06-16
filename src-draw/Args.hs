@@ -22,8 +22,6 @@ data Commands
   | TSSMess TSSMessCommands
   -- Wars
   | Wars DO
-  -- Career log
-  | Career
 
 data TSSMessCommands
   = GameInfo

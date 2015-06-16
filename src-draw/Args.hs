@@ -28,8 +28,8 @@ data TSSMessCommands
   | RoleInfo
   | PlayerInfo
   | MechInfo
+  deriving Show
 
-{-
 instance Show Commands where
   show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]
   show (ADemo n (d, _)) = mconcat ["Arrows ", show n, " ", show d]
@@ -38,15 +38,8 @@ instance Show Commands where
   show (Arrow (d, _)) = "Arrow " ++ show d
   show (Tournament (d, _)) = "Tournament " ++ show d
   show (Wars (d, _)) = "Wars " ++ show d
-  show (TSSMess c) = "TSSMess " ++ show c
+  show (TSSMess c (d, _)) = mconcat ["TSSMess ", show c, " ", show d]
   show NoDiagram = "NoDiagram"
-
-instance Show TSSMessCommands where
-  show (GameInfo (d, _)) = "GameInfo " ++ show d
-  show (RoleInfo (d, _)) = "RoleInfo " ++ show d
-  show (PlayerInfo (d, _)) = "PlayerInfo " ++ show d
-  show (MechInfo (d, _)) = "MechInfo " ++ show d
-  -}
 
 parseArgs :: IO Commands
 parseArgs = execParser $ info (helper <*> parseModes) $

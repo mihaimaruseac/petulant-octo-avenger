@@ -19,16 +19,15 @@ data Commands
   -- demo for no diagram
   | NoDiagram
   -- TSS mess
-  | TSSMess TSSMessCommands DO
+  | TSSMess TSSMessCommands
   -- Wars
   | Wars DO
 
 data TSSMessCommands
-  = GameInfo
-  | RoleInfo
-  | PlayerInfo
-  | MechInfo
-  deriving Show
+  = GameInfo DO
+  | RoleInfo DO
+  | PlayerInfo DO
+  | MechInfo DO
 
 instance Show Commands where
   show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]
@@ -38,8 +37,14 @@ instance Show Commands where
   show (Arrow (d, _)) = "Arrow " ++ show d
   show (Tournament (d, _)) = "Tournament " ++ show d
   show (Wars (d, _)) = "Wars " ++ show d
-  show (TSSMess c (d, _)) = mconcat ["TSSMess", show c, " ", show d]
+  show (TSSMess c) = "TSSMess " ++ show c
   show NoDiagram = "NoDiagram"
+
+instance Show TSSMessCommands where
+  show (GameInfo (d, _)) = "GameInfo " ++ show d
+  show (RoleInfo (d, _)) = "RoleInfo " ++ show d
+  show (PlayerInfo (d, _)) = "PlayerInfo " ++ show d
+  show (MechInfo (d, _)) = "MechInfo " ++ show d
 
 parseArgs :: IO Commands
 parseArgs = execParser $ info (helper <*> parseModes) $
@@ -78,16 +83,17 @@ parseDemo ct d = flip info (buildMod d) . (helper <*>) $ ct
     )
   <*> parser
 
-parseSingle :: (DO -> a) -> String -> ParserInfo a
+parseSingle :: (Parseable b) => (b -> a) -> String -> ParserInfo a
 parseSingle f d = flip info (buildMod d) . (helper <*>) $ f <$> parser
 
 parseNoDiagram :: String -> ParserInfo Commands
 parseNoDiagram d = flip info (buildMod d) . (helper <*>) $ pure NoDiagram
 
 parseTSSMess :: String -> ParserInfo Commands
-parseTSSMess d = flip info (buildMod d) . (helper <*>) $ TSSMess
-  <$> argument (error "1")
-    ( help "Type of diagram: GameInfo | RoleInfo | PlayerInfo | MechInfo"
-   <> metavar "TYPE"
-    )
-  <*> parser --undefined --flip info (buildMod d) . (helper <*>) $ pure TSSMess
+parseTSSMess d = flip info (buildMod d) . (helper <*>) $ TSSMess <$> subparse
+  where
+    subparse = build (parseSingle GameInfo) "Game info" "g"
+           <|> build (parseSingle RoleInfo) "Role info" "r"
+           <|> build (parseSingle PlayerInfo) "Player info" "p"
+           <|> build (parseSingle MechInfo) "Special mechanics" "m"
+    build p d c = subparser (command c (p d) <> metavar c)

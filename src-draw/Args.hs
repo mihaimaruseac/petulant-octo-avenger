@@ -78,7 +78,7 @@ parseDemo ct d = flip info (buildMod d) . (helper <*>) $ ct
     )
   <*> parser
 
-parseSingle :: (DO -> Commands) -> String -> ParserInfo Commands
+parseSingle :: (DO -> a) -> String -> ParserInfo a
 parseSingle f d = flip info (buildMod d) . (helper <*>) $ f <$> parser
 
 parseNoDiagram :: String -> ParserInfo Commands

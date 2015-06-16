@@ -20,5 +20,4 @@ main = do
     -- other
     TSSMess      -> tssMess
     Wars o       -> doWars (mainRender o)
-    Career       -> undefined
     _            -> print args

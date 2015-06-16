@@ -1,11 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module TSSMess (tssMess) where
+module TSSMess (doTssMess) where
 
 import Control.Lens
 import Data.Text
 import Data.Time
+import Diagrams.Backend.Rasterific.CmdLine
+import Diagrams.Prelude hiding (view)
+
+import Args
+import Utils
 
 {- types -}
 
@@ -1149,6 +1154,9 @@ g12 = G pDinonumber (fromGregorian 2014 8 26)
 artemisGames = [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12]
 
 tssMess = print artemisGames
+
+doTssMess :: TSSMessCommands -> (Diagram B R2 -> IO ()) -> IO ()
+doTssMess = undefined
 --
 
 {-

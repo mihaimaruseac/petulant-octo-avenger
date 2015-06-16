@@ -1,4 +1,4 @@
-module Args (parseArgs, DO, Commands(..)) where
+module Args (parseArgs, DO, Commands(..), TSSMessCommands(..)) where
 
 import Diagrams.Backend.CmdLine
 import Options.Applicative

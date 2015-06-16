@@ -18,6 +18,7 @@ main = do
     Arrow o      -> mainRender o demoArrow
     Tournament o -> mainRender o demoTournament
     -- other
-    TSSMess _ _  -> undefined --tssMess m
+    TSSMess m o  -> doTssMess m (mainRender o)
     Wars o       -> doWars (mainRender o)
-    --_            -> print args
+    -- default catch
+    _            -> print args

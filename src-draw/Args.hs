@@ -19,7 +19,7 @@ data Commands
   -- demo for no diagram
   | NoDiagram
   -- TSS mess
-  | TSSMess TSSMessCommands
+  | TSSMess TSSMessCommands DO
   -- Wars
   | Wars DO
 
@@ -38,7 +38,7 @@ instance Show Commands where
   show (Arrow (d, _)) = "Arrow " ++ show d
   show (Tournament (d, _)) = "Tournament " ++ show d
   show (Wars (d, _)) = "Wars " ++ show d
-  show (TSSMess c) = "TSSMess" ++ show c
+  show (TSSMess c (d, _)) = mconcat ["TSSMess", show c, " ", show d]
   show NoDiagram = "NoDiagram"
 
 parseArgs :: IO Commands
@@ -53,7 +53,7 @@ parseModes = build (parseDemo Demo) "Draw tutorial demo diagram" "demo"
          <|> build (parseSingle Arrow) "Draw demo arrow diagram" "arrow"
          <|> build (parseSingle Tournament) "Draw demo tournament diagram" "tournament"
          <|> build (parseSingle Wars) "Pardus Wars diagrams" "wars"
-         <|> build (parseSingle TSSMess) "Pardus TSSMess diagrams" "tssmess"
+         <|> build parseTSSMess "Pardus TSSMess diagrams" "tssmess"
          <|> build parseNoDiagram "Don't draw anything" "nodia"
   where
     build p d c = subparser (command c (p d) <> metavar c)
@@ -85,4 +85,6 @@ parseNoDiagram :: String -> ParserInfo Commands
 parseNoDiagram d = flip info (buildMod d) . (helper <*>) $ pure NoDiagram
 
 parseTSSMess :: String -> ParserInfo Commands
-parseTSSMess d = flip info (buildMod d) . (helper <*>) $ pure TSSMess
+parseTSSMess d = flip info (buildMod d). (helper <*>) $ TSSMess
+  <$> undefined
+  <*> parser --undefined --flip info (buildMod d) . (helper <*>) $ pure TSSMess

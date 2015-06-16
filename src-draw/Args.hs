@@ -19,16 +19,17 @@ data Commands
   -- demo for no diagram
   | NoDiagram
   -- TSS mess
-  | TSSMess TSSMessCommands
+  | TSSMess TSSMessCommands DO
   -- Wars
   | Wars DO
 
 data TSSMessCommands
-  = GameInfo DO
-  | RoleInfo DO
-  | PlayerInfo DO
-  | MechInfo DO
+  = GameInfo
+  | RoleInfo
+  | PlayerInfo
+  | MechInfo
 
+{-
 instance Show Commands where
   show (Demo n (d, _)) = mconcat ["Demo ", show n, " ", show d]
   show (ADemo n (d, _)) = mconcat ["Arrows ", show n, " ", show d]
@@ -45,6 +46,7 @@ instance Show TSSMessCommands where
   show (RoleInfo (d, _)) = "RoleInfo " ++ show d
   show (PlayerInfo (d, _)) = "PlayerInfo " ++ show d
   show (MechInfo (d, _)) = "MechInfo " ++ show d
+  -}
 
 parseArgs :: IO Commands
 parseArgs = execParser $ info (helper <*> parseModes) $
@@ -91,9 +93,9 @@ buildSP :: (p -> ParserInfo a) -> p -> String -> Parser a
 buildSP parseFun descr c = subparser (command c (parseFun descr) <> metavar c)
 
 parseTSSMess :: String -> ParserInfo Commands
-parseTSSMess d = flip info (buildMod d) . (helper <*>) $ TSSMess <$> subparse
+parseTSSMess d = flip info (buildMod d) . (helper <*>) $ TSSMess <$> subparse <*> parser
   where
-    subparse = buildSP (parseSingle GameInfo) "Game info" "g"
-           <|> buildSP (parseSingle RoleInfo) "Role info" "r"
-           <|> buildSP (parseSingle PlayerInfo) "Player info" "p"
-           <|> buildSP (parseSingle MechInfo) "Special mechanics" "m"
+    subparse = buildSP (parsePure GameInfo) "Game info" "g"
+           <|> buildSP (parsePure RoleInfo) "Role info" "r"
+           <|> buildSP (parsePure PlayerInfo) "Player info" "p"
+           <|> buildSP (parsePure MechInfo) "Special mechanics" "m"

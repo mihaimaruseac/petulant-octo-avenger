@@ -85,6 +85,9 @@ parseNoDiagram :: String -> ParserInfo Commands
 parseNoDiagram d = flip info (buildMod d) . (helper <*>) $ pure NoDiagram
 
 parseTSSMess :: String -> ParserInfo Commands
-parseTSSMess d = flip info (buildMod d). (helper <*>) $ TSSMess
-  <$> undefined
+parseTSSMess d = flip info (buildMod d) . (helper <*>) $ TSSMess
+  <$> argument (error "1")
+    ( help "Type of diagram: GameInfo | RoleInfo | PlayerInfo | MechInfo"
+   <> metavar "TYPE"
+    )
   <*> parser --undefined --flip info (buildMod d) . (helper <*>) $ pure TSSMess

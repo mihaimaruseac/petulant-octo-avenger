@@ -59,7 +59,7 @@ parseModes = buildSP (parseDemo Demo) "Draw tutorial demo diagram" "demo"
          <|> buildSP (parseSingle Tournament) "Draw demo tournament diagram" "tournament"
          <|> buildSP (parseSingle Wars) "Pardus Wars diagrams" "wars"
          <|> buildSP parseTSSMess "Pardus TSSMess diagrams" "tssmess"
-         <|> buildSP parseNoDiagram "Don't draw anything" "nodia"
+         <|> buildSP (parsePure NoDiagram) "Don't draw anything" "nodia"
 
 buildMod :: String -> InfoMod a
 buildMod d = mconcat
@@ -84,11 +84,11 @@ parseDemo ct d = flip info (buildMod d) . (helper <*>) $ ct
 parseSingle :: (Parseable b) => (b -> a) -> String -> ParserInfo a
 parseSingle f d = flip info (buildMod d) . (helper <*>) $ f <$> parser
 
+parsePure :: a -> String -> ParserInfo a
+parsePure f d = flip info (buildMod d) . (helper <*>) $ pure f
+
 buildSP :: (p -> ParserInfo a) -> p -> String -> Parser a
 buildSP parseFun descr c = subparser (command c (parseFun descr) <> metavar c)
-
-parseNoDiagram :: String -> ParserInfo Commands
-parseNoDiagram d = flip info (buildMod d) . (helper <*>) $ pure NoDiagram
 
 parseTSSMess :: String -> ParserInfo Commands
 parseTSSMess d = flip info (buildMod d) . (helper <*>) $ TSSMess <$> subparse

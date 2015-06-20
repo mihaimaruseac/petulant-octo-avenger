@@ -11,7 +11,5 @@ import Utils
 import TSSMess.Data
 import TSSMess.Types
 
-tssMess = print artemisGames
-
 doTssMess :: TSSMessCommands -> (Diagram B R2 -> IO ()) -> IO ()
 doTssMess = undefined

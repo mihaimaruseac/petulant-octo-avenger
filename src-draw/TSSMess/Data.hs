@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TSSMess.Data where
+module TSSMess.Data (games) where
 
 import Data.Time (fromGregorian)
 

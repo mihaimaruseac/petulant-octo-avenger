@@ -3,10 +3,9 @@
 module TSSMess.Types where
 
 import Control.Lens (makeLenses, (^.))
-import Data.Text (Text)
 import Data.Time (Day)
 
-newtype Player = P Text deriving (Show, Eq)
+type Player = String
 
 data Role
   = TSS
@@ -134,8 +133,8 @@ data Game = G
   , _announcementDate :: Day
   , _startDate :: Day
   , _endDate :: Day
-  , _title :: Text
-  , _quote :: Text
+  , _title :: String
+  , _quote :: String
   , _players :: [(Player, Role, Status)]
   , _mechanics :: [(Role, Mechanic)]
   , _specialMechanics :: [SpecialMechanic]

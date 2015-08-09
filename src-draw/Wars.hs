@@ -12,7 +12,7 @@ import Utils
 import Wars.Data
 import Wars.Types
 
-doWars :: (Diagram B R2 -> IO ()) -> IO ()
+doWars :: (Diagram B -> IO ()) -> IO ()
 doWars rf = do
   fImgs <- mapM loadImage
     [ "src-draw/res/wars/sign_fed_64x64.png"
@@ -22,12 +22,12 @@ doWars rf = do
   today <- fmap utctDay getCurrentTime
   rf $ wars fImgs today
 
-wars :: [Diagram B R2] -> Day -> Diagram B R2
+wars :: [Diagram B] -> Day -> Diagram B
 wars fi d = vcat $ map (drawEvent fi maxes d) events
   where
     maxes = map _details events ^.. folded . _War . _3 ^. traverse . both
 
-drawEvent :: [Diagram B R2] -> WarDetails -> Day -> Event -> Diagram B R2
+drawEvent :: [Diagram B] -> WarDetails -> Day -> Event -> Diagram B
 drawEvent fi w d e
   | isPeace e         = textBox cPeace peaceText
   | isLocalConflict e = textBox cLocal evName
@@ -44,13 +44,13 @@ drawEvent fi w d e
     evName = maybe "" (' ':) $ e ^. name
     peaceText = mconcat [durText, evName, " peace"]
 
-textBox :: Colour Double -> String -> Diagram B R2
+textBox :: Colour Double -> String -> Diagram B
 textBox c t = text t # fc black <> frameBox
   where
     frameBox = rect 900 50 # bg c # lc c # alignY (-0.6)
 
-buildWarFrame :: [Diagram B R2] -> WarDetails -> Day -> Day -> String
-  -> EventDetails -> Diagram B R2
+buildWarFrame :: [Diagram B] -> WarDetails -> Day -> Day -> String
+  -> EventDetails -> Diagram B
 buildWarFrame fi w st en n d = vcat
   [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
   , hcat [i1 <> r 100 100, build f1 c1]

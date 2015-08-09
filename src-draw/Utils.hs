@@ -2,10 +2,10 @@ module Utils (loadImage) where
 
 import Data.Monoid (mempty)
 import Diagrams.Backend.Rasterific.CmdLine (B)
-import Diagrams.Prelude (Diagram, R2)
+import Diagrams.Prelude (Diagram)
 import Diagrams.TwoD.Image (loadImageEmb, image)
 
-loadImage :: FilePath -> IO (Diagram B R2)
+loadImage :: FilePath -> IO (Diagram B)
 loadImage path = do
   img <- loadImageEmb path
   case img of

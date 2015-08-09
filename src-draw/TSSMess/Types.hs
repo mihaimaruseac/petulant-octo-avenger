@@ -27,7 +27,7 @@ data Role
   | Sniper --Marcus2013
   | Infected --Marcus2013
   | MercenaryAssassin --Dino2013
-  | EPSCrussaded --Dino2014
+  | EPSCrussader --Dino2014
   deriving (Show, Eq)
 
 data Status

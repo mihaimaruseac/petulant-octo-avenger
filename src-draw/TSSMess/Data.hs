@@ -8,7 +8,7 @@ games :: [Game]
 games = artemisGames
 
 artemisGames :: [Game]
-artemisGames = [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12]
+artemisGames = [g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, g11, g12, g13]
 
 {- games -}
 g1 :: Game
@@ -807,7 +807,7 @@ g11 = G pDinonumber (fromGregorian 2013 6 29)
 
 g12 :: Game
 g12 = G pDinonumber (fromGregorian 2014 8 26)
-  (fromGregorian 2014 9 13) (fromGregorian 2013 9 19)
+  (fromGregorian 2014 9 13) (fromGregorian 2014 9 19)
   "Flares of Polaris" "I expect to be severin' his bones soon"
   [ (pCarimo, EPS, Won)
   , (pChadDeoxy, Neutral, Survived)
@@ -878,9 +878,76 @@ g12 = G pDinonumber (fromGregorian 2014 8 26)
   , DocGunKill, DocGunKillSelf, DocGunTSSRandomTSSKill
   ]
 
+g13 :: Game
+g13 = G pXolarix (fromGregorian 2015 5 30)
+  (fromGregorian 2015 6 4) (fromGregorian 2015 6 11)
+  "Strawman" "When the time comes, kill me before they can get me."
+  [ (pMith, Wildcard Android, Won)
+  , (pJohnBlasor, Hacker, TSSed)
+  , (pTheInsaneOne, Neutral, Won)
+  , (pTheCloneRanger, MisguidedVigilante, Suicided)
+  , (pWildChocolate, Federation, BackfiredLynch)
+  , (pFlink, Doctor, TSSed)
+  , (pAmirIlberhe, TSS, Won)
+  , (pCameronKnight, VeteranFighter, TSSed)
+  , (pLauraTheLovedOne, Neutral, Lynched)
+  , (pBlah, Empire, TSSed)
+  , (pDTigerlead, Empire, TSSed)
+  , (pChadDeoxy, Neutral, TSSed)
+  , (pStormer, TSS, Won)
+  , (pNashSteelfist, Union, Bombed)
+  , (pSextusPompeius, Federation, Lynched)
+  , (pDreadReapers, Union, Suicided)
+  , (pGryffAvehd, EPS, Lynched)
+  , (pTatmaraNholl, Neutral, Lynched)
+  , (pZuriah, IllegalDealer, Lynched)
+  , (pTazzy, TSS, Won)
+  ]
+  [ (TSS, KillAtNight [] WConsensus $ PerDay $ I 1)
+  , (TSS, Communication WithinGroup)
+  , (TSS, AnonymousMessage OwnID $ PerDay $ I 1)
+  , (TSS, WinWhenDead [Federation, Empire, Union, Hacker,
+      IllegalDealer, VeteranFighter, EPS, Doctor, MisguidedVigilante])
+  , (TSS, TrophyPoints [Bloodlust])
+  , (Federation, Communication WithinGroup)
+  , (Empire, Communication WithinGroup)
+  , (Union, Communication WithinGroup)
+  , (Federation, WinWhenDead [TSS, Empire, Union])
+  , (Empire, WinWhenDead [TSS, Federation, Union])
+  , (Union, WinWhenDead [TSS, Federation, Empire])
+  , (Federation, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Empire, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Union, Bomb ExactMatch $ PerGame Used $ I 2)
+  , (Neutral, Communication DeadLetterDrop)
+  , (Neutral, WinWhenDead [Federation, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Empire, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, WinWhenDead [Union, VeteranFighter, Hacker, MisguidedVigilante])
+  , (Neutral, NoTSSKillWhenWon)
+  , (Hacker, HackID)
+  , (Hacker, RevealWildcardMechanic)
+  , (Hacker, AnonymousMessage OwnID $ PerDay $ I 1)
+  , (Hacker, WinWhenDead [TSS, EPS])
+  , (IllegalDealer, Gun $ Cooldown 0)
+  , (IllegalDealer, WinWhenDead [TSS, EPS])
+  , (VeteranFighter, KillAtNight [] WOConsensus $ PerGame Used $ I 1)
+  , (VeteranFighter, DiesWhenKills [Neutral])
+  , (VeteranFighter, WinWhenDead [TSS, MisguidedVigilante])
+  , (VeteranFighter, WinWhenDead [TSS, Doctor])
+  , (EPS, NightImmunity)
+  , (EPS, WinWhenDead [TSS, Hacker])
+  , (EPS, WinWhenDead [TSS, IllegalDealer])
+  , (Doctor, ProtectAtNight SelfDenied)
+  , (Doctor, WinWhenDead [TSS, VeteranFighter])
+  , (MisguidedVigilante, KillAtNight [Neutral] WOConsensus $ PerGame Used $ EqRole [Neutral])
+  , (MisguidedVigilante, WinWhenDead [Neutral, TSS])
+  ]
+  [Suicide 2, Votes Public, DocGunKillSelf
+  ]
+
 {- players -}
-pAgile, pAnger, pAnthonya, pAquilaSicarius, pArose, pAsriel, pBarackAlIssteg, pBeep, pBlackChocolate, pBlah, pBomb, pBrenettoftheRills, pBstr, pCaledor, pCalimond, pCarimo, pChadDeoxy, pCommandaguy, pCovington, pCrackpot, pCurfin, pDanteLongshadow, pDarsia, pDdaz, pDemonswrath, pDiablo, pDinonumber, pDodge, pEddieBLanner, pEddieRikes, pElGringoBandito, pElMalo, pEsmereldaWeatherwax, pFUrquhart, pFehera, pFenrir, pFera, pFlink, pGamerguy, pGarkosTheDevourer, pGarkostheButcher, pGeePig, pGrafEisen, pHamsterAlien, pHatelove, pHellequin, pHerneTheHunter, pHolidayKoval, pHorizon, pHuckleberry, pHugolum, pInvictio, pIrk, pJoshuaCalvert, pKennyYoobaStard, pKillforfood, pKurburis, pKurrai, pKylie, pLauraDumitrescu, pLauraTheLovedOne, pLornanRoche, pLoyalty, pMarcus, pMattGray, pMephistoles, pMicase, pMikillThomas, pMikkas, pMilkyway, pMiloStark, pMissSmokey, pMistyMoonlight, pMith, pNanuq, pNashSteelfist, pNeight, pNolt, pObsequey, pPelor, pPiggieWiggie, pProle, pRedKomodo, pReez, pRichert, pSalathr, pSalveCrossbones, pSarthker, pSaturnine, pSeneka, pSenty, pSeverin, pSextusPompeius, pShine, pSirius, pSkyCrossbones, pSmedley, pSolarGeo, pSonofWarson, pSream, pStarflight, pSupercooli, pSysice, pTEldor, pTacoguy, pTarraEclipse, pTatmaraNholl, pThanu, pTheCloneRanger, pTheInsaneOne, pThePwnlyCollective, pTheSheep, pThraxis, pTradeMachine, pTro, pTudytudysavaki, pTyMercer, pUristMclovin, pVegas, pWesR, pWildGina, pWilliamUrquhart, pXolarix, pXorism, pYarok :: Player
+pAgile, pAmirIlberhe, pAnger, pAnthonya, pAquilaSicarius, pArose, pAsriel, pBarackAlIssteg, pBeep, pBlackChocolate, pBlah, pBomb, pBrenettoftheRills, pBstr, pCaledor, pCalimond, pCameronKnight, pCarimo, pChadDeoxy, pCommandaguy, pCovington, pCrackpot, pCurfin, pDanteLongshadow, pDarsia, pDdaz, pDemonswrath, pDiablo, pDinonumber, pDodge, pDreadReapers, pDTigerlead, pEddieBLanner, pEddieRikes, pElGringoBandito, pElMalo, pEsmereldaWeatherwax, pFUrquhart, pFehera, pFenrir, pFera, pFlink, pGamerguy, pGarkosTheDevourer, pGarkostheButcher, pGeePig, pGrafEisen, pGryffAvehd, pHamsterAlien, pHatelove, pHellequin, pHerneTheHunter, pHolidayKoval, pHorizon, pHuckleberry, pHugolum, pInvictio, pIrk, pJohnBlasor, pJoshuaCalvert, pKennyYoobaStard, pKillforfood, pKurburis, pKurrai, pKylie, pLauraDumitrescu, pLauraTheLovedOne, pLornanRoche, pLoyalty, pMarcus, pMattGray, pMephistoles, pMicase, pMikillThomas, pMikkas, pMilkyway, pMiloStark, pMissSmokey, pMistyMoonlight, pMith, pNanuq, pNashSteelfist, pNeight, pNolt, pObsequey, pPelor, pPiggieWiggie, pProle, pRedKomodo, pReez, pRichert, pSalathr, pSalveCrossbones, pSarthker, pSaturnine, pSeneka, pSenty, pSeverin, pSextusPompeius, pShine, pSirius, pSkyCrossbones, pSmedley, pSolarGeo, pSonofWarson, pSream, pStarflight, pStormer, pSupercooli, pSysice, pTEldor, pTacoguy, pTarraEclipse, pTatmaraNholl, pTazzy, pThanu, pTheCloneRanger, pTheInsaneOne, pThePwnlyCollective, pTheSheep, pThraxis, pTradeMachine, pTro, pTudytudysavaki, pTyMercer, pUristMclovin, pVegas, pWesR, pWildGina, pWildChocolate, pWilliamUrquhart, pXolarix, pXorism, pYarok, pZuriah :: Player
 pAgile = "Agile"
+pAmirIlberhe = "Amir Ilberhe"
 pAnger = "Anger"
 pAnthonya = "Anthonya"
 pAquilaSicarius = "Aquila Sicarius"
@@ -895,12 +962,14 @@ pBrenettoftheRills = "Brenett of the Rills"
 pBstr = "Bstr"
 pCaledor = "Caledor"
 pCalimond = "Calimond"
+pCameronKnight = "Cameron Knight"
 pCarimo = "Carimo"
 pChadDeoxy = "Chad Deoxy"
 pCommandaguy = "Commandaguy"
 pCovington = "Covington"
 pCrackpot = "Crackpot"
 pCurfin = "Curfin"
+pDTigerlead = "D Tigerlead"
 pDanteLongshadow = "Dante Longshadow"
 pDarsia = "Darsia"
 pDdaz = "Ddaz"
@@ -908,6 +977,7 @@ pDemonswrath = "Demonswrath"
 pDiablo = "Diablo"
 pDinonumber = "Dinonumber"
 pDodge = "Dodge"
+pDreadReapers = "Dread Reapers"
 pEddieBLanner = "Eddie B Lanner"
 pEddieRikes = "Eddie Rikes"
 pElGringoBandito = "El Gringo Bandito"
@@ -923,6 +993,7 @@ pGarkosTheDevourer = "Garkos the Devourer"
 pGarkostheButcher = "Garkos the Butcher"
 pGeePig = "Gee Pig"
 pGrafEisen = "Graf Eisen"
+pGryffAvehd = "Gryff Avehd"
 pHamsterAlien = "Hamster Alien"
 pHatelove = "Hatelove"
 pHellequin = "Hellequin"
@@ -933,6 +1004,7 @@ pHuckleberry = "Huckleberry"
 pHugolum = "Hugolum"
 pInvictio = "Invictoo"
 pIrk = "Irk"
+pJohnBlasor = "John Blasor"
 pJoshuaCalvert = "Joshua Calvert"
 pKennyYoobaStard = "Kenny Yooba Stard"
 pKillforfood = "Killforfood"
@@ -981,12 +1053,14 @@ pSolarGeo = "Solar Geo"
 pSonofWarson = "Son of Warson"
 pSream = "Sream"
 pStarflight = "Starflight"
+pStormer = "Stormer"
 pSupercooli = "Supercooli"
 pSysice = "Sysice"
 pTEldor = "T Eldor"
 pTacoguy = "Tacoguy"
 pTarraEclipse = "Tarra Eclipse"
 pTatmaraNholl = "Tatmara Nholl"
+pTazzy = "Tazzy"
 pThanu = "Thanu"
 pTheCloneRanger = "The Clone Ranger"
 pTheInsaneOne = "The Insane One"
@@ -1000,11 +1074,13 @@ pTyMercer = "Ty Mercer"
 pUristMclovin = "Urist Mclovin"
 pVegas = "Vegas"
 pWesR = "Wes R"
+pWildChocolate = "Wild Chocolate"
 pWildGina = "Wild Gina"
 pWilliamUrquhart = "William Urquhart"
 pXolarix = "Xolarix"
 pXorism = "Xorism"
 pYarok = "Yarok"
+pZuriah = "Zuriah"
 
 {-
  - Games:
@@ -1021,6 +1097,7 @@ pYarok = "Yarok"
  - http://forum.pardus.at/archive/index.php?showtopic=62795&st=0
  - http://forum.pardus.at/archive/index.php?showtopic=62905&st=0
  - http://forum.pardus.at/archive/index.php?showtopic=65885&st=0
+ - http://forum.pardus.at/index.php?showtopic=67199&st=0
  -
  - Notes (as funny quotes):
  - http://forum.pardus.at/archive/index.php?showtopic=55254&st=15&#entry1112281 This is not a combat game

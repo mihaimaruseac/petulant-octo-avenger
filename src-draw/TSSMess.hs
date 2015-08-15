@@ -26,13 +26,26 @@ doTMGI rf = do
   rf $ gameInfos
 
 gameInfos :: Diagram B
-gameInfos = gameInfo $ head games
+gameInfos = vcat . map gameInfo $ games
 
 gameInfo :: Game -> Diagram B
-gameInfo g = textBox 900 50 green (g ^. dm) --undefined
-
-textBox :: Double -> Double -> Colour Double -> String -> Diagram B
-textBox w h c t = text t # fc black <> frameBox
+gameInfo g = vcat
+  [ mkTxt bold   $ concat [g ^. title, " (", g ^. dm, ")"]
+  , mkTxt italic $ concat ["\"", g ^. quote, "\""]
+  , mkTxt id     $ concat [show $ g ^. announcementDate, " ", show $ g ^. startDate, " ", show $ g ^. endDate]
+  ]
   where
-    frameBox = rect w h # bg c # lc c -- # alignY (-0.6)
+    w = 900
+    mkTxt style s = textBox 14 s style w 30 black green
 
+textBox :: Double -- font size
+  -> String -- text
+  -> (Diagram B -> Diagram B)
+  -> Double -- width of box
+  -> Double -- height of box
+  -> Colour Double -- foreground
+  -> Colour Double -- background
+  -> Diagram B
+textBox s t td w h c bc = text t # fc c # fontSizeG s # td <> frameBox
+  where
+    frameBox = rect w h # bg bc # lc bc

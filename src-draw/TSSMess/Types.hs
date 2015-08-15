@@ -27,6 +27,7 @@ data Role
   | Infected --Marcus2013
   | MercenaryAssassin --Dino2013
   | EPSCrussader --Dino2014
+  | Android -- Xolarix2015
   deriving (Show, Eq)
 
 data Status
@@ -41,6 +42,7 @@ data Status
   | RNGed
   | Sniperred
   | Assasinated
+  | BackfiredLynch
   -- the following are end-game conditions
   | DiedAtEndOfGame
   | Survived

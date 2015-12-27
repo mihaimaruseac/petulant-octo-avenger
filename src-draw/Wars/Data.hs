@@ -6,7 +6,7 @@ import Data.Time
 import Wars.Types
 
 events, artemis, orion, pegasus :: [Event]
-events = last [artemis, orion, pegasus]
+events = head [artemis, orion, pegasus]
 
 artemis =
   [ peace & startDate .~ artemisOpened & endDate ?~ vendettaStart
@@ -26,9 +26,16 @@ artemis =
         & startDate .~ lastWarStart & endDate ?~ lastWarEnd
   , peace & startDate .~ lastWarEnd & endDate ?~ warsonGate & name ?~ "deceitful"
   , majorEvent & startDate .~ warsonGate & name ?~ "Warsongate"
-  , peace & startDate .~ warsonGate & endDate ?~ splitStart & name ?~ "Treaty Enforced"
+  , peace & startDate .~ warsonGate & endDate ?~ splitStart & name ?~ "treaty enforced"
   , localConflict & startDate .~ splitStart & endDate ?~ splitEnd & name ?~ "Split Conflict (Feds Failed Taking Veedfa... Again)"
-  , peace & startDate .~ splitEnd & name ?~ "a strange"
+  , peace & startDate .~ splitEnd & name ?~ "a strange"-- & endDate ?~ mithakenStart
+  -- , war & details .~ mithaken & name ?~ "Mithaken"
+  --       & startDate .~ mithakenStart & endDate ?~ mithakenEnd
+  -- , war & details .~ esb & name ?~ "Empire Strikes Back"
+  --       & startDate .~ esbStart & endDate ?~ esbEnd
+  , war & details .~ galactic & name ?~ "Second Galactic"
+        & startDate .~ mithakenStart & endDate ?~ esbEnd
+  , peace & startDate .~ esbEnd & name ?~ "rebuilding"
   ]
   where
     artemisOpened   = fromGregorian 2007  6 10
@@ -45,11 +52,18 @@ artemis =
     warsonGate      = fromGregorian 2013  4  9
     splitStart      = fromGregorian 2014  9 11
     splitEnd        = fromGregorian 2015  1  3
+    mithakenStart   = fromGregorian 2015  9 12
+    --mithakenEnd     = fromGregorian 2015 11 11
+    --esbStart        = fromGregorian 2015 10  6
+    esbEnd          = fromGregorian 2015 11 14
     vendetta   = War Federation Empire (vendettaFed, vendettaEmp)
     dominionI  = War Union Federation (dominionIUni, dominionIFed)
     dominionII = War Federation Union (dominionIIFed, dominionIIUni)
     prosperity = War Federation Empire (prosperityFed, prosperityEmp)
     lastWar    = War Federation Union (lastWarFed, lastWarUni)
+    --mithaken   = War Federation Union (mithakenFed, mithakenUni)
+    --esb        = War Empire Federation (esbEmp, esbFed)
+    galactic   = War Empion Federation (galacticEmpion, galacticFed)
     vendettaFed   = Details 315944 185653  15591 114700      0 243 389
     vendettaEmp   = Details 230784 180219  13165  37400      0 210 322
     dominionIUni  = Details 626901 345115  28586 188200  65000 223 463
@@ -60,6 +74,12 @@ artemis =
     prosperityEmp = Details 390711 311371  39740  39600      0 193 368
     lastWarUni    = Details 480084 207297  46187 226600      0 153 356
     lastWarFed    = Details 495682 265319  72163  78200  80000 178 377
+    --mithakenFed   = Details 338727  94258  56869 157600  30000 261 108
+    --mithakenUni   = Details 317808  89251  44557 184000      0 197  78
+    --esbEmp        = Details 268741 105752  60189  67800  35000 195  90
+    --esbFed        = Details 221953  78997  42256 100700      0 174  78
+    galacticEmpion= Details 586549 195003 104746 251800  35000 392 302
+    galacticFed   = Details 560680 173255  99125 258300  30000 435 270
 -- end artemis
 
 orion =
@@ -155,4 +175,3 @@ pegasus =
     shimokitaEmp = Details 399436 31257 19279 308900 40000 43 160
     shimokitaFed = Details 153982 19985  2397 131600     0 30  78
 -- end pegasus
-

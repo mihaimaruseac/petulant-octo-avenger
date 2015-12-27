@@ -39,6 +39,7 @@ data Faction
   = Federation
   | Empire
   | Union
+  | Empion
   deriving (Show, Eq, Enum)
 
 -- NOTE that this is not transitive!

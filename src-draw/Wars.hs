@@ -18,6 +18,7 @@ doWars rf = do
     [ "src-draw/res/wars/sign_fed_64x64.png"
     , "src-draw/res/wars/sign_emp_64x64.png"
     , "src-draw/res/wars/sign_uni_64x64.png"
+    , "src-draw/res/wars/sign_eun_64x64.png"
     ]
   today <- fmap utctDay getCurrentTime
   rf $ wars fImgs today
@@ -45,17 +46,17 @@ drawEvent fi w d e
     peaceText = mconcat [durText, evName, " peace"]
 
 textBox :: Colour Double -> String -> Diagram B
-textBox c t = text t # fc black <> frameBox
+textBox c t = text t # fontSizeL 14 # fc black <> frameBox
   where
-    frameBox = rect 900 50 # bg c # lc c # alignY (-0.6)
+    frameBox = rect 900 50 # bg c # lc c
 
 buildWarFrame :: [Diagram B] -> WarDetails -> Day -> Day -> String
   -> EventDetails -> Diagram B
 buildWarFrame fi w st en n d = vcat
-  [ t 14 n # translate (r2 (350, -12)) <> r 800 50 # translateX 350
+  [ t 14 n # translate (r2 (350, 0)) <> r 800 50 # translateX 350
   , hcat [i1 <> r 100 100, build f1 c1]
   , hcat [i2 <> r 100 100, build f2 c2]
-  , hcat $ map (\tx -> (t 14 tx # translateY (-12))<> r 100 50)
+  , hcat $ map (\tx -> (t 14 tx)<> r 100 50)
       ["Factions", "Kills", "Structs", "Mission", "Sector",
       "Heroes", "Medals", "Points"]
   , hcat
@@ -84,7 +85,7 @@ buildWarFrame fi w st en n d = vcat
         jaccard 0 0 = 1
         jaccard x y = fromIntegral (min x y) / fromIntegral (max x y)
         pAll = sqrt $ sum (map (**2) l) / 7
-    display4TextVals = translateY 25 . vcat' (with & sep .~ 30) . map (t 18)
+    display4TextVals = translateY 44 . vcat' (with & sep .~ 30) . map (t 18)
     t fs tx = text tx # bold # fontSizeL fs
     wonFaction = d ^?! winner
     lstFaction = d ^?! loser
@@ -100,7 +101,7 @@ buildWarFrame fi w st en n d = vcat
     buildOne c v m = buildText v
       <> r' c 86 (86 * fromIntegral v / fromIntegral m)
       <> r 100 100
-    buildText v = show v # t 14 # translateY (-15)
+    buildText v = show v # t 14
 
 pd :: Double -> String
 pd x
@@ -116,8 +117,9 @@ colorOf :: Faction -> Colour Double
 colorOf Federation = cFed
 colorOf Empire = cEmp
 colorOf Union = cUni
+colorOf Empion = cEUn
 
-cBG, cPeace, cSpecial, cLocal, cFed, cEmp, cUni :: Colour Double
+cBG, cPeace, cSpecial, cLocal, cFed, cEmp, cUni, cEUn :: Colour Double
 cBG = rgb 0.25 0.25 0.25
 cPeace = rgb 0.32 0.59 0.28
 cSpecial = rgb 0.80 0.70 0.05
@@ -125,3 +127,4 @@ cLocal = rgb 0.50 0.52 0.54
 cFed = rgb 0.02 0.23 0.89
 cEmp = rgb 0.95 0.00 0.00
 cUni = rgb 0.85 0.68 0.00
+cEUn = rgb 0.98 0.14 0.00

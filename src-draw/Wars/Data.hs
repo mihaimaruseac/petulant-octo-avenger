@@ -29,11 +29,11 @@ artemis =
   , peace & startDate .~ warsonGate & endDate ?~ splitStart & name ?~ "treaty enforced"
   , localConflict & startDate .~ splitStart & endDate ?~ splitEnd & name ?~ "Split Conflict (Feds Failed Taking Veedfa... Again)"
   , peace & startDate .~ splitEnd & name ?~ "a strange"-- & endDate ?~ mithakenStart
-  -- , war & details .~ mithaken & name ?~ "Mithaken"
+  -- , war & details .~ mithaken & name ?~ "The Mithaken War"
   --       & startDate .~ mithakenStart & endDate ?~ mithakenEnd
-  -- , war & details .~ esb & name ?~ "Empire Strikes Back"
+  -- , war & details .~ esb & name ?~ "Empire Strikes Back War"
   --       & startDate .~ esbStart & endDate ?~ esbEnd
-  , war & details .~ galactic & name ?~ "Second Galactic"
+  , war & details .~ galactic & name ?~ "The Second Galactic War"
         & startDate .~ mithakenStart & endDate ?~ esbEnd
   , peace & startDate .~ esbEnd & name ?~ "rebuilding"
   ]
@@ -74,12 +74,12 @@ artemis =
     prosperityEmp = Details 390711 311371  39740  39600      0 193 368
     lastWarUni    = Details 480084 207297  46187 226600      0 153 356
     lastWarFed    = Details 495682 265319  72163  78200  80000 178 377
-    --mithakenFed   = Details 338727  94258  56869 157600  30000 261 108
-    --mithakenUni   = Details 317808  89251  44557 184000      0 197  78
-    --esbEmp        = Details 268741 105752  60189  67800  35000 195  90
-    --esbFed        = Details 221953  78997  42256 100700      0 174  78
-    galacticEmpion= Details 586549 195003 104746 251800  35000 392 302
-    galacticFed   = Details 560680 173255  99125 258300  30000 435 270
+    --mithakenFed   = Details 338727  94258  56869 157600  30000 108 261
+    --mithakenUni   = Details 317808  89251  44557 184000      0  78 197
+    --esbEmp        = Details 268741 105752  60189  67800  35000  90 195
+    --esbFed        = Details 221953  78997  42256 100700      0  78 174
+    galacticEmpion= Details 586549 195003 104746 251800  35000 302 392
+    galacticFed   = Details 560680 173255  99125 258300  30000 270 435
 -- end artemis
 
 orion =

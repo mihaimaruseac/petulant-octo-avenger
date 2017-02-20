@@ -3,7 +3,7 @@ module Args (parseArgs, DO, Commands(..), TSSMessCommands(..)) where
 import Diagrams.Backend.CmdLine
 import Options.Applicative
 
-import Data.Monoid (mconcat)
+import Data.Monoid (mconcat, (<>))
 
 type DO = (DiagramOpts, DiagramLoopOpts)
 

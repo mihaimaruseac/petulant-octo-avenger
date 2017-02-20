@@ -32,7 +32,14 @@ executable stats-collector
   ghc-options:       -Wall -O2
   main-is:           Main.hs
   hs-source-dirs:    src
-
+  other-modules:
+      Errors
+    , Globals
+    , IP
+    , ProcessChain
+    , TCP
+    , Tag
+    , Types
   build-depends:
     attoparsec >= 0.10,
     base >= 4.6,
@@ -53,7 +60,16 @@ executable drawer
   ghc-options:       -Wall -O2
   main-is:           Main.hs
   hs-source-dirs:    src-draw
-
+  other-modules:
+      Args
+    , Demos
+    , TSSMess
+    , TSSMess.Data
+    , TSSMess.Types
+    , Utils
+    , Wars
+    , Wars.Data
+    , Wars.Types
   build-depends:
     base >= 4.6,
     colour >= 2.3,

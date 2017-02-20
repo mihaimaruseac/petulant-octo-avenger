@@ -5,7 +5,6 @@ module Wars.Types where
 
 import Control.Lens
 import Data.Default
-import Data.Monoid
 import Data.Time
 
 data Event = Event

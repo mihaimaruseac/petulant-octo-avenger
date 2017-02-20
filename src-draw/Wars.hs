@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Wars (doWars) where
 
 import Control.Lens hiding ((#))

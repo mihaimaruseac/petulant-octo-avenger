@@ -47,6 +47,9 @@ data DBCommand
   | AM Skill Skill
   | ASP ASP
   | ATP ATP
+  | AllianceID Int
+  | AllianceMemberCount Int
+  | AllianceMember Payload
   | Bounties Bounties
   | CLK Skill Skill
   | Competency CompetencyLevel CompetencyPercentage

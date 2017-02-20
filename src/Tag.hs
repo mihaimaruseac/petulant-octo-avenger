@@ -6,6 +6,7 @@ module Tag {-(tagAndStore)-} where
 import Control.Applicative ((<$>))
 import Control.Monad.Error (throwError)
 import Control.Monad.State
+import Data.Either (rights)
 import Data.List
 import Text.HTML.TagSoup
 
@@ -29,8 +30,9 @@ evalStatsSM s m = case runStatsSM s m of
 
 tagAndStore :: TaggedHeaderRequest -> StatsM [DBCommand]
 tagAndStore thr@(_, uri, _, _, _, rpp)
-  | uri == "msgframe.php" = evalStatsSM rpp parseMsgFrame
-  | uri == "overview_stats.php" = evalStatsSM rpp parseOverviewStats
+  | "alliance.php" `C.isPrefixOf` uri = evalStatsSM rpp (parseAlliance $ C.drop 16 uri)
+  | uri == "msgframe.php" = return [] --evalStatsSM rpp parseMsgFrame
+  | uri == "overview_stats.php" = return [] --evalStatsSM rpp parseOverviewStats
   | uri `elem` ignorabimus = return []
   | otherwise = throwError $ UnhandledHTMLRequest thr
   where
@@ -43,6 +45,15 @@ tagAndStore thr@(_, uri, _, _, _, rpp)
       , "overview_ship.php"
       ]
 
+parseAlliance :: Payload -> StatsPSM [DBCommand]
+parseAlliance aid = do
+  _ <- searchByTags [TagOpen "table" [], TagOpen "tr" []
+                    ,TagOpen "th" [], TagText "Members"]
+  ts <- reverse . drop 6 . reverse . rights . map extractTagText
+      . filter isTagText <$> getUntilTag (TagClose "table")
+  c <- lift $ readAtStartIgnore readLongNumber aid
+  n <- lift $ readAtEnd readLongNumber $ last ts
+  return $ AllianceID c:AllianceMemberCount n:map AllianceMember (init ts)
 
 parseMsgFrame :: StatsPSM [DBCommand]
 parseMsgFrame = obtainFieldInfo tags build

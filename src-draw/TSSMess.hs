@@ -13,8 +13,8 @@ import TSSMess.Types
 
 doTssMess :: TSSMessCommands -> (Diagram B -> IO ()) -> IO ()
 doTssMess GameInfo rf = doTMGI rf
-doTssMess m rf = do
-  fImgs <- mapM loadImage
+doTssMess _ rf = do
+  _fImgs <- mapM loadImage
     [ "src-draw/res/wars/sign_fed_64x64.png"
     , "src-draw/res/wars/sign_emp_64x64.png"
     , "src-draw/res/wars/sign_uni_64x64.png"
@@ -45,6 +45,7 @@ gWidth1 = gWidth - 2 * gPad1
 gHeight1 :: Double
 gHeight1 = 30
 
+gPad1 :: Double
 gPad1 = 10
 {- end [Constants] -}
 

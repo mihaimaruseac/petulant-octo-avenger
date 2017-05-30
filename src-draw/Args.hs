@@ -2,6 +2,7 @@ module Args (parseArgs, DO, Commands(..), TSSMessCommands(..)) where
 
 import Diagrams.Backend.CmdLine
 import Options.Applicative
+import Text.Printf
 
 import Data.Monoid (mconcat, (<>))
 
@@ -22,6 +23,8 @@ data Commands
   | TSSMess TSSMessCommands DO
   -- Wars
   | Wars DO
+  -- Activity
+  | Activity FilePath Int DO
 
 data TSSMessCommands
   = GameInfo
@@ -39,6 +42,7 @@ instance Show Commands where
   show (Tournament (d, _)) = "Tournament " ++ show d
   show (Wars (d, _)) = "Wars " ++ show d
   show (TSSMess c (d, _)) = mconcat ["TSSMess ", show c, " ", show d]
+  show (Activity dir off (d, _)) = printf "Activity %s %d %s" dir off $ show d
   show NoDiagram = "NoDiagram"
 
 parseArgs :: IO Commands
@@ -54,6 +58,7 @@ parseModes = buildSP (parseDemo Demo) "Draw tutorial demo diagram" "demo"
          <|> buildSP (parseSingle Tournament) "Draw demo tournament diagram" "tournament"
          <|> buildSP (parseSingle Wars) "Pardus Wars diagrams" "wars"
          <|> buildSP parseTSSMess "Pardus TSSMess diagrams" "tssmess"
+         <|> buildSP (parseActivity Activity) "Pardus war activity diagrams" "activity"
          <|> buildSP (parsePure NoDiagram) "Don't draw anything" "nodia"
 
 buildMod :: String -> InfoMod a
@@ -84,6 +89,26 @@ parseDemo ct d = buildParserHelper d $ ct
    <> help "Demo number"
    <> metavar "INT"
    <> value 1
+   <> showDefault
+    )
+  <*> parser
+
+parseActivity :: (FilePath -> Int -> DO -> Commands) -> String -> ParserInfo Commands
+parseActivity ct d = buildParserHelper d $ ct
+  <$> strOption
+    ( short 'd'
+   <> long "datadir"
+   <> help "Directory of data files (data,sides,predictions)"
+   <> metavar "DIRECTORY"
+   <> value "./src-draw/WarActivity/war2017"
+   <> showDefault
+    )
+  <*> option auto
+    ( short 'j'
+   <> long "offset"
+   <> help "Offset"
+   <> metavar "OFFSET"
+   <> value 0
    <> showDefault
     )
   <*> parser
